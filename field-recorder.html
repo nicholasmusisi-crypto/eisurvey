@@ -342,63 +342,66 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
         <p style="font-size:13px;color:rgba(255,255,255,.6);margin-top:4px">Data collection platform</p>
       </div>
 
-      <!-- Role cards -->
-      <div id="role-cards">
-        <div class="role-card" onclick="showRoleLogin('admin')">
-          <div class="ico" style="background:rgba(245,184,24,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5B818" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size:15px;font-weight:600;color:#fff">Admin</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Full access — assign roles &amp; manage system</p>
+      <!-- Default: Data Collector login -->
+      <div id="dc-login-view">
+        <div style="margin-bottom:10px">
+          <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">Username</label>
+          <input type="text" id="dc-uname" autocomplete="username" placeholder="Your username" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('dc-pass').focus()">
+        </div>
+        <div style="margin-bottom:4px">
+          <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">Password</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="dc-pass" placeholder="Enter password" style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')doDCLogin()">
+            <button class="btn-white" onclick="doDCLogin()">Start</button>
           </div>
         </div>
-
-        <div class="role-card" onclick="showRoleLogin('contentmanager')">
-          <div class="ico" style="background:rgba(100,148,245,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6494f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size:15px;font-weight:600;color:#fff">Content Manager</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Upload tools, edit, export &amp; publish data</p>
-          </div>
+        <div id="dc-err" style="color:rgba(255,100,100,.9);font-size:12px;margin-top:8px;display:none"></div>
+        <div style="text-align:center;margin-top:32px">
+          <span onclick="showStaffAccess()" style="font-size:12px;color:rgba(255,255,255,.3);cursor:pointer;letter-spacing:.2px">Staff / Management access ›</span>
         </div>
+      </div>
 
-        <div class="role-card" onclick="showRoleLogin('datacollector')">
-          <div class="ico" style="background:rgba(31,168,150,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1FA896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <!-- Staff role selection (hidden) -->
+      <div id="role-cards" style="display:none">
+        <span class="back-link" onclick="backToDCLogin()">&#8592; Back to data collection</span>
+        <div style="margin-top:12px">
+          <div class="role-card" onclick="showRoleLogin('admin')">
+            <div class="ico" style="background:rgba(245,184,24,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5B818" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff">Admin</h3>
+              <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Full access — assign roles &amp; manage system</p>
+            </div>
           </div>
-          <div>
-            <h3 style="font-size:15px;font-weight:600;color:#fff">Data Collector</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Collect surveys and record audio</p>
+          <div class="role-card" onclick="showRoleLogin('contentmanager')">
+            <div class="ico" style="background:rgba(100,148,245,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6494f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff">Content Manager</h3>
+              <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Upload tools, edit, export &amp; publish data</p>
+            </div>
           </div>
-        </div>
-
-        <div class="role-card" onclick="showRoleLogin('viewer')">
-          <div class="ico" style="background:rgba(150,150,150,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <div>
-            <h3 style="font-size:15px;font-weight:600;color:#fff">Viewer</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">View dashboard and data — read only</p>
+          <div class="role-card" onclick="showRoleLogin('viewer')">
+            <div class="ico" style="background:rgba(150,150,150,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size:15px;font-weight:600;color:#fff">Viewer</h3>
+              <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">View dashboard and data — read only</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Unified credential login form (all roles) -->
+      <!-- Staff credential form (hidden) -->
       <div id="admin-login-form" style="display:none;background:rgba(255,255,255,.1);border-radius:16px;padding:18px;margin-top:8px">
         <h3 id="pin-login-title" style="font-size:14px;font-weight:600;color:#fff;margin-bottom:14px">Sign In</h3>
         <div id="user-picker" style="display:none;margin-bottom:10px"></div>
         <div style="margin-bottom:10px">
           <label id="credential-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">Email</label>
           <input type="text" id="credential-input" autocomplete="username" placeholder="Your email address" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('pin-input').focus()">
-        </div>
-        <div id="dc-password-wrap" style="display:none;margin-bottom:10px">
-          <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">Password</label>
-          <div style="display:flex;gap:8px">
-            <input type="password" id="dc-password-input" placeholder="Enter password" style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')doPinLogin()">
-            <button class="btn-white" onclick="doPinLogin()">Enter</button>
-          </div>
         </div>
         <div id="pin-wrap-row" style="margin-bottom:4px">
           <label id="pin-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">PIN</label>
@@ -408,15 +411,6 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
           </div>
         </div>
         <div id="pin-error" style="color:rgba(255,100,100,.9);font-size:12px;margin-top:8px;display:none">Incorrect credentials</div>
-        <span class="back-link" onclick="backToRoles()">&#8592; Back</span>
-      </div>
-
-      <!-- Enumerator name form -->
-      <div id="enum-login-form" style="display:none;background:rgba(255,255,255,.1);border-radius:16px;padding:18px;margin-top:8px">
-        <h3 style="font-size:14px;font-weight:600;color:#fff;margin-bottom:8px">Your name</h3>
-        <input type="text" id="enum-name-input" placeholder="Enter your full name" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;margin-bottom:8px" onkeydown="if(event.key==='Enter')doEnumLogin()">
-        <div class="recent-names" id="recent-names"></div>
-        <button class="btn-white" style="width:100%" onclick="doEnumLogin()">Start collecting</button>
         <span class="back-link" onclick="backToRoles()">&#8592; Back</span>
       </div>
     </div>
@@ -1141,21 +1135,35 @@ function applyRoleUI(){
 // ════════════════════════════════════════════════════════════
 // LOGIN / ROLE
 // ════════════════════════════════════════════════════════════
+function doDCLogin(){
+  const errEl = document.getElementById('dc-err');
+  const username = document.getElementById('dc-uname').value.trim();
+  const password = document.getElementById('dc-pass').value;
+  if(!username){ errEl.textContent='Enter your username'; errEl.style.display='block'; return; }
+  if(!password){ errEl.textContent='Enter your password'; errEl.style.display='block'; return; }
+  const user = appUsers.find(u=>u.role==='datacollector' && u.credential.toLowerCase()===username.toLowerCase());
+  if(!user){ errEl.textContent='No account found with that username'; errEl.style.display='block'; return; }
+  if(password!==user.pin){ errEl.textContent='Incorrect password'; errEl.style.display='block'; return; }
+  currentRole=user.role; currentUser=user.name;
+  sessionStorage.setItem('role',user.role); sessionStorage.setItem('user',user.name); sessionStorage.setItem('userId',user.id);
+  document.getElementById('enum-display-name').textContent = user.name;
+  switchScreen('scr-enum');
+}
+function showStaffAccess(){
+  document.getElementById('dc-login-view').style.display='none';
+  document.getElementById('role-cards').style.display='block';
+}
+function backToDCLogin(){
+  document.getElementById('role-cards').style.display='none';
+  document.getElementById('admin-login-form').style.display='none';
+  document.getElementById('dc-login-view').style.display='block';
+  document.getElementById('dc-uname').value='';
+  document.getElementById('dc-pass').value='';
+  document.getElementById('dc-err').style.display='none';
+}
 function showRoleLogin(role){
   loginRole = role;
-  selectedLoginUser = null;
-  const isDC = role==='datacollector';
   document.getElementById('pin-login-title').textContent = (ROLE_LABEL[role]||role) + ' Sign In';
-  // Credential label/placeholder
-  const credLabel = document.getElementById('credential-label');
-  const credInput = document.getElementById('credential-input');
-  credLabel.textContent = isDC ? 'Username' : 'Email';
-  credInput.placeholder = isDC ? 'Your username' : 'Your email address';
-  credInput.type = isDC ? 'text' : 'email';
-  // DC uses password field; supervisors use PIN field
-  document.getElementById('dc-password-wrap').style.display = isDC ? 'block' : 'none';
-  document.getElementById('pin-wrap-row').style.display    = isDC ? 'none'  : 'block';
-  // No-accounts notice
   const users = appUsers.filter(u=>u.role===role);
   const picker = document.getElementById('user-picker');
   if(!users.length){
@@ -1166,23 +1174,20 @@ function showRoleLogin(role){
   }
   document.getElementById('role-cards').style.display='none';
   document.getElementById('admin-login-form').style.display='block';
-  credInput.value='';
+  document.getElementById('credential-input').value='';
   document.getElementById('pin-input').value='';
-  document.getElementById('dc-password-input').value='';
   document.getElementById('pin-error').style.display='none';
-  setTimeout(()=>credInput.focus(),50);
+  setTimeout(()=>document.getElementById('credential-input').focus(),50);
 }
-function showAdminLogin(){ showRoleLogin('admin'); }
-function showEnumLogin(){ showRoleLogin('datacollector'); }
+function showAdminLogin(){ showStaffAccess(); }
+function showEnumLogin(){ backToDCLogin(); }
 function backToRoles(){
-  loginRole=null; selectedLoginUser=null;
+  loginRole=null;
   document.getElementById('role-cards').style.display='block';
   document.getElementById('admin-login-form').style.display='none';
-  document.getElementById('enum-login-form').style.display='none';
   document.getElementById('pin-error').style.display='none';
   document.getElementById('credential-input').value='';
   document.getElementById('pin-input').value='';
-  document.getElementById('dc-password-input').value='';
   document.getElementById('user-picker').style.display='none';
   document.getElementById('user-picker').innerHTML='';
 }
@@ -1190,25 +1195,17 @@ function backToRoles(){
 function doPinLogin(){
   const errEl = document.getElementById('pin-error');
   const credential = document.getElementById('credential-input').value.trim();
-  const isDC = loginRole==='datacollector';
-  const secret = isDC
-    ? document.getElementById('dc-password-input').value
-    : document.getElementById('pin-input').value;
-  if(!credential){ errEl.textContent='Enter your '+(isDC?'username':'email'); errEl.style.display='block'; return; }
-  if(!secret){ errEl.textContent='Enter your '+(isDC?'password':'PIN'); errEl.style.display='block'; return; }
+  const secret = document.getElementById('pin-input').value;
+  if(!credential){ errEl.textContent='Enter your email'; errEl.style.display='block'; return; }
+  if(!secret){ errEl.textContent='Enter your PIN'; errEl.style.display='block'; return; }
   const user = appUsers.find(u=>u.role===loginRole && u.credential.toLowerCase()===credential.toLowerCase());
-  if(!user){ errEl.textContent='No account found with that '+(isDC?'username':'email'); errEl.style.display='block'; return; }
-  if(secret!==user.pin){ errEl.textContent='Incorrect '+(isDC?'password':'PIN'); errEl.style.display='block'; return; }
+  if(!user){ errEl.textContent='No account found with that email'; errEl.style.display='block'; return; }
+  if(secret!==user.pin){ errEl.textContent='Incorrect PIN'; errEl.style.display='block'; return; }
   currentRole=user.role; currentUser=user.name;
   sessionStorage.setItem('role',user.role); sessionStorage.setItem('user',user.name); sessionStorage.setItem('userId',user.id);
-  if(isDC){
-    document.getElementById('enum-display-name').textContent = user.name;
-    switchScreen('scr-enum');
-  } else {
-    switchScreen('scr-admin');
-    renderAdminDashboard(); renderDataView(); renderUserList(); applyRoleUI();
-    if(user.role==='viewer') aTab('dashboard', document.getElementById('tab-btn-dashboard'));
-  }
+  switchScreen('scr-admin');
+  renderAdminDashboard(); renderDataView(); renderUserList(); applyRoleUI();
+  if(user.role==='viewer') aTab('dashboard', document.getElementById('tab-btn-dashboard'));
 }
 function doAdminLogin(){
   doPinLogin(); // kept for backward-compat; doPinLogin handles everything
@@ -1230,10 +1227,10 @@ function doEnumLogin(){
 function logout(){
   if(!confirm('Sign out?')) return;
   currentRole=null; currentUser=null;
-  sessionStorage.removeItem('role'); sessionStorage.removeItem('user');
+  sessionStorage.removeItem('role'); sessionStorage.removeItem('user'); sessionStorage.removeItem('userId');
   if(mediaRecorder) stopRecording();
   switchScreen('scr-login');
-  backToRoles();
+  backToDCLogin();
 }
 
 function switchScreen(id){
