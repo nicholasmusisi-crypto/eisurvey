@@ -948,6 +948,58 @@ function getOrCreateFolder_(name) {
   </div>
 </div>
 
+<!-- ════ SHARE CREDENTIALS SHEET ════ -->
+<div class="modal-bg" id="share-sheet" onclick="closeShareSheet()">
+  <div onclick="event.stopPropagation()" style="background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px;padding-bottom:max(24px,env(safe-area-inset-bottom))">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:700">Share Access</div>
+      <button onclick="closeShareSheet()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--t3);line-height:1">×</button>
+    </div>
+
+    <!-- Credential summary card -->
+    <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:16px;border:.5px solid var(--bd)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div id="share-role-dot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></div>
+        <div>
+          <div id="share-user-name" style="font-size:14px;font-weight:600"></div>
+          <div id="share-role-label" style="font-size:11px;color:var(--t3)"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px">
+        <span id="share-cred-label" style="color:var(--t3)">Email</span>
+        <span id="share-cred-value" style="font-family:monospace;font-weight:600"></span>
+        <span id="share-secret-label" style="color:var(--t3)">PIN</span>
+        <span id="share-secret-value" style="font-family:monospace;font-weight:600"></span>
+      </div>
+    </div>
+
+    <!-- Share buttons -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button id="share-email-btn" onclick="shareViaEmail()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:.5px solid var(--bd);background:var(--bg2);cursor:pointer;text-align:left">
+        <div style="width:38px;height:38px;border-radius:10px;background:#E8F4FD;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3E8FD6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--t)">Send via Email</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px">Opens your mail app with credentials pre-filled</div>
+        </div>
+      </button>
+
+      <button onclick="shareViaWhatsApp()" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:.5px solid var(--bd);background:var(--bg2);cursor:pointer;text-align:left">
+        <div style="width:38px;height:38px;border-radius:10px;background:#E8F8F0;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.99 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.045 22l4.975-1.36A9.953 9.953 0 0 0 11.99 22C17.513 22 22 17.523 22 12S17.513 2 11.99 2z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--t)">Send via WhatsApp</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px">Opens WhatsApp with a ready-to-send message</div>
+        </div>
+      </button>
+    </div>
+
+    <button onclick="closeShareSheet()" class="btn btn-secondary btn-sm btn-full" style="margin-top:14px">Done</button>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════
@@ -1514,13 +1566,61 @@ function saveNewUser(){
     }
   }
   saveUsers(); cancelAddUser(); renderUserList();
-  toast(isEdit?'User updated':'User added');
+  if(isEdit){ toast('User updated'); } else {
+    const newUser = appUsers[appUsers.length-1];
+    showShareSheet(newUser);
+  }
 }
 function deleteUser(id){
   const u=appUsers.find(u=>u.id===id); if(!u) return;
   if(!confirm(`Delete user "${u.name}"?`)) return;
   appUsers=appUsers.filter(u=>u.id!==id);
   saveUsers(); renderUserList(); toast('User deleted');
+}
+
+// ════════════════════════════════════════════════════════════
+// SHARE CREDENTIALS
+// ════════════════════════════════════════════════════════════
+const ROLE_COLOR = {admin:'#D4920A', contentmanager:'#6494f5', datacollector:'#1FA896', viewer:'#888'};
+let _shareUser = null;
+
+function showShareSheet(user){
+  _shareUser = user;
+  const isDC = user.role==='datacollector';
+  document.getElementById('share-user-name').textContent = user.name;
+  document.getElementById('share-role-label').textContent = ROLE_LABEL[user.role]||user.role;
+  document.getElementById('share-role-dot').style.background = ROLE_COLOR[user.role]||'#888';
+  document.getElementById('share-cred-label').textContent = isDC ? 'Username' : 'Email';
+  document.getElementById('share-cred-value').textContent = user.credential||'';
+  document.getElementById('share-secret-label').textContent = isDC ? 'Password' : 'PIN';
+  document.getElementById('share-secret-value').textContent = user.pin||'';
+  // Pre-fill email To: only for supervisor roles (they have an email as credential)
+  document.getElementById('share-email-btn').title = isDC ? '' : user.credential;
+  const sheet = document.getElementById('share-sheet');
+  sheet.style.display='flex';
+  requestAnimationFrame(()=>sheet.style.opacity='1');
+}
+function closeShareSheet(){
+  const sheet=document.getElementById('share-sheet');
+  sheet.style.display='none';
+}
+function _shareMessage(user){
+  const isDC = user.role==='datacollector';
+  const appUrl = window.location.href.split('?')[0];
+  return `Hi ${user.name},\n\nYou have been given access to E!Survey as *${ROLE_LABEL[user.role]||user.role}*.\n\n${isDC?'Username':'Email'}: ${user.credential}\n${isDC?'Password':'PIN'}: ${user.pin}\n\nOpen the app here:\n${appUrl}\n\nInstall it on your phone: tap Share → "Add to Home Screen" in Safari (iPhone) or tap the install prompt (Android).`;
+}
+function shareViaEmail(){
+  if(!_shareUser) return;
+  const isDC = _shareUser.role==='datacollector';
+  const to = isDC ? '' : encodeURIComponent(_shareUser.credential);
+  const subject = encodeURIComponent('Your E!Survey access credentials');
+  const body = encodeURIComponent(_shareMessage(_shareUser));
+  window.open(`mailto:${to}?subject=${subject}&body=${body}`,'_blank');
+}
+function shareViaWhatsApp(){
+  if(!_shareUser) return;
+  const text = encodeURIComponent(_shareMessage(_shareUser));
+  window.open(`https://wa.me/?text=${text}`,'_blank');
 }
 
 // ════════════════════════════════════════════════════════════
