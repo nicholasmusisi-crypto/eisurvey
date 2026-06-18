@@ -1,4 +1,4 @@
-const CACHE = 'eisurvey-v5';
+const CACHE = 'eisurvey-v6';
 const SHELL = ['./field-recorder.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', ev => {
