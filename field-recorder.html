@@ -426,6 +426,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
     </div>
     <div class="hdr-actions">
       <div id="form-badge-admin" style="display:none;font-size:10px;font-weight:600;padding:3px 9px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff"></div>
+      <button id="collect-btn" class="btn-logout" onclick="switchToCollect()" style="background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4)">Collect</button>
       <button class="btn-logout" onclick="logout()">Sign out</button>
     </div>
   </header>
@@ -706,6 +707,7 @@ function getOrCreateFolder_(name) {
       </div>
       <div class="hdr-actions">
         <div id="draft-badge" style="display:none;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--al);color:var(--a)"></div>
+        <button id="back-to-admin-btn" onclick="backToAdmin()" style="display:none;padding:6px 12px;border-radius:8px;border:.5px solid var(--bd2);background:var(--bg2);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer">← Admin</button>
         <button class="btn-logout dark" onclick="logout()">Sign out</button>
       </div>
     </header>
@@ -1100,11 +1102,8 @@ function saveUsers(){ localStorage.setItem('fr_users', JSON.stringify(appUsers))
 
 function canDo(cap){
   if(!currentRole) return false;
-  if(currentRole==='admin') return true;
-  const caps = {
-    contentmanager: ['uploadForms','editForms','exportData','publishData','viewData','deleteEntry'],
-    viewer: ['viewData']
-  };
+  if(currentRole==='admin' || currentRole==='contentmanager') return true;
+  const caps = { viewer: ['viewData'] };
   return (caps[currentRole]||[]).includes(cap);
 }
 
@@ -1231,6 +1230,18 @@ function logout(){
   if(mediaRecorder) stopRecording();
   switchScreen('scr-login');
   backToDCLogin();
+}
+function switchToCollect(){
+  document.getElementById('enum-display-name').textContent = currentUser||'';
+  const btn = document.getElementById('back-to-admin-btn');
+  if(btn) btn.style.display='block';
+  switchScreen('scr-enum');
+  renderEnumHome();
+}
+function backToAdmin(){
+  const btn = document.getElementById('back-to-admin-btn');
+  if(btn) btn.style.display='none';
+  switchScreen('scr-admin');
 }
 
 function switchScreen(id){
