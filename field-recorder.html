@@ -11,6 +11,11 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" id="ati" href="icon.svg">
 <title>E!Survey</title>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -411,8 +416,31 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
           </div>
         </div>
         <div id="pin-error" style="color:rgba(255,100,100,.9);font-size:12px;margin-top:8px;display:none">Incorrect credentials</div>
-        <span class="back-link" onclick="backToRoles()">&#8592; Back</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <span class="back-link" onclick="backToRoles()" style="position:static;margin:0">&#8592; Back</span>
+          <span onclick="showForgotPassword()" style="font-size:12px;color:rgba(255,255,255,.4);cursor:pointer">Forgot password?</span>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Forgot Password Overlay -->
+<div id="forgot-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:24px">
+  <div style="background:#1e1e2e;border-radius:20px;padding:28px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+    <h3 style="color:#fff;font-size:16px;font-weight:700;margin:0 0 6px">Reset Password</h3>
+    <div id="reset-wrap">
+      <p style="color:rgba(255,255,255,.6);font-size:13px;margin:0 0 18px">Enter the email address linked to your account and we'll send your credentials.</p>
+      <input type="email" id="reset-email-input" placeholder="Your email address" style="width:100%;padding:11px 13px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px">
+      <button id="reset-send-btn" onclick="doPasswordReset()" style="width:100%;padding:12px;background:#8B1A1A;border:none;border-radius:9px;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Send Reset Email</button>
+    </div>
+    <div id="reset-success" style="display:none;text-align:center;padding:10px 0">
+      <div style="font-size:32px;margin-bottom:10px">✅</div>
+      <p style="color:#fff;font-size:14px;font-weight:600;margin:0 0 4px">Email Sent</p>
+      <p style="color:rgba(255,255,255,.6);font-size:13px;margin:0">Check your inbox for your credentials.</p>
+    </div>
+    <div style="text-align:center;margin-top:18px">
+      <span onclick="closeForgotPassword()" style="font-size:13px;color:rgba(255,255,255,.45);cursor:pointer">Close</span>
     </div>
   </div>
 </div>
@@ -1012,6 +1040,28 @@ let pForms=(()=>{
   return arr;
 })();
 let pForm=null; // set to the active form when a survey is started or resumed
+
+// ════════════════════════════════════════════════════════════
+// FIREBASE + EMAILJS
+// ════════════════════════════════════════════════════════════
+const _fbCfg = {
+  apiKey:"AIzaSyB1p0k-fnVNrYVR3iasLk5gzIurFovT1w4",
+  authDomain:"e-survey-32d40.firebaseapp.com",
+  projectId:"e-survey-32d40",
+  storageBucket:"e-survey-32d40.firebasestorage.app",
+  messagingSenderId:"891624134867",
+  appId:"1:891624134867:web:c9cfe8f429692bdd091c26"
+};
+firebase.initializeApp(_fbCfg);
+const db = firebase.firestore();
+
+const EJS_SVC  = 'service_asopshc';
+const EJS_WELCOME = 'template_wdps2fi';
+const EJS_RESET   = 'template_zzwqy6g';
+const EJS_KEY  = 'p522hjs-x5_VoSCzk';
+const APP_URL  = 'https://nicholasmusisi-crypto.github.io/eisurvey/field-recorder.html';
+emailjs.init(EJS_KEY);
+
 let syncCfg     = JSON.parse(localStorage.getItem('fr_sync')      || '{"url":""}');
 let webhookCfg  = JSON.parse(localStorage.getItem('fr_webhook')   || '{"url":"","auth":""}');
 let adminPin    = localStorage.getItem('fr_pin') || '1234';
@@ -1080,25 +1130,40 @@ function countQ(qs){
 // ════════════════════════════════════════════════════════════
 const ROLE_LABEL = {admin:'Admin', contentmanager:'Content Manager', datacollector:'Data Collector', viewer:'Viewer'};
 
-function initUsers(){
-  appUsers = JSON.parse(localStorage.getItem('fr_users')||'null');
-  if(!appUsers){
-    appUsers = [{id:Date.now(), name:'Admin', role:'admin', credential:'admin@local', pin: localStorage.getItem('fr_pin')||'1234'}];
-    saveUsers();
-  } else {
-    let changed=false;
-    appUsers.forEach(u=>{
-      if(u.role==='superadmin'){ u.role='admin'; changed=true; }
-      if(!u.credential){
-        u.credential = u.role==='datacollector' ? (u.username||'dc-'+String(u.id).slice(-4)) : (u.email||(u.role==='admin'?'admin@local':'user@local'));
-        changed=true;
-      }
-    });
-    if(changed) saveUsers();
+async function initUsers(){
+  const local = JSON.parse(localStorage.getItem('fr_users')||'null');
+  try {
+    const snap = await db.collection('users').orderBy('id').get();
+    if(!snap.empty){
+      appUsers = snap.docs.map(d => d.data());
+    } else if(local){
+      appUsers = local;
+    } else {
+      appUsers = [{id:Date.now(), name:'Admin', role:'admin', credential:'admin@local', pin: localStorage.getItem('fr_pin')||'1234'}];
+    }
+  } catch(_){
+    appUsers = local || [{id:Date.now(), name:'Admin', role:'admin', credential:'admin@local', pin: localStorage.getItem('fr_pin')||'1234'}];
   }
+  let changed=false;
+  appUsers.forEach(u=>{
+    if(u.role==='superadmin'){ u.role='admin'; changed=true; }
+    if(!u.credential){
+      u.credential = u.role==='datacollector' ? (u.username||'dc-'+String(u.id).slice(-4)) : (u.email||(u.role==='admin'?'admin@local':'user@local'));
+      changed=true;
+    }
+  });
+  if(changed) saveUsers();
+  localStorage.setItem('fr_users', JSON.stringify(appUsers));
   if(currentRole==='superadmin'){ currentRole='admin'; sessionStorage.setItem('role','admin'); }
 }
-function saveUsers(){ localStorage.setItem('fr_users', JSON.stringify(appUsers)); }
+function saveUsers(){
+  localStorage.setItem('fr_users', JSON.stringify(appUsers));
+  try {
+    const batch = db.batch();
+    appUsers.forEach(u => batch.set(db.collection('users').doc(String(u.id)), u));
+    batch.commit();
+  } catch(_){}
+}
 
 function canDo(cap){
   if(!currentRole) return false;
@@ -1576,6 +1641,7 @@ function saveNewUser(){
   saveUsers(); cancelAddUser(); renderUserList();
   if(isEdit){ toast('User updated'); } else {
     const newUser = appUsers[appUsers.length-1];
+    sendWelcomeEmail(newUser);
     showShareSheet(newUser);
   }
 }
@@ -1629,6 +1695,57 @@ function shareViaWhatsApp(){
   if(!_shareUser) return;
   const text = encodeURIComponent(_shareMessage(_shareUser));
   window.open(`https://wa.me/?text=${text}`,'_blank');
+}
+
+// ════════════════════════════════════════════════════════════
+// EMAIL NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
+function sendWelcomeEmail(user){
+  if(user.role==='datacollector') return;
+  const email = user.credential;
+  if(!email || email.endsWith('@local')) return;
+  emailjs.send(EJS_SVC, EJS_WELCOME, {
+    to_name:  user.name,
+    to_email: email,
+    role:     ROLE_LABEL[user.role]||user.role,
+    login_id: email,
+    password: user.pin,
+    app_url:  APP_URL
+  }).catch(()=>{});
+}
+
+function showForgotPassword(){
+  document.getElementById('forgot-overlay').style.display='flex';
+  document.getElementById('reset-wrap').style.display='block';
+  document.getElementById('reset-success').style.display='none';
+  document.getElementById('reset-email-input').value='';
+}
+function closeForgotPassword(){
+  document.getElementById('forgot-overlay').style.display='none';
+}
+async function doPasswordReset(){
+  const email = document.getElementById('reset-email-input').value.trim();
+  if(!email){ toast('Enter your email address'); return; }
+  const u = appUsers.find(x => x.credential===email && x.role!=='datacollector');
+  const btn = document.getElementById('reset-send-btn');
+  btn.disabled=true; btn.textContent='Sending…';
+  try {
+    if(u){
+      await emailjs.send(EJS_SVC, EJS_RESET, {
+        to_name:  u.name,
+        to_email: email,
+        role:     ROLE_LABEL[u.role]||u.role,
+        login_id: email,
+        password: u.pin,
+        app_url:  APP_URL
+      });
+    }
+    document.getElementById('reset-wrap').style.display='none';
+    document.getElementById('reset-success').style.display='block';
+  } catch(e){
+    toast('Could not send email — check connection');
+  }
+  btn.disabled=false; btn.textContent='Send Reset Email';
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2650,9 +2767,9 @@ function renderQualityReportHTML(r){
 // ════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async ()=>{
   // Initialise user accounts (migrates from legacy single-PIN setup)
-  initUsers();
+  await initUsers();
 
   // Restore admin fields
   document.getElementById('gas-url').value=syncCfg.url||'';
