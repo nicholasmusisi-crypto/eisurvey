@@ -614,6 +614,7 @@ function getOrCreateFolder_(name) {
           <input type="text" id="new-user-name" placeholder="e.g. Jane Doe" oninput="if(document.getElementById('new-user-role').value==='datacollector')onAddUserRoleChange()">
           <label class="flbl" style="margin-top:8px">Role</label>
           <select id="new-user-role" onchange="onAddUserRoleChange()">
+            <option value="admin">Admin</option>
             <option value="contentmanager">Content Manager</option>
             <option value="viewer">Viewer</option>
             <option value="datacollector">Data Collector</option>
@@ -1147,7 +1148,7 @@ function doPinLogin(){
   if(!user){ errEl.textContent='No account found with that '+(isDC?'username':'email'); errEl.style.display='block'; return; }
   if(secret!==user.pin){ errEl.textContent='Incorrect '+(isDC?'password':'PIN'); errEl.style.display='block'; return; }
   currentRole=user.role; currentUser=user.name;
-  sessionStorage.setItem('role',user.role); sessionStorage.setItem('user',user.name);
+  sessionStorage.setItem('role',user.role); sessionStorage.setItem('user',user.name); sessionStorage.setItem('userId',user.id);
   if(isDC){
     document.getElementById('enum-display-name').textContent = user.name;
     switchScreen('scr-enum');
@@ -1391,20 +1392,26 @@ function changePin(){
 // ════════════════════════════════════════════════════════════
 function renderUserList(){
   const el=document.getElementById('user-list'); if(!el) return;
-  const others=appUsers.filter(u=>u.role!=='admin');
-  if(!others.length){ el.innerHTML='<div style="font-size:13px;color:var(--t3);padding:8px 0">No other users yet — tap "+ Add user" to create one.</div>'; return; }
-  el.innerHTML=others.map(u=>`
+  const currentId = parseInt(sessionStorage.getItem('userId')||'0');
+  if(!appUsers.length){ el.innerHTML='<div style="font-size:13px;color:var(--t3);padding:8px 0">No users yet.</div>'; return; }
+  el.innerHTML=appUsers.map(u=>{
+    const isMe = u.id===currentId;
+    return `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:.5px solid var(--bd)">
       <div>
-        <div style="font-size:13px;font-weight:500;margin-bottom:2px">${esc(u.name)}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+          <span style="font-size:13px;font-weight:500">${esc(u.name)}</span>
+          ${isMe?'<span style="font-size:10px;font-weight:600;color:var(--g);background:var(--gl);padding:1px 6px;border-radius:8px">you</span>':''}
+        </div>
         <div style="font-size:11px;color:var(--t3);margin-bottom:3px">${esc(u.credential||'')}</div>
         <span class="role-badge ${u.role}">${ROLE_LABEL[u.role]||u.role}</span>
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-secondary btn-sm" onclick="showEditUser(${u.id})">Edit</button>
-        <button class="btn btn-sm" style="background:var(--rl);color:var(--r);border:.5px solid var(--r)" onclick="deleteUser(${u.id})">Del</button>
+        ${isMe?'':'<button class="btn btn-sm" style="background:var(--rl);color:var(--r);border:.5px solid var(--r)" onclick="deleteUser('+u.id+')">Del</button>'}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function _genDCCredentials(name){
