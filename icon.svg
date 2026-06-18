@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="256" cy="200" r="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2A0808"/>
+      <stop offset="100%" stop-color="#080000"/>
+    </radialGradient>
+    <radialGradient id="shine" cx="140" cy="100" r="260" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.06)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="110" x2="0" y2="402" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFCE3A"/>
+      <stop offset="100%" stop-color="#D4920A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="88" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="88" fill="url(#shine)"/>
+  <rect x="12" y="12" width="488" height="488" rx="78" fill="none"
+        stroke="rgba(255,255,255,0.05)" stroke-width="1.5"/>
+
+  <!-- Geometric E — spine -->
+  <rect x="109" y="110" width="50" height="292" rx="8" fill="url(#gold)"/>
+  <!-- E top arm -->
+  <rect x="109" y="110" width="220" height="50" rx="8" fill="url(#gold)"/>
+  <!-- E middle arm (slightly shorter) -->
+  <rect x="109" y="240" width="165" height="42" rx="8" fill="url(#gold)"/>
+  <!-- E bottom arm -->
+  <rect x="109" y="352" width="220" height="50" rx="8" fill="url(#gold)"/>
+
+  <!-- ! bar -->
+  <rect x="359" y="110" width="44" height="196" rx="8" fill="url(#gold)"/>
+  <!-- ! dot — teal brand accent -->
+  <circle cx="381" cy="361" r="33" fill="#1FA896"/>
+  <!-- Dot inner highlight -->
+  <circle cx="368" cy="349" r="10" fill="rgba(255,255,255,0.22)"/>
+</svg>

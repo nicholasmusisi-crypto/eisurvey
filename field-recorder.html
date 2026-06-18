@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="E!Survey">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#8B1A1A">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" id="ati" href="icon.svg">
+<title>E!Survey</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  /* Warm off-white backgrounds — reduces eye-strain on long sessions */
+  --bg:#FAF9F6;--bg2:#F1EFE9;--bg3:#E4E2DA;
+  /* Warm near-black text — softer than pure black */
+  --t:#28271F;--t2:#6A6858;--t3:#A09E90;
+  --bd:rgba(40,39,31,.11);--bd2:rgba(40,39,31,.20);
+  /* Teal-blue primary: calming, reduces cortisol, promotes flow */
+  --g:#1FA896;--gl:#D4F0EB;--gd:#0A6558;
+  /* Soft coral-red: visible without triggering alarm response */
+  --r:#D95640;--rl:#FAEAE6;
+  /* Sky blue: trust, secondary info */
+  --b:#3E8FD6;--bl:#E0EEFA;
+  /* Warm amber: optimism, energising CTAs */
+  --a:#C67C15;--al:#FDF0D8;
+  /* Soft indigo-purple for AI coach */
+  --pu:#5E50C2;--pul:#ECEAFA;--pud:#3F35A3;
+  --rad:14px;--rs:9px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
+  --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.17);
+  --gl:#073D33;--gd:#72D9C8;
+  --rl:#4A1509;--r:#F09070;
+  --bl:#04294F;--b:#7AB5EA;
+  --al:#3F2100;--a:#F0A030;
+  --pul:#221D56;--pud:#C6C2F5;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh;padding-top:env(safe-area-inset-top)}
+.screen{display:none;min-height:100vh;flex-direction:column}
+/* iOS notch / home-bar safe areas */
+.hdr{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.survey-footer{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.screen.on{display:flex}
+
+/* ─ Login ─ */
+#scr-login{background:var(--gd);justify-content:center;align-items:center;padding:24px 20px}
+.login-wrap{width:100%;max-width:400px}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo h1{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.login-logo p{font-size:14px;color:rgba(255,255,255,.65);margin-top:4px}
+.role-card{background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.2);border-radius:16px;padding:18px 20px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:background .15s}
+.role-card:active{background:rgba(255,255,255,.18)}
+.role-card .ico{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.role-card .ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.role-card .rc-admin .ico{background:rgba(255,255,255,.15);color:#fff}
+.role-card .rc-enum .ico{background:rgba(255,255,255,.15);color:#fff}
+.role-card h3{font-size:15px;font-weight:600;color:#fff}
+.role-card p{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px}
+.pin-wrap{background:rgba(255,255,255,.1);border-radius:16px;padding:20px;margin-top:8px;display:none}
+.pin-wrap h3{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
+.pin-input-row{display:flex;gap:8px}
+.pin-input-row input{flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:16px;font-family:inherit;outline:none;text-align:center;letter-spacing:4px}
+.pin-input-row input::placeholder{letter-spacing:0;color:rgba(255,255,255,.4)}
+.pin-input-row input:focus{border-color:rgba(255,255,255,.6)}
+.btn-white{padding:10px 20px;border-radius:8px;border:none;background:#fff;color:var(--gd);font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0}
+.btn-white:active{opacity:.85}
+.enum-name-wrap{background:rgba(255,255,255,.1);border-radius:16px;padding:20px;margin-top:8px;display:none}
+.enum-name-wrap h3{font-size:14px;font-weight:600;color:#fff;margin-bottom:8px}
+.enum-name-wrap input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;margin-bottom:10px}
+.enum-name-wrap input::placeholder{color:rgba(255,255,255,.4)}
+.enum-name-wrap input:focus{border-color:rgba(255,255,255,.6)}
+.recent-names{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.rname{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85);font-size:12px;cursor:pointer;background:none}
+.rname:active{background:rgba(255,255,255,.15)}
+.back-link{color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;margin-top:10px;display:inline-block}
+.back-link:active{color:#fff}
+
+/* ─ Shared admin/enum header ─ */
+.hdr{border-bottom:.5px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50}
+.admin-hdr{background:var(--gd)}
+.admin-hdr .hdr-title{color:#fff;font-size:16px;font-weight:600}
+.admin-hdr .hdr-sub{color:rgba(255,255,255,.65);font-size:11px;margin-top:1px}
+.enum-hdr{background:var(--bg)}
+.enum-hdr .hdr-title{color:var(--t);font-size:16px;font-weight:600}
+.enum-hdr .hdr-sub{color:var(--t3);font-size:11px;margin-top:1px}
+.hdr-actions{display:flex;align-items:center;gap:8px}
+.btn-logout{padding:6px 12px;border-radius:8px;border:.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:500;cursor:pointer}
+.btn-logout.dark{border-color:var(--bd2);background:var(--bg2);color:var(--t2)}
+.btn-logout:active{opacity:.8}
+
+/* ─ Tabs ─ */
+.tabs{display:flex;flex-shrink:0}
+.admin-tabs{background:rgba(0,0,0,.15)}
+.enum-tabs{background:var(--bg);border-bottom:.5px solid var(--bd)}
+.tab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;border:none;cursor:pointer;border-bottom:2px solid transparent}
+.admin-tabs .tab{background:none;color:rgba(255,255,255,.55)}
+.admin-tabs .tab.on{color:#fff;border-bottom-color:#fff}
+.enum-tabs .tab{background:none;color:var(--t3)}
+.enum-tabs .tab.on{color:var(--g);border-bottom-color:var(--g)}
+
+/* ─ Content area ─ */
+.content{flex:1;overflow-y:auto;padding:14px}
+.pg{display:none}
+.pg.on{display:block}
+
+/* ─ Cards, badges, pills ─ */
+.card{background:var(--bg);border-radius:var(--rad);border:.5px solid var(--bd);padding:14px;margin-bottom:12px}
+.ct{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px}
+.badge.ok{background:var(--gl);color:var(--gd)}
+.badge.warn{background:var(--al);color:var(--a)}
+.badge.info{background:var(--bl);color:var(--b)}
+.badge.grey{background:var(--bg3);color:var(--t3)}
+.badge.pu{background:var(--pul);color:var(--pud)}
+.badge.red{background:var(--rl);color:var(--r)}
+
+/* ─ Stat grid ─ */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.sc{background:var(--bg2);border-radius:var(--rs);padding:13px}
+.sv{font-size:26px;font-weight:500}
+.sl{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* ─ Form inputs ─ */
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=password],select,textarea{width:100%;padding:10px 12px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);color:var(--t);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(29,158,117,.15)}
+textarea{resize:vertical;min-height:68px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236b6b66' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.flbl{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;margin-top:12px}
+.flbl:first-child{margin-top:0}
+
+/* ─ Buttons ─ */
+.btn{padding:10px 18px;border-radius:var(--rs);border:none;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn-primary{background:var(--g);color:#fff}
+.btn-primary:active{opacity:.82}
+.btn-secondary{background:var(--bg2);color:var(--t);border:.5px solid var(--bd2)}
+.btn-secondary:active{background:var(--bg3)}
+.btn-danger{background:var(--rl);color:var(--r);border:.5px solid var(--r)}
+.btn-danger:active{opacity:.82}
+.btn-full{width:100%;justify-content:center}
+.btn-sm{padding:7px 13px;font-size:12px}
+.btn-outline{background:none;border:.5px solid var(--bd2);color:var(--t2)}
+.btn-outline:active{background:var(--bg2)}
+
+/* ─ Upload zone ─ */
+.upload-zone{border:1.5px dashed var(--bd2);border-radius:var(--rad);padding:28px 16px;text-align:center;cursor:pointer;background:var(--bg);transition:background .15s}
+.upload-zone:active{background:var(--bg2)}
+.upload-zone svg{display:block;margin:0 auto 10px;color:var(--t3)}
+.upload-zone p{font-size:14px;color:var(--t2);margin-bottom:2px}
+.upload-zone small{font-size:12px;color:var(--t3)}
+.form-info{background:var(--gl);border-radius:var(--rad);padding:12px;margin-bottom:12px}
+.form-info h3{font-size:14px;font-weight:600;color:var(--gd);margin-bottom:3px}
+.form-info p{font-size:12px;color:var(--g)}
+.sec-list{list-style:none}
+.sec-list li{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--bd);font-size:12px}
+.sec-list li:last-child{border-bottom:none}
+.sec-list .cn{font-size:10px;color:var(--t3);background:var(--bg2);padding:2px 6px;border-radius:8px}
+
+/* ─ Data / entries table ─ */
+.entry-row{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:.5px solid var(--bd)}
+.entry-row:last-child{border-bottom:none}
+.entry-row-main{flex:1;min-width:0}
+.er-title{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+.er-meta{font-size:11px;color:var(--t3);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.er-actions{display:flex;gap:6px;flex-shrink:0}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px}
+.filter-bar select{flex:1}
+.filter-pill{padding:6px 12px;border-radius:20px;border:.5px solid var(--bd2);background:var(--bg);font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;white-space:nowrap}
+.filter-pill.on{background:var(--gl);color:var(--gd);border-color:var(--g)}
+
+/* ─ Sync settings ─ */
+.sync-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 9px;border-radius:10px}
+.sync-badge.ok{background:var(--gl);color:var(--gd)}
+.sync-badge.no{background:var(--bg3);color:var(--t3)}
+.code-block{background:var(--bg2);border-radius:var(--rs);padding:10px 12px;font-size:10px;font-family:monospace;color:var(--t2);overflow-x:auto;white-space:pre;max-height:140px;border:.5px solid var(--bd)}
+
+/* ─ Enumerator: survey list ─ */
+.survey-card{background:var(--bg);border-radius:var(--rad);border:.5px solid var(--bd);padding:13px 15px;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px}
+.survey-card.draft{border-left:3px solid var(--a)}
+.survey-card.complete{border-left:3px solid var(--g)}
+.sc-main{flex:1;min-width:0}
+.sc-title{font-size:14px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-meta{font-size:11px;color:var(--t3);margin-bottom:6px}
+.sc-prog{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.sc-prog-fill{height:100%;border-radius:2px;background:var(--a)}
+.sc-prog-fill.done{background:var(--g)}
+.sc-actions{display:flex;gap:6px;flex-shrink:0;flex-direction:column;align-items:flex-end}
+.new-survey-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;border-radius:var(--rad);border:none;background:var(--g);color:#fff;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:16px}
+.new-survey-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.new-survey-btn:active{opacity:.85}
+.section-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;margin-top:16px}
+.section-label:first-child{margin-top:0}
+.empty-state{text-align:center;padding:40px 16px;color:var(--t3)}
+.empty-state svg{display:block;margin:0 auto 10px}
+.empty-state p{font-size:13px}
+
+/* ─ Survey view ─ */
+.survey-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg);border-bottom:.5px solid var(--bd);flex-shrink:0}
+.survey-header .sh-title{flex:1;min-width:0}
+.survey-header .sh-title h2{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.survey-header .sh-title p{font-size:11px;color:var(--t3)}
+.back-btn{width:34px;height:34px;border-radius:50%;border:.5px solid var(--bd2);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);flex-shrink:0}
+.back-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ─ Audio recorder ─ */
+.waveform-wrap{background:var(--bg2);border-radius:var(--rs);height:58px;overflow:hidden;margin-bottom:10px}
+canvas#waveform{width:100%;height:100%;display:block}
+.timer{text-align:center;font-size:30px;font-weight:300;letter-spacing:2px;margin-bottom:13px;font-variant-numeric:tabular-nums}
+.timer.rec{color:var(--r)}
+.rec-row{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:11px}
+.btn-rec{width:60px;height:60px;border-radius:50%;border:2.5px solid var(--r);background:var(--rl);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-rec:active{transform:scale(.93)}
+.dot{width:22px;height:22px;border-radius:50%;background:var(--r);transition:border-radius .2s,width .2s,height .2s}
+.btn-rec.recording .dot{border-radius:4px;width:16px;height:16px}
+.btn-sm-circle{width:42px;height:42px;border-radius:50%;border:.5px solid var(--bd2);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2)}
+.btn-sm-circle svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lvbar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.lvfill{height:100%;border-radius:2px;background:var(--g);width:0%;transition:width .05s}
+.qpill-row{display:flex;gap:6px;margin-top:10px}
+.qpill{flex:1;padding:6px 4px;border-radius:14px;border:.5px solid var(--bd2);background:var(--bg2);font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;text-align:center}
+.qpill.on{background:var(--gl);color:var(--gd);border-color:var(--g)}
+
+/* ─ Section nav ─ */
+.sec-nav{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sec-nav .sn-title{flex:1;font-size:13px;font-weight:600;line-height:1.3}
+.sn-pct{font-size:11px;color:var(--t3)}
+.arr-btn{width:32px;height:32px;border-radius:50%;border:.5px solid var(--bd2);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:15px}
+.arr-btn:disabled{opacity:.3;cursor:default}
+.prog-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:14px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--g),#3DBFAE);border-radius:3px;transition:width .35s ease}
+
+/* ─ Question fields ─ */
+.q-wrap{margin-bottom:15px}
+.q-wrap.hid{display:none}
+.q-label{display:block;font-size:13px;font-weight:500;color:var(--t);margin-bottom:5px;line-height:1.4}
+.q-note{font-size:12px;color:var(--t2);line-height:1.5;background:var(--al);border-radius:var(--rs);padding:9px 11px;margin-bottom:10px;border-left:3px solid var(--a);border-radius:0 var(--rs) var(--rs) 0}
+.sub-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 8px}
+.opts{display:flex;flex-direction:column;gap:5px}
+.opts.scroll{max-height:200px;overflow-y:auto}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);cursor:pointer;user-select:none;transition:background .1s,border-color .1s}
+.opt.sel{background:var(--gl);border-color:var(--g)}
+.opt input{width:15px;height:15px;accent-color:var(--g);flex-shrink:0}
+.opt span{font-size:13px;color:var(--t);line-height:1.3}
+
+/* ─ Survey bottom actions ─ */
+.survey-footer{padding:12px 14px;background:var(--bg);border-top:.5px solid var(--bd);display:flex;gap:8px;flex-shrink:0}
+.survey-footer .btn{flex:1;justify-content:center}
+
+/* ─ Audio playback ─ */
+.audio-player{display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:var(--rs);padding:8px 11px;margin-bottom:7px}
+.play-btn{width:30px;height:30px;border-radius:50%;border:none;background:var(--g);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.play-btn svg{width:11px;height:11px;fill:currentColor;margin-left:1px}
+.ainfo{flex:1;min-width:0}
+.albl{font-size:11px;color:var(--t2);font-weight:500}
+.aprog{height:3px;background:var(--bg3);border-radius:2px;margin-top:3px;overflow:hidden}
+.apfill{height:100%;background:var(--g);width:0%;transition:width .1s linear}
+
+/* ─ Toast ─ */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--t);color:var(--bg);padding:9px 18px;border-radius:18px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─ Modal overlay ─ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--bg);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;max-height:70vh;overflow-y:auto}
+.modal h2{font-size:16px;font-weight:600;margin-bottom:14px}
+.modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--t3);line-height:1;margin-top:-2px}
+.pub-scope{flex:1;padding:6px 8px;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;background:none;color:var(--t3)}
+.pub-scope.on{background:var(--bg);color:var(--t);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.pub-dest{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pub-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.role-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.3px;text-transform:uppercase;display:inline-block}
+.role-badge.superadmin{background:rgba(245,184,24,.18);color:#d4920a}
+.role-badge.admin{background:rgba(100,148,245,.18);color:#6494f5}
+.role-badge.viewer{background:rgba(150,150,150,.18);color:#888}
+.role-badge.datacollector{background:rgba(31,168,150,.18);color:#1FA896}
+.user-pick-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.08);margin-bottom:6px;cursor:pointer;border:1.5px solid transparent;transition:.15s}
+.user-pick-item.sel,.user-pick-item:active{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35)}
+
+hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
+
+/* ─ AI Coach ─ */
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);display:inline-block;flex-shrink:0;transition:background .3s}
+.ai-dot.listening{background:var(--g);animation:aipulse 1.6s ease-in-out infinite}
+.ai-dot.analyzing{background:var(--b);animation:aipulse .6s ease-in-out infinite}
+.ai-dot.error{background:var(--r)}
+@keyframes aipulse{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes _qfade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* ─ Single-question view ─ */
+.q-card-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t3)}
+.q-card-num{font-size:11px;color:var(--t3)}
+.q-card-label{font-size:16px;font-weight:500;line-height:1.55;color:var(--t);margin-bottom:14px;display:block}
+.q-note-card{background:var(--al);border-left:3px solid var(--a);border-radius:0 var(--rs) var(--rs) 0;padding:13px 15px;font-size:14px;line-height:1.65;color:var(--t)}
+.coach-tip{border-radius:var(--rs);padding:10px 12px;font-size:13px;line-height:1.5;border-left:3px solid var(--bd2)}
+.coach-tip.probe{background:var(--al);border-color:var(--a)}
+.coach-tip.clarify{background:var(--bl);border-color:var(--b)}
+.coach-tip.followup{background:var(--pul);border-color:var(--pu)}
+.coach-tip.warn{background:var(--rl);border-color:var(--r)}
+.tip-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;opacity:.75}
+.probe .tip-lbl{color:var(--a)}
+.clarify .tip-lbl{color:var(--b)}
+.followup .tip-lbl{color:var(--pu)}
+.warn .tip-lbl{color:var(--r)}
+.ai-hist-item{font-size:11px;color:var(--t2);padding:5px 0;border-bottom:.5px solid var(--bd);display:flex;gap:6px;align-items:flex-start}
+.ai-hist-item:last-child{border-bottom:none}
+.ai-toggle-btn{padding:4px 12px;border-radius:12px;border:none;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0}
+.ai-toggle-btn.on{background:var(--gl);color:var(--gd)}
+.ai-toggle-btn.off{background:var(--bg3);color:var(--t3)}
+.report-hero{display:flex;align-items:flex-start;gap:14px;padding:10px 0 8px}
+.report-score-num{font-size:38px;font-weight:200;line-height:1;flex-shrink:0}
+.report-grade-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;display:inline-block}
+.grade-E{background:var(--gl);color:var(--gd)}
+.grade-G{background:var(--bl);color:var(--b)}
+.grade-F{background:var(--al);color:var(--a)}
+.grade-N,.grade-P{background:var(--rl);color:var(--r)}
+.report-section{margin-top:10px}
+.report-section h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:5px}
+.report-list{list-style:none;padding:0;margin:0}
+.report-list li{font-size:12px;padding:4px 0 4px 14px;position:relative;color:var(--t);border-bottom:.5px solid var(--bd)}
+.report-list li:last-child{border-bottom:none}
+.report-list li:before{content:'';position:absolute;left:2px;top:10px;width:5px;height:5px;border-radius:50%;background:var(--t3)}
+.report-list.str li:before{background:var(--g)}
+.report-list.imp li:before{background:var(--a)}
+.report-list.miss li:before{background:var(--r)}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="scr-login" class="screen on">
+  <div id="login-wrap" style="background:var(--gd);flex:1;display:flex;justify-content:center;align-items:center;padding:28px 20px">
+    <div style="width:100%;max-width:400px">
+      <div style="text-align:center;margin-bottom:36px">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        <h1 style="font-size:26px;font-weight:700;color:#fff;letter-spacing:-.4px">E!Survey</h1>
+        <p style="font-size:13px;color:rgba(255,255,255,.6);margin-top:4px">Data collection platform</p>
+      </div>
+
+      <!-- Role cards -->
+      <div id="role-cards">
+        <div class="role-card" onclick="showRoleLogin('admin')">
+          <div class="ico" style="background:rgba(245,184,24,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5B818" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;color:#fff">Admin</h3>
+            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Full access — assign roles &amp; manage system</p>
+          </div>
+        </div>
+
+        <div class="role-card" onclick="showRoleLogin('contentmanager')">
+          <div class="ico" style="background:rgba(100,148,245,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6494f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;color:#fff">Content Manager</h3>
+            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Upload tools, edit, export &amp; publish data</p>
+          </div>
+        </div>
+
+        <div class="role-card" onclick="showRoleLogin('datacollector')">
+          <div class="ico" style="background:rgba(31,168,150,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1FA896" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;color:#fff">Data Collector</h3>
+            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Collect surveys and record audio</p>
+          </div>
+        </div>
+
+        <div class="role-card" onclick="showRoleLogin('viewer')">
+          <div class="ico" style="background:rgba(150,150,150,.2);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;color:#fff">Viewer</h3>
+            <p style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">View dashboard and data — read only</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unified credential login form (all roles) -->
+      <div id="admin-login-form" style="display:none;background:rgba(255,255,255,.1);border-radius:16px;padding:18px;margin-top:8px">
+        <h3 id="pin-login-title" style="font-size:14px;font-weight:600;color:#fff;margin-bottom:14px">Sign In</h3>
+        <div id="user-picker" style="display:none;margin-bottom:10px"></div>
+        <div style="margin-bottom:10px">
+          <label id="credential-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">Email</label>
+          <input type="text" id="credential-input" autocomplete="username" placeholder="Your email address" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;box-sizing:border-box" onkeydown="if(event.key==='Enter')document.getElementById('pin-input').focus()">
+        </div>
+        <div id="dc-password-wrap" style="display:none;margin-bottom:10px">
+          <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">Password</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="dc-password-input" placeholder="Enter password" style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')doPinLogin()">
+            <button class="btn-white" onclick="doPinLogin()">Enter</button>
+          </div>
+        </div>
+        <div id="pin-wrap-row" style="margin-bottom:4px">
+          <label id="pin-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px">PIN</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="pin-input" placeholder="Enter PIN" maxlength="10" style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:16px;font-family:inherit;outline:none;letter-spacing:4px" onkeydown="if(event.key==='Enter')doPinLogin()">
+            <button class="btn-white" onclick="doPinLogin()">Enter</button>
+          </div>
+        </div>
+        <div id="pin-error" style="color:rgba(255,100,100,.9);font-size:12px;margin-top:8px;display:none">Incorrect credentials</div>
+        <span class="back-link" onclick="backToRoles()">&#8592; Back</span>
+      </div>
+
+      <!-- Enumerator name form -->
+      <div id="enum-login-form" style="display:none;background:rgba(255,255,255,.1);border-radius:16px;padding:18px;margin-top:8px">
+        <h3 style="font-size:14px;font-weight:600;color:#fff;margin-bottom:8px">Your name</h3>
+        <input type="text" id="enum-name-input" placeholder="Enter your full name" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;outline:none;margin-bottom:8px" onkeydown="if(event.key==='Enter')doEnumLogin()">
+        <div class="recent-names" id="recent-names"></div>
+        <button class="btn-white" style="width:100%" onclick="doEnumLogin()">Start collecting</button>
+        <span class="back-link" onclick="backToRoles()">&#8592; Back</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADMIN SCREEN ════ -->
+<div id="scr-admin" class="screen">
+  <header class="hdr admin-hdr">
+    <div>
+      <div class="hdr-title">E!Survey</div>
+      <div class="hdr-sub" id="admin-hdr-sub">Administrator</div>
+    </div>
+    <div class="hdr-actions">
+      <div id="form-badge-admin" style="display:none;font-size:10px;font-weight:600;padding:3px 9px;border-radius:10px;background:rgba(255,255,255,.15);color:#fff"></div>
+      <button class="btn-logout" onclick="logout()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="tabs admin-tabs">
+    <button id="tab-btn-dashboard" class="tab on" onclick="aTab('dashboard',this)">Dashboard</button>
+    <button id="tab-btn-form" class="tab" onclick="aTab('form',this)">Form</button>
+    <button id="tab-btn-sync" class="tab" onclick="aTab('sync',this)">Sync</button>
+    <button id="tab-btn-data" class="tab" onclick="aTab('data',this)">Data</button>
+    <button id="tab-btn-settings" class="tab" onclick="aTab('settings',this)">Settings</button>
+  </div>
+
+  <div class="content" id="admin-content">
+
+    <!-- Dashboard -->
+    <div id="ap-dashboard" class="pg on">
+      <div class="stat-grid">
+        <div class="sc"><div class="sv" id="st-total">0</div><div class="sl">Total entries</div></div>
+        <div class="sc"><div class="sv" id="st-complete">0</div><div class="sl">Completed</div></div>
+        <div class="sc"><div class="sv" id="st-draft">0</div><div class="sl">Drafts</div></div>
+        <div class="sc"><div class="sv" id="st-enum-count">0</div><div class="sl">Enumerators</div></div>
+      </div>
+      <div class="card">
+        <div class="ct">Recent entries</div>
+        <div id="dash-recent"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Enumerator activity</div>
+        <div id="dash-enums"></div>
+      </div>
+    </div>
+
+    <!-- Form Library (multi-survey) -->
+    <div id="ap-form" class="pg">
+      <div id="forms-list"></div>
+      <div class="upload-zone" onclick="document.getElementById('admin-fi').click()" style="margin-top:4px">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        <p>Add XLSForm (.xlsx)</p>
+        <small>SurveyCTO / ODK · select multiple files to add several surveys at once</small>
+      </div>
+      <input type="file" id="admin-fi" accept=".xlsx,.xls" style="display:none" onchange="loadForm(this)" multiple>
+    </div>
+
+    <!-- Sync Settings -->
+    <div id="ap-sync" class="pg">
+      <div class="card">
+        <div class="ct">Google Sheets connection</div>
+        <label class="flbl">Apps Script web app URL</label>
+        <input type="text" id="gas-url" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveSyncSettings()">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <div class="sync-badge no" id="sync-badge">Not configured</div>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="testSync()">Test connection</button>
+        </div>
+        <hr class="div">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:10px">
+          <b>Setup:</b> script.google.com → New project → paste script below → Deploy → Web app → Execute as: <b>Me</b> · Access: <b>Anyone</b>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:12px;color:var(--t3)">Apps Script code</span>
+          <button class="btn btn-secondary btn-sm" onclick="copyScript()">Copy</button>
+        </div>
+        <div class="code-block" id="gas-script">function doPost(e) {
+  try {
+    const d = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // Upload audio to Drive and get a shareable link
+    let audioUrl = '';
+    if (d.audioB64) {
+      try {
+        const folder = getOrCreateFolder_('E!Survey Audio');
+        const ext = d.audioExt || 'webm';
+        const bytes = Utilities.base64Decode(d.audioB64);
+        const file = folder.createFile(
+          Utilities.newBlob(bytes, 'audio/' + ext, (d.id || Date.now()) + '.' + ext)
+        );
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        audioUrl = file.getUrl();
+      } catch(ae) { /* audio upload failed — row saved without link */ }
+    }
+
+    const nm = String(d.formTitle||'Entries').slice(0,100);
+    let sh = ss.getSheetByName(nm)||ss.insertSheet(nm);
+    const ans = d.answers||{};
+    const meta = ['_id','_createdAt','_completedAt','_enumerator','_status','_form','_audioSec','_audioLink','_quality'];
+    let hdrs;
+    if (sh.getLastRow()===0) {
+      hdrs = [...meta,...Object.keys(ans)];
+      sh.appendRow(hdrs);
+      sh.getRange(1,1,1,hdrs.length).setFontWeight('bold');
+    } else {
+      hdrs = sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0];
+      const nk = Object.keys(ans).filter(k=>!hdrs.includes(k));
+      if (nk.length) { hdrs=[...hdrs,...nk]; sh.getRange(1,1,1,hdrs.length).setValues([hdrs]); }
+    }
+    sh.appendRow(hdrs.map(h=>{
+      if(h==='_id') return String(d.id||'');
+      if(h==='_createdAt') return d.createdAt||'';
+      if(h==='_completedAt') return d.completedAt||'';
+      if(h==='_enumerator') return d.enumerator||'';
+      if(h==='_status') return d.status||'';
+      if(h==='_form') return d.formTitle||'';
+      if(h==='_audioSec') return d.durationSec||0;
+      if(h==='_audioLink') return audioUrl;
+      if(h==='_quality') return d.quality||'';
+      return ans[h]!==undefined ? String(ans[h]) : '';
+    }));
+    return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+function doGet() {
+  return ContentService.createTextOutput(JSON.stringify({status:'ok',msg:'E!Survey active'}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+function getOrCreateFolder_(name) {
+  const it = DriveApp.getFoldersByName(name);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(name);
+}</div>
+        <button class="btn btn-secondary btn-sm btn-full" style="margin-top:10px" onclick="syncPending()">Sync all pending entries</button>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="ct">Webhook / REST API</div>
+        <label class="flbl">Endpoint URL</label>
+        <input type="url" id="webhook-url" placeholder="https://your-api.com/ingest" oninput="saveWebhookSettings()">
+        <label class="flbl" style="margin-top:8px">Authorization header <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+        <input type="text" id="webhook-auth" placeholder="Bearer token or API key" oninput="saveWebhookSettings()">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <div class="sync-badge no" id="webhook-badge">Not configured</div>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="testWebhook()">Test</button>
+        </div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-top:10px">
+          Each entry is sent as a <b>POST</b> with <code style="font-size:11px;background:var(--bd);padding:1px 4px;border-radius:3px">Content-Type: application/json</code>. The payload includes all answers, metadata, and timestamps.
+        </div>
+      </div>
+    </div>
+
+    <!-- Data -->
+    <div id="ap-data" class="pg">
+      <div class="filter-bar" style="flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        <select id="filter-form" onchange="renderDataView()" style="width:100%;flex-basis:100%">
+          <option value="">All surveys</option>
+        </select>
+        <select id="filter-enum" onchange="renderDataView()" style="flex:1;min-width:120px">
+          <option value="">All enumerators</option>
+        </select>
+        <select id="filter-status" onchange="renderDataView()" style="width:110px">
+          <option value="">All</option>
+          <option value="complete">Complete</option>
+          <option value="draft">Drafts</option>
+        </select>
+      </div>
+      <button id="data-publish-btn" class="btn btn-sm" onclick="openPublishSheet()" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#1FA896,#147a6c);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Publish Data
+      </button>
+      <div id="data-export-row" style="display:flex;gap:6px;margin-bottom:12px">
+        <button class="btn btn-secondary btn-sm" onclick="exportJSON()">JSON</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">CSV</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportAudio()">Audio</button>
+        <button id="data-clear-btn" class="btn btn-sm" style="background:var(--rl);color:var(--r);border:.5px solid var(--r);margin-left:auto" onclick="clearAll()">Clear all</button>
+      </div>
+      <div id="data-list"></div>
+    </div>
+
+    <!-- Settings -->
+    <div id="ap-settings" class="pg">
+
+      <!-- User Management — superadmin only -->
+      <div class="card" id="user-mgmt-card">
+        <div class="ct">User Management</div>
+        <div id="user-list"></div>
+        <button class="btn btn-secondary btn-sm btn-full" style="margin-top:8px" onclick="showAddUserForm()">+ Add user</button>
+        <div id="add-user-form" style="display:none;margin-top:12px;border-top:.5px solid var(--bd);padding-top:12px">
+          <label class="flbl" id="add-user-form-label">Full name</label>
+          <input type="text" id="new-user-name" placeholder="e.g. Jane Doe" oninput="if(document.getElementById('new-user-role').value==='datacollector')onAddUserRoleChange()">
+          <label class="flbl" style="margin-top:8px">Role</label>
+          <select id="new-user-role" onchange="onAddUserRoleChange()">
+            <option value="contentmanager">Content Manager</option>
+            <option value="viewer">Viewer</option>
+            <option value="datacollector">Data Collector</option>
+          </select>
+          <!-- Email + PIN (for non-DC roles) -->
+          <div id="supervisor-cred-wrap">
+            <label class="flbl" style="margin-top:8px">Email</label>
+            <input type="email" id="new-user-email" placeholder="name@organisation.org">
+            <label class="flbl" style="margin-top:8px">PIN <span id="pin-optional-hint" style="font-weight:400;color:var(--t3)">(leave blank to keep current)</span></label>
+            <input type="password" id="new-user-pin" placeholder="Min 4 characters">
+          </div>
+          <!-- Auto-generated credentials display (DC only) -->
+          <div id="dc-creds-wrap" style="display:none;margin-top:10px;background:var(--bg2);border-radius:10px;padding:12px;border:.5px solid var(--bd)">
+            <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Auto-generated credentials</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:12px;color:var(--t3)">Username</span>
+              <span id="dc-gen-username" style="font-size:13px;font-weight:700;font-family:monospace;color:var(--t)"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:12px;color:var(--t3)">Password</span>
+              <span id="dc-gen-password" style="font-size:13px;font-weight:700;font-family:monospace;color:var(--t)"></span>
+            </div>
+            <button class="btn btn-secondary btn-sm btn-full" onclick="copyCreds()">Copy credentials</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary btn-sm" style="flex:1" id="save-user-btn" onclick="saveNewUser()">Save user</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="cancelAddUser()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change PIN — superadmin only -->
+      <div class="card" id="superadmin-only-pin">
+        <div class="ct">Change PIN</div>
+        <label class="flbl">Current PIN</label>
+        <input type="password" id="cur-pin" placeholder="Current PIN">
+        <label class="flbl">New PIN</label>
+        <input type="password" id="new-pin" placeholder="New PIN (min 4 digits)">
+        <label class="flbl">Confirm new PIN</label>
+        <input type="password" id="conf-pin" placeholder="Confirm new PIN">
+        <button class="btn btn-primary btn-sm btn-full" style="margin-top:12px" onclick="changePin()">Update PIN</button>
+      </div>
+      <div class="card">
+        <div class="ct">Enumerators</div>
+        <div id="enum-mgmt-list"></div>
+        <button class="btn btn-secondary btn-sm btn-full" style="margin-top:8px" onclick="clearEnumerators()">Clear enumerator history</button>
+      </div>
+      <div class="card">
+        <div class="ct">AI Interview Coach</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-size:13px;font-weight:500;margin-bottom:2px">Enable AI coaching</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5">Real-time guidance &amp; quality reports via Claude</div>
+          </div>
+          <button id="ai-toggle-btn" onclick="toggleAI()" class="ai-toggle-btn off">OFF</button>
+        </div>
+        <label class="flbl">Anthropic API Key</label>
+        <input type="password" id="ai-api-key" placeholder="sk-ant-api03-..." oninput="saveAICfg()">
+        <div style="font-size:11px;color:var(--t3);margin-top:5px;line-height:1.5">Get a key at <b>console.anthropic.com</b> · Stored only on this device.</div>
+        <label class="flbl" style="margin-top:10px">Coaching speed</label>
+        <select id="ai-model-sel" onchange="saveAICfg()">
+          <option value="claude-haiku-4-5-20251001">Fast — Claude Haiku (recommended)</option>
+          <option value="claude-sonnet-4-6">Thorough — Claude Sonnet</option>
+        </select>
+        <hr class="div">
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">
+          <b>During interview:</b> listens via speech recognition; prompts enumerator to probe, clarify or follow up when needed.<br>
+          <b>After interview:</b> generates a quality score, strengths, and specific improvement notes.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /scr-admin -->
+
+<!-- ════ ENUMERATOR SCREEN ════ -->
+<div id="scr-enum" class="screen">
+
+  <!-- Survey picker bottom-sheet (shown when multiple forms loaded) -->
+  <div id="form-picker" onclick="closeFormPicker()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end">
+    <div onclick="event.stopPropagation()" style="background:var(--bg);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:75vh;overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <span style="font-size:13px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px">Choose a survey</span>
+        <button onclick="closeFormPicker()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--t3);line-height:1">×</button>
+      </div>
+      <div id="form-picker-list"></div>
+    </div>
+  </div>
+  <!-- Home: survey list -->
+  <div id="ev-home" style="display:flex;flex-direction:column;flex:1">
+    <header class="hdr enum-hdr">
+      <div>
+        <div class="hdr-title" id="enum-display-name">Data Collector</div>
+        <div class="hdr-sub" id="enum-form-name">No form loaded</div>
+      </div>
+      <div class="hdr-actions">
+        <div id="draft-badge" style="display:none;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;background:var(--al);color:var(--a)"></div>
+        <button class="btn-logout dark" onclick="logout()">Sign out</button>
+      </div>
+    </header>
+    <div style="flex:1;overflow-y:auto;padding:14px">
+      <button class="new-survey-btn" onclick="startNewSurvey()" id="new-survey-btn">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Start new survey
+      </button>
+      <div id="no-form-notice" style="display:none;text-align:center;padding:16px;background:var(--al);border-radius:var(--rad);margin-bottom:12px;font-size:13px;color:var(--a)">No form loaded. Ask your administrator to upload a form.</div>
+      <div id="ev-drafts-section" style="display:none">
+        <div class="section-label">Drafts <span id="draft-count"></span></div>
+        <div id="ev-drafts"></div>
+      </div>
+      <div id="ev-completed-section" style="display:none">
+        <div class="section-label">Completed surveys</div>
+        <div id="ev-completed"></div>
+      </div>
+      <div id="ev-empty" class="empty-state" style="display:none">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No surveys yet. Tap "Start new survey" to begin.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active survey view -->
+  <div id="ev-survey" style="display:none;flex-direction:column;flex:1">
+    <header class="survey-header">
+      <button class="back-btn" onclick="backToHome()">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="sh-title">
+        <h2 id="survey-title-display">Survey</h2>
+        <p id="survey-enum-display"></p>
+      </div>
+      <div id="survey-status-badge"></div>
+      <button id="btn-phone-toggle" class="back-btn" onclick="togglePhoneCard()" title="Phone survey mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.38 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.54a16 16 0 0 0 5.55 5.55l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </button>
+    </header>
+
+    <div style="flex:1;overflow-y:auto;padding:14px">
+      <!-- Phone Survey Card -->
+      <div id="phone-call-card" class="card" style="display:none;border-color:var(--g);border-width:1px">
+        <!-- Setup state -->
+        <div id="pc-pre">
+          <div class="ct" style="margin-bottom:8px">Phone Survey Mode</div>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <div style="flex:1">
+              <label class="flbl" style="margin-top:0">Respondent phone number</label>
+              <input type="tel" id="call-number" placeholder="+260 97x xxx xxxx" inputmode="tel">
+            </div>
+            <button class="btn btn-primary" onclick="dialAndRecord()" style="flex-shrink:0;height:41px;padding:0 14px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.38 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.54a16 16 0 0 0 5.55 5.55l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Dial &amp; Record
+            </button>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.55">Tap <b>Dial &amp; Record</b> → put phone on <b>speaker</b> → return here. Recording starts automatically when you come back.</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px">⚖ Recording calls may require respondent consent under local law.</div>
+        </div>
+        <!-- Waiting: user is in phone app -->
+        <div id="pc-waiting" style="display:none;text-align:center;padding:6px 0">
+          <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:6px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--a);animation:aipulse 1s ease-in-out infinite"></div>
+            <span style="font-size:13px;font-weight:600;color:var(--a)">Dialing <span id="pc-wait-num"></span>…</span>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.5">Put call on <b>speaker</b> then switch back here — recording starts automatically</div>
+          <button class="btn btn-secondary btn-sm" onclick="cancelDial()">Cancel</button>
+        </div>
+        <!-- Active: call in progress + recording -->
+        <div id="pc-active" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:7px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--g);animation:aipulse 1.6s ease-in-out infinite"></div>
+              <span style="font-size:13px;font-weight:600;color:var(--g)">Recording call</span>
+            </div>
+            <button onclick="endPhoneCall()" style="padding:5px 11px;font-size:11px;font-weight:600;border-radius:var(--rs);border:.5px solid var(--r);background:var(--rl);color:var(--r);cursor:pointer">End &amp; stop</button>
+          </div>
+          <div id="pc-num-display" style="font-size:15px;font-weight:600;color:var(--t);margin-bottom:8px"></div>
+          <div style="background:var(--gl);border-radius:var(--rs);padding:8px 11px;font-size:12px;color:var(--gd);display:flex;align-items:center;gap:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            Speaker ON — both voices captured by microphone
+          </div>
+          <button class="btn btn-secondary btn-sm btn-full" style="margin-top:8px" onclick="redialCall()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.3"/></svg>
+            Redial
+          </button>
+        </div>
+      </div>
+
+      <!-- Audio card -->
+      <div class="card">
+        <div class="ct">Audio recording</div>
+        <div class="waveform-wrap"><canvas id="waveform"></canvas></div>
+        <div class="timer" id="timer">00:00</div>
+        <div class="rec-row">
+          <button class="btn-sm-circle" id="btn-pause" onclick="togglePause()" style="display:none">
+            <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+          </button>
+          <button class="btn-rec" id="btn-rec" onclick="toggleRecord()"><div class="dot"></div></button>
+          <button class="btn-sm-circle" id="btn-discard" onclick="discardRecording()" style="display:none">
+            <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.3"/></svg>
+          </button>
+        </div>
+        <div class="lvbar"><div class="lvfill" id="lvfill"></div></div>
+        <div id="existing-audio-player" style="display:none;margin-top:10px"></div>
+        <div class="qpill-row">
+          <button class="qpill" onclick="setQuality('voice',this)">Voice</button>
+          <button class="qpill on" onclick="setQuality('standard',this)">Standard</button>
+          <button class="qpill" onclick="setQuality('high',this)">High</button>
+        </div>
+      </div>
+
+      <!-- AI Coach -->
+      <div id="ai-coach-card" class="card" style="display:none;border-color:var(--pu);border-width:1px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pu)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><circle cx="12" cy="16" r=".5" fill="var(--pu)"/></svg>
+            <span style="font-size:13px;font-weight:600;color:var(--pu)">AI Coach</span>
+            <span id="ai-dot" class="ai-dot"></span>
+            <span id="ai-status-text" style="font-size:11px;color:var(--t3)">Ready</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="triggerAnalysis()" style="padding:4px 10px;font-size:11px">Analyze now</button>
+        </div>
+        <div id="ai-tip-box" style="display:none"></div>
+        <div id="ai-hist-box" style="display:none;margin-top:7px;padding-top:7px;border-top:.5px solid var(--bd)">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Previous suggestions</div>
+          <div id="ai-hist-list"></div>
+        </div>
+        <div style="margin-top:7px">
+          <button onclick="toggleAITranscript()" id="ai-tx-toggle" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;padding:0">&#9658; Live transcript</button>
+          <div id="ai-tx-box" style="display:none;margin-top:5px;background:var(--bg2);border-radius:var(--rs);padding:7px 9px;font-size:11px;color:var(--t2);max-height:80px;overflow-y:auto;line-height:1.6;font-style:italic">Waiting for speech…</div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div id="form-section-card" class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+          <div class="q-card-lbl" id="q-section-lbl"></div>
+          <div class="q-card-num" id="q-counter"></div>
+        </div>
+        <div class="prog-bar" style="margin-bottom:18px"><div class="prog-fill" id="sec-prog-fill"></div></div>
+        <div id="section-questions"></div>
+      </div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="survey-footer">
+      <button class="btn btn-secondary btn-sm" id="btn-q-prev" onclick="prevQ()" style="flex:0 0 auto">&#8592; Prev</button>
+      <button class="btn btn-outline btn-sm" onclick="saveDraft()" style="flex:0 0 auto;padding:7px 14px">Save</button>
+      <button class="btn btn-primary btn-sm" style="flex:2" id="btn-q-next" onclick="nextQ()">Next &#8594;</button>
+    </div>
+  </div>
+</div><!-- /scr-enum -->
+
+<div class="toast" id="toast"></div>
+
+<!-- Entry detail modal -->
+<div class="modal-bg" id="detail-modal" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h2 id="modal-title">Entry detail</h2>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Publish sheet -->
+<div class="modal-bg" id="publish-sheet" onclick="closePublishSheet()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:82vh">
+    <button class="modal-close" onclick="closePublishSheet()">&times;</button>
+    <h2 style="margin-bottom:3px">Publish Data</h2>
+    <div id="publish-count" style="font-size:12px;color:var(--t3);margin-bottom:14px"></div>
+
+    <!-- Scope toggle -->
+    <div style="display:flex;gap:3px;margin-bottom:16px;background:rgba(0,0,0,.07);border-radius:9px;padding:3px">
+      <button class="pub-scope on" onclick="setPubScope('filtered',this)">Current filter</button>
+      <button class="pub-scope" onclick="setPubScope('all',this)">All complete</button>
+    </div>
+
+    <!-- Google Sheets -->
+    <div class="card" style="margin-bottom:10px">
+      <div class="pub-dest">
+        <div class="pub-icon" style="background:#0f9d58">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600">Google Sheets</div>
+          <div id="pub-sheets-status" style="font-size:11px;color:var(--t3)">Checking…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-full" id="pub-sheets-btn" onclick="publishToSheets()">Push to Sheets</button>
+      <div id="pub-sheets-prog" style="font-size:12px;color:var(--t3);margin-top:6px;display:none"></div>
+    </div>
+
+    <!-- Webhook -->
+    <div class="card" style="margin-bottom:10px">
+      <div class="pub-dest">
+        <div class="pub-icon" style="background:#5465ff">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600">Webhook / REST API</div>
+          <div id="pub-webhook-status" style="font-size:11px;color:var(--t3)">Checking…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-full" id="pub-webhook-btn" onclick="publishToWebhook()">Send to Webhook</button>
+      <div id="pub-webhook-prog" style="font-size:12px;color:var(--t3);margin-top:6px;display:none"></div>
+    </div>
+
+    <!-- Download -->
+    <div class="card" style="margin-bottom:10px">
+      <div class="pub-dest">
+        <div class="pub-icon" style="background:#6c757d">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div style="font-size:13px;font-weight:600">Download</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="pubDownloadJSON()">JSON</button>
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="pubDownloadCSV()">CSV</button>
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="pubDownloadAudio()">Audio</button>
+      </div>
+    </div>
+
+    <!-- Clipboard -->
+    <div class="card">
+      <div class="pub-dest">
+        <div class="pub-icon" style="background:#fd7e14">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        </div>
+        <div style="font-size:13px;font-weight:600">Copy to Clipboard</div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-full" onclick="pubCopyClipboard()">Copy as JSON</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let entries     = JSON.parse(localStorage.getItem('fr_entries')   || '[]');
+// Multi-survey form library (migrates single fr_form on first run)
+let pForms=(()=>{
+  const s=localStorage.getItem('fr_forms');
+  if(s) return JSON.parse(s);
+  const old=JSON.parse(localStorage.getItem('fr_form')||'null');
+  const arr=old?[{...old,id:'form_'+Date.now()}]:[];
+  try{localStorage.setItem('fr_forms',JSON.stringify(arr));}catch(_){}
+  return arr;
+})();
+let pForm=null; // set to the active form when a survey is started or resumed
+let syncCfg     = JSON.parse(localStorage.getItem('fr_sync')      || '{"url":""}');
+let webhookCfg  = JSON.parse(localStorage.getItem('fr_webhook')   || '{"url":"","auth":""}');
+let adminPin    = localStorage.getItem('fr_pin') || '1234';
+let knownEnums  = JSON.parse(localStorage.getItem('fr_enums')     || '[]');
+let appUsers    = null; // initialised by initUsers()
+
+// Session (cleared on tab close via sessionStorage)
+let currentRole = sessionStorage.getItem('role')  || null;
+let currentUser = sessionStorage.getItem('user')  || null;
+// Migrate legacy session roles
+if(currentRole==='superadmin'){ currentRole='admin'; sessionStorage.setItem('role','admin'); }
+
+// Login state
+let loginRole         = null;
+let selectedLoginUser = null;
+let editingUserId     = null;
+
+// Active survey state
+let activeDraftId  = null;
+let currentAnswers = {};
+let currentSection = 0; // kept for backward-compat with existing drafts
+let currentQIdx    = 0;
+let flatQuestions  = [];
+let existingAudio  = null;
+
+// Audio
+let mediaRecorder = null, audioChunks = [], recStart = null;
+let timerInterval = null, pauseStart = null, pausedMs = 0, isPaused = false;
+let audioCtx = null, analyser = null, animFrame = null, currentQuality = 'standard';
+let activeAudio = null, activeAudioId = null;
+// Phone survey
+let pendingAutoRecord = false;
+let callPhoneNum = '';
+let callStarted  = null;
+
+const QUAL = {
+  voice:    { sampleRate:16000, bitrate:16000,  echo:true,  noise:true,  ch:1 },
+  standard: { sampleRate:44100, bitrate:96000,  echo:false, noise:false, ch:1 },
+  high:     { sampleRate:48000, bitrate:192000, echo:false, noise:false, ch:2 }
+};
+const SKIP = new Set(['start','end','deviceid','phonenumber','username','caseid','calculate','audio audit','hidden']);
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(ms){ const s=Math.floor(ms/1000),m=Math.floor(s/60); return (m<10?'0':'')+m+':'+(s%60<10?'0':'')+s%60; }
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+function saveEntries(){ try{ localStorage.setItem('fr_entries',JSON.stringify(entries)); }catch(_){ toast('Storage full — export data first'); } }
+function saveForms(){ try{ localStorage.setItem('fr_forms',JSON.stringify(pForms)); }catch(_){ toast('Storage full'); } }
+
+function countQ(qs){
+  let n=0;
+  for(const q of qs){ if(q.type==='_sub') n+=countQ(q.questions); else if(q.type!=='note') n++; }
+  return n;
+}
+
+// ════════════════════════════════════════════════════════════
+// USER MODEL
+// ════════════════════════════════════════════════════════════
+const ROLE_LABEL = {admin:'Admin', contentmanager:'Content Manager', datacollector:'Data Collector', viewer:'Viewer'};
+
+function initUsers(){
+  appUsers = JSON.parse(localStorage.getItem('fr_users')||'null');
+  if(!appUsers){
+    appUsers = [{id:Date.now(), name:'Admin', role:'admin', credential:'admin@local', pin: localStorage.getItem('fr_pin')||'1234'}];
+    saveUsers();
+  } else {
+    let changed=false;
+    appUsers.forEach(u=>{
+      if(u.role==='superadmin'){ u.role='admin'; changed=true; }
+      if(!u.credential){
+        u.credential = u.role==='datacollector' ? (u.username||'dc-'+String(u.id).slice(-4)) : (u.email||(u.role==='admin'?'admin@local':'user@local'));
+        changed=true;
+      }
+    });
+    if(changed) saveUsers();
+  }
+  if(currentRole==='superadmin'){ currentRole='admin'; sessionStorage.setItem('role','admin'); }
+}
+function saveUsers(){ localStorage.setItem('fr_users', JSON.stringify(appUsers)); }
+
+function canDo(cap){
+  if(!currentRole) return false;
+  if(currentRole==='admin') return true;
+  const caps = {
+    contentmanager: ['uploadForms','editForms','exportData','publishData','viewData','deleteEntry'],
+    viewer: ['viewData']
+  };
+  return (caps[currentRole]||[]).includes(cap);
+}
+
+function applyRoleUI(){
+  const r = currentRole;
+  const show = {
+    'tab-btn-form':     r==='admin'||r==='contentmanager',
+    'tab-btn-sync':     r==='admin'||r==='contentmanager',
+    'tab-btn-settings': r==='admin'||r==='contentmanager'
+  };
+  Object.entries(show).forEach(([id,vis])=>{ const el=document.getElementById(id); if(el) el.style.display=vis?'':'none'; });
+  const active=document.querySelector('#scr-admin .tab.on');
+  if(active && active.style.display==='none') aTab('dashboard', document.getElementById('tab-btn-dashboard'));
+  const pub=document.getElementById('data-publish-btn');
+  const exp=document.getElementById('data-export-row');
+  const clr=document.getElementById('data-clear-btn');
+  if(pub) pub.style.display = canDo('publishData')?'':'none';
+  if(exp) exp.style.display = canDo('exportData') ?'':'none';
+  if(clr) clr.style.display = r==='admin'         ?'':'none';
+  const um=document.getElementById('user-mgmt-card');
+  const pc=document.getElementById('superadmin-only-pin');
+  if(um) um.style.display = r==='admin'?'':'none';
+  if(pc) pc.style.display = (r==='admin'||r==='contentmanager')?'':'none';
+  const sub=document.getElementById('admin-hdr-sub');
+  if(sub) sub.textContent = (currentUser||'') + (ROLE_LABEL[r]?' · '+ROLE_LABEL[r]:'');
+}
+
+// ════════════════════════════════════════════════════════════
+// LOGIN / ROLE
+// ════════════════════════════════════════════════════════════
+function showRoleLogin(role){
+  loginRole = role;
+  selectedLoginUser = null;
+  const isDC = role==='datacollector';
+  document.getElementById('pin-login-title').textContent = (ROLE_LABEL[role]||role) + ' Sign In';
+  // Credential label/placeholder
+  const credLabel = document.getElementById('credential-label');
+  const credInput = document.getElementById('credential-input');
+  credLabel.textContent = isDC ? 'Username' : 'Email';
+  credInput.placeholder = isDC ? 'Your username' : 'Your email address';
+  credInput.type = isDC ? 'text' : 'email';
+  // DC uses password field; supervisors use PIN field
+  document.getElementById('dc-password-wrap').style.display = isDC ? 'block' : 'none';
+  document.getElementById('pin-wrap-row').style.display    = isDC ? 'none'  : 'block';
+  // No-accounts notice
+  const users = appUsers.filter(u=>u.role===role);
+  const picker = document.getElementById('user-picker');
+  if(!users.length){
+    picker.style.display='block';
+    picker.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.55);padding:8px 0;line-height:1.6">No accounts for this role yet.<br>Admin can add users in Settings.</div>';
+  } else {
+    picker.style.display='none';
+  }
+  document.getElementById('role-cards').style.display='none';
+  document.getElementById('admin-login-form').style.display='block';
+  credInput.value='';
+  document.getElementById('pin-input').value='';
+  document.getElementById('dc-password-input').value='';
+  document.getElementById('pin-error').style.display='none';
+  setTimeout(()=>credInput.focus(),50);
+}
+function showAdminLogin(){ showRoleLogin('admin'); }
+function showEnumLogin(){ showRoleLogin('datacollector'); }
+function backToRoles(){
+  loginRole=null; selectedLoginUser=null;
+  document.getElementById('role-cards').style.display='block';
+  document.getElementById('admin-login-form').style.display='none';
+  document.getElementById('enum-login-form').style.display='none';
+  document.getElementById('pin-error').style.display='none';
+  document.getElementById('credential-input').value='';
+  document.getElementById('pin-input').value='';
+  document.getElementById('dc-password-input').value='';
+  document.getElementById('user-picker').style.display='none';
+  document.getElementById('user-picker').innerHTML='';
+}
+
+function doPinLogin(){
+  const errEl = document.getElementById('pin-error');
+  const credential = document.getElementById('credential-input').value.trim();
+  const isDC = loginRole==='datacollector';
+  const secret = isDC
+    ? document.getElementById('dc-password-input').value
+    : document.getElementById('pin-input').value;
+  if(!credential){ errEl.textContent='Enter your '+(isDC?'username':'email'); errEl.style.display='block'; return; }
+  if(!secret){ errEl.textContent='Enter your '+(isDC?'password':'PIN'); errEl.style.display='block'; return; }
+  const user = appUsers.find(u=>u.role===loginRole && u.credential.toLowerCase()===credential.toLowerCase());
+  if(!user){ errEl.textContent='No account found with that '+(isDC?'username':'email'); errEl.style.display='block'; return; }
+  if(secret!==user.pin){ errEl.textContent='Incorrect '+(isDC?'password':'PIN'); errEl.style.display='block'; return; }
+  currentRole=user.role; currentUser=user.name;
+  sessionStorage.setItem('role',user.role); sessionStorage.setItem('user',user.name);
+  if(isDC){
+    document.getElementById('enum-display-name').textContent = user.name;
+    switchScreen('scr-enum');
+  } else {
+    switchScreen('scr-admin');
+    renderAdminDashboard(); renderDataView(); renderUserList(); applyRoleUI();
+    if(user.role==='viewer') aTab('dashboard', document.getElementById('tab-btn-dashboard'));
+  }
+}
+function doAdminLogin(){
+  doPinLogin(); // kept for backward-compat; doPinLogin handles everything
+}
+
+function doEnumLogin(){
+  const name = document.getElementById('enum-name-input').value.trim();
+  if(!name){ toast('Please enter your name'); return; }
+  currentRole='enum'; currentUser=name;
+  sessionStorage.setItem('role','enum'); sessionStorage.setItem('user',name);
+  if(!knownEnums.find(e=>e.name===name)){
+    knownEnums.unshift({name, firstLogin:new Date().toISOString()});
+    localStorage.setItem('fr_enums',JSON.stringify(knownEnums));
+  }
+  switchScreen('scr-enum');
+  renderEnumHome();
+}
+
+function logout(){
+  if(!confirm('Sign out?')) return;
+  currentRole=null; currentUser=null;
+  sessionStorage.removeItem('role'); sessionStorage.removeItem('user');
+  if(mediaRecorder) stopRecording();
+  switchScreen('scr-login');
+  backToRoles();
+}
+
+function switchScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+function renderRecentNames(){
+  const row=document.getElementById('recent-names');
+  row.innerHTML=knownEnums.slice(0,6).map(e=>
+    `<button class="rname" onclick="document.getElementById('enum-name-input').value='${esc(e.name)}'">${esc(e.name)}</button>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// XLSFORM PARSING
+// ════════════════════════════════════════════════════════════
+function loadForm(input){
+  Array.from(input.files).forEach(parseSingleForm);
+  input.value='';
+}
+
+function parseSingleForm(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      if(!wb.Sheets['survey']||!wb.Sheets['choices']){ toast(file.name+': needs survey+choices sheets'); return; }
+      const sv=XLSX.utils.sheet_to_json(wb.Sheets['survey'],{defval:''});
+      const ch=XLSX.utils.sheet_to_json(wb.Sheets['choices'],{defval:''});
+      const st=wb.Sheets['settings']?XLSX.utils.sheet_to_json(wb.Sheets['settings'],{defval:''}):[];
+      const cm={};
+      ch.forEach(c=>{ const ln=String(c.list_name||'').trim(); if(!ln) return; if(!cm[ln]) cm[ln]=[]; const l=String(c.label||c['label::English']||c.value||'').trim(); if(l) cm[ln].push({value:String(c.value||'').trim(),label:l}); });
+      const secs=[],gs=[];
+      let qNum=0;
+      for(const row of sv){
+        const rt=String(row.type||'').trim(),nm=String(row.name||'').trim(),lbl=String(row.label||row['label::English']||row['label:English']||'').trim(),rel=String(row.relevant||row.relevance||'').trim();
+        if(!rt||!nm) continue;
+        const base=rt.split(' ')[0];
+        if(SKIP.has(base)) continue;
+        if(base==='begin'){ const sec={name:nm,label:lbl||nm,questions:[],rel}; if(gs.length===0) secs.push(sec); else gs[gs.length-1].questions.push({type:'_sub',label:lbl||nm,rel,questions:sec.questions}); gs.push(sec); continue; }
+        if(base==='end'){ if(gs.length>0) gs.pop(); continue; }
+        const tgt=gs.length>0?gs[gs.length-1]:null; if(!tgt) continue;
+        if(rt==='note'){ if(lbl) tgt.questions.push({type:'note',name:nm,label:lbl,rel}); continue; }
+        qNum++;
+        const q={type:base,rawType:rt,name:nm,label:lbl||nm,rel,required:String(row.required||'').toLowerCase()==='yes',qn:qNum};
+        if(base==='select_one'||base==='select_multiple'){ q.listName=rt.slice(base.length).trim(); q.choices=cm[q.listName]||[]; }
+        tgt.questions.push(q);
+      }
+      const title=st.length?String(st[0].form_title||file.name):file.name;
+      const newForm={id:'form_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),title,sections:secs.filter(s=>s.questions.length>0),totalQ:qNum,loadedAt:new Date().toISOString()};
+      const dup=pForms.findIndex(f=>f.title===newForm.title);
+      if(dup>-1){ pForms.splice(dup,1,newForm); toast(`Updated: ${newForm.title}`); }
+      else{ pForms.push(newForm); toast(`Added "${newForm.title}" — ${newForm.sections.length} sections · ${newForm.totalQ} questions`); }
+      saveForms(); renderAdminFormTab(); renderAdminDashboard();
+    }catch(err){ toast('Parse error ('+file.name+'): '+err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function removeForm(id){ if(!confirm('Remove this survey? Existing entries are preserved.')) return; pForms=pForms.filter(f=>f.id!==id); saveForms(); renderAdminFormTab(); toast('Survey removed'); }
+
+function renderAdminFormTab(){
+  const badge=document.getElementById('form-badge-admin');
+  badge.textContent=pForms.length?pForms.length+(pForms.length===1?' survey':' surveys'):'';
+  badge.style.display=pForms.length?'':'none';
+  document.getElementById('forms-list').innerHTML=pForms.length?pForms.map(f=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.title)}</div>
+          <div style="font-size:11px;color:var(--t3)">${f.sections.length} sections · ${f.totalQ} questions · Added ${new Date(f.loadedAt).toLocaleDateString()}</div>
+        </div>
+        <button onclick="removeForm('${f.id}')" style="flex-shrink:0;padding:5px 10px;font-size:11px;font-weight:600;border-radius:var(--rs);border:.5px solid var(--r);background:var(--rl);color:var(--r);cursor:pointer">Remove</button>
+      </div>
+      <ul class="sec-list" style="margin-top:8px">${f.sections.map((s,i)=>`<li><span>${i+1}. ${esc(s.label)}</span><span class="cn">${countQ(s.questions)}</span></li>`).join('')}</ul>
+    </div>`).join(''):'';
+}
+
+// ════════════════════════════════════════════════════════════
+// ADMIN DASHBOARD
+// ════════════════════════════════════════════════════════════
+function aTab(id, el){
+  document.querySelectorAll('#scr-admin .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('#admin-content .pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('ap-'+id).classList.add('on');
+  if(id==='dashboard') renderAdminDashboard();
+  if(id==='form') renderAdminFormTab();
+  if(id==='data') renderDataView();
+  if(id==='settings') renderEnumMgmt();
+}
+
+function renderAdminDashboard(){
+  const total=entries.length;
+  const complete=entries.filter(e=>e.status==='complete').length;
+  const drafts=entries.filter(e=>e.status==='draft').length;
+  const enumSet=new Set(entries.map(e=>e.enumerator));
+  document.getElementById('st-total').textContent=total;
+  document.getElementById('st-complete').textContent=complete;
+  document.getElementById('st-draft').textContent=drafts;
+  document.getElementById('st-enum-count').textContent=enumSet.size;
+
+  const recent=document.getElementById('dash-recent');
+  if(!entries.length){ recent.innerHTML='<div style="font-size:13px;color:var(--t3);padding:8px 0">No entries yet</div>'; }
+  else{
+    recent.innerHTML=entries.slice(0,5).map(e=>`
+      <div class="entry-row">
+        <div class="entry-row-main">
+          <div class="er-title">${esc(e.title)}</div>
+          <div class="er-meta">
+            <span>${esc(e.enumerator||'')}</span>
+            <span>&nbsp;·&nbsp;</span>
+            <span>${new Date(e.createdAt).toLocaleDateString()}</span>
+            <span>&nbsp;·&nbsp;</span>
+            <span class="badge ${e.status==='complete'?'ok':'warn'}">${e.status==='complete'?'Complete':'Draft'}</span>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="openModal(${e.id})">View</button>
+      </div>`).join('');
+  }
+
+  const enumDiv=document.getElementById('dash-enums');
+  if(!enumSet.size){ enumDiv.innerHTML='<div style="font-size:13px;color:var(--t3);padding:8px 0">No enumerators yet</div>'; return; }
+  enumDiv.innerHTML=[...enumSet].map(name=>{
+    const mine=entries.filter(e=>e.enumerator===name);
+    const done=mine.filter(e=>e.status==='complete').length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--bd)">
+      <div>
+        <div style="font-size:13px;font-weight:500">${esc(name)}</div>
+        <div style="font-size:11px;color:var(--t3)">${done} complete · ${mine.length-done} draft</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--g)">${mine.length} entries</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDataView(){
+  const filterForm=document.getElementById('filter-form').value;
+  const filterEnum=document.getElementById('filter-enum').value;
+  const filterStatus=document.getElementById('filter-status').value;
+
+  // Populate survey filter
+  const formSel=document.getElementById('filter-form');
+  const formTitles=[...new Set(entries.map(e=>e.formTitle).filter(Boolean))];
+  formSel.innerHTML='<option value="">All surveys</option>'+formTitles.map(t=>`<option value="${esc(t)}"${filterForm===t?' selected':''}>${esc(t)}</option>`).join('');
+
+  // Populate enumerator dropdown
+  const enumSel=document.getElementById('filter-enum');
+  const enumSet=new Set(entries.map(e=>e.enumerator).filter(Boolean));
+  const curVal=enumSel.value;
+  enumSel.innerHTML='<option value="">All enumerators</option>'+[...enumSet].map(n=>`<option value="${esc(n)}"${curVal===n?' selected':''}>${esc(n)}</option>`).join('');
+
+  let filtered=entries;
+  if(filterForm) filtered=filtered.filter(e=>e.formTitle===filterForm);
+  if(filterEnum) filtered=filtered.filter(e=>e.enumerator===filterEnum);
+  if(filterStatus) filtered=filtered.filter(e=>e.status===filterStatus);
+
+  const el=document.getElementById('data-list');
+  if(!filtered.length){ el.innerHTML='<div style="font-size:13px;color:var(--t3);padding:12px 0;text-align:center">No entries match filter</div>'; return; }
+  el.innerHTML=filtered.map(e=>`
+    <div class="entry-row">
+      <div class="entry-row-main">
+        <div class="er-title">${esc(e.title)}</div>
+        <div class="er-meta">
+          <span>${esc(e.enumerator||'')}</span> ·
+          <span>${new Date(e.createdAt).toLocaleDateString()}</span> ·
+          <span class="badge ${e.status==='complete'?'ok':'warn'}">${e.status==='complete'?'Complete':'Draft'}</span>
+          ${e.audioDataUrl?'&nbsp;<span class="badge info">Audio</span>':''}
+          ${e.synced?'&nbsp;<span class="badge ok">Synced</span>':''}
+        </div>
+      </div>
+      <div class="er-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openModal(${e.id})">View</button>
+        ${canDo('deleteEntry')?`<button class="btn btn-sm" style="background:var(--rl);color:var(--r);border:.5px solid var(--r)" onclick="deleteEntry(${e.id})">Del</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderEnumMgmt(){
+  const el=document.getElementById('enum-mgmt-list');
+  if(!knownEnums.length){ el.innerHTML='<div style="font-size:13px;color:var(--t3)">No enumerators have logged in yet</div>'; return; }
+  el.innerHTML=knownEnums.map(en=>{
+    const cnt=entries.filter(e=>e.enumerator===en.name).length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:.5px solid var(--bd)">
+      <div><div style="font-size:13px;font-weight:500">${esc(en.name)}</div><div style="font-size:11px;color:var(--t3)">${cnt} entries · joined ${new Date(en.firstLogin).toLocaleDateString()}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function clearEnumerators(){ if(!confirm('Clear enumerator login history?')) return; knownEnums=[]; localStorage.removeItem('fr_enums'); renderEnumMgmt(); toast('Enumerator history cleared'); }
+
+function changePin(){
+  const cur=document.getElementById('cur-pin').value;
+  const nw=document.getElementById('new-pin').value;
+  const cf=document.getElementById('conf-pin').value;
+  const su=appUsers.find(u=>u.role==='admin');
+  if(!su||cur!==su.pin){ toast('Current PIN incorrect'); return; }
+  if(nw.length<4){ toast('PIN must be at least 4 characters'); return; }
+  if(nw!==cf){ toast('New PINs do not match'); return; }
+  su.pin=nw; adminPin=nw; localStorage.setItem('fr_pin',nw); saveUsers();
+  document.getElementById('cur-pin').value=''; document.getElementById('new-pin').value=''; document.getElementById('conf-pin').value='';
+  toast('PIN updated successfully');
+}
+
+// ════════════════════════════════════════════════════════════
+// USER MANAGEMENT
+// ════════════════════════════════════════════════════════════
+function renderUserList(){
+  const el=document.getElementById('user-list'); if(!el) return;
+  const others=appUsers.filter(u=>u.role!=='admin');
+  if(!others.length){ el.innerHTML='<div style="font-size:13px;color:var(--t3);padding:8px 0">No other users yet — tap "+ Add user" to create one.</div>'; return; }
+  el.innerHTML=others.map(u=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:.5px solid var(--bd)">
+      <div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:2px">${esc(u.name)}</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:3px">${esc(u.credential||'')}</div>
+        <span class="role-badge ${u.role}">${ROLE_LABEL[u.role]||u.role}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="showEditUser(${u.id})">Edit</button>
+        <button class="btn btn-sm" style="background:var(--rl);color:var(--r);border:.5px solid var(--r)" onclick="deleteUser(${u.id})">Del</button>
+      </div>
+    </div>`).join('');
+}
+
+function _genDCCredentials(name){
+  const base = name.trim().toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'').slice(0,12) || 'dc';
+  const suffix = Math.floor(100+Math.random()*900);
+  const username = base+suffix;
+  const chars='abcdefghjkmnpqrstuvwxyz23456789';
+  let password='';
+  for(let i=0;i<8;i++) password+=chars[Math.floor(Math.random()*chars.length)];
+  return {username, password};
+}
+function onAddUserRoleChange(){
+  const role=document.getElementById('new-user-role').value;
+  const isDC=role==='datacollector';
+  document.getElementById('supervisor-cred-wrap').style.display=isDC?'none':'block';
+  document.getElementById('dc-creds-wrap').style.display=isDC?'block':'none';
+  if(isDC){
+    const name=document.getElementById('new-user-name').value;
+    const creds=_genDCCredentials(name||'collector');
+    document.getElementById('dc-gen-username').textContent=creds.username;
+    document.getElementById('dc-gen-password').textContent=creds.password;
+    document.getElementById('dc-gen-username').dataset.val=creds.username;
+    document.getElementById('dc-gen-password').dataset.val=creds.password;
+  }
+}
+function copyCreds(){
+  const u=document.getElementById('dc-gen-username').dataset.val||document.getElementById('dc-gen-username').textContent;
+  const p=document.getElementById('dc-gen-password').dataset.val||document.getElementById('dc-gen-password').textContent;
+  navigator.clipboard.writeText(`Username: ${u}\nPassword: ${p}`).then(()=>toast('Credentials copied!')).catch(()=>toast('Copy failed — note down credentials manually'));
+}
+
+function showAddUserForm(){
+  editingUserId=null;
+  document.getElementById('add-user-form-label').textContent='Full name';
+  document.getElementById('save-user-btn').textContent='Save user';
+  document.getElementById('pin-optional-hint').style.display='none';
+  document.getElementById('new-user-name').value='';
+  document.getElementById('new-user-email').value='';
+  document.getElementById('new-user-pin').value='';
+  document.getElementById('new-user-role').value='contentmanager';
+  document.getElementById('supervisor-cred-wrap').style.display='block';
+  document.getElementById('dc-creds-wrap').style.display='none';
+  document.getElementById('add-user-form').style.display='block';
+  document.getElementById('new-user-name').focus();
+}
+function showEditUser(id){
+  const u=appUsers.find(u=>u.id===id); if(!u) return;
+  editingUserId=id;
+  document.getElementById('add-user-form-label').textContent='Full name';
+  document.getElementById('save-user-btn').textContent='Update user';
+  document.getElementById('pin-optional-hint').style.display='';
+  document.getElementById('new-user-name').value=u.name;
+  document.getElementById('new-user-role').value=u.role;
+  const isDC=u.role==='datacollector';
+  document.getElementById('supervisor-cred-wrap').style.display=isDC?'none':'block';
+  document.getElementById('dc-creds-wrap').style.display=isDC?'block':'none';
+  if(isDC){
+    document.getElementById('dc-gen-username').textContent=u.credential||'';
+    document.getElementById('dc-gen-username').dataset.val=u.credential||'';
+    document.getElementById('dc-gen-password').textContent=u.pin||'';
+    document.getElementById('dc-gen-password').dataset.val=u.pin||'';
+  } else {
+    document.getElementById('new-user-email').value=u.credential||'';
+    document.getElementById('new-user-pin').value='';
+  }
+  document.getElementById('add-user-form').style.display='block';
+  document.getElementById('new-user-name').focus();
+}
+function cancelAddUser(){
+  editingUserId=null;
+  document.getElementById('add-user-form').style.display='none';
+}
+function saveNewUser(){
+  const name=document.getElementById('new-user-name').value.trim();
+  const role=document.getElementById('new-user-role').value;
+  if(!name){ toast('Enter a name'); return; }
+  const isDC=role==='datacollector';
+  const isEdit=!!editingUserId;
+  if(isDC){
+    const username=document.getElementById('dc-gen-username').dataset.val||document.getElementById('dc-gen-username').textContent;
+    const password=document.getElementById('dc-gen-password').dataset.val||document.getElementById('dc-gen-password').textContent;
+    if(isEdit){
+      const u=appUsers.find(u=>u.id===editingUserId); if(!u) return;
+      u.name=name; u.role=role; u.credential=username; u.pin=password;
+    } else {
+      appUsers.push({id:Date.now(), name, role, credential:username, pin:password});
+    }
+  } else {
+    const email=document.getElementById('new-user-email').value.trim();
+    const pin=document.getElementById('new-user-pin').value;
+    if(!email){ toast('Enter an email address'); return; }
+    if(isEdit){
+      const u=appUsers.find(u=>u.id===editingUserId); if(!u) return;
+      u.name=name; u.role=role; u.credential=email;
+      if(pin.length>=4) u.pin=pin;
+      else if(pin.length>0){ toast('PIN must be at least 4 characters'); return; }
+    } else {
+      if(pin.length<4){ toast('PIN must be at least 4 characters'); return; }
+      appUsers.push({id:Date.now(), name, role, credential:email, pin});
+    }
+  }
+  saveUsers(); cancelAddUser(); renderUserList();
+  toast(isEdit?'User updated':'User added');
+}
+function deleteUser(id){
+  const u=appUsers.find(u=>u.id===id); if(!u) return;
+  if(!confirm(`Delete user "${u.name}"?`)) return;
+  appUsers=appUsers.filter(u=>u.id!==id);
+  saveUsers(); renderUserList(); toast('User deleted');
+}
+
+// ════════════════════════════════════════════════════════════
+// SYNC
+// ════════════════════════════════════════════════════════════
+function saveSyncSettings(){ syncCfg.url=document.getElementById('gas-url').value.trim(); localStorage.setItem('fr_sync',JSON.stringify(syncCfg)); updateSyncBadge(); }
+function updateSyncBadge(){ const el=document.getElementById('sync-badge'); if(syncCfg.url){el.textContent='Configured';el.className='sync-badge ok';}else{el.textContent='Not configured';el.className='sync-badge no';} }
+async function testSync(){ if(!syncCfg.url){toast('Enter URL first');return;} const el=document.getElementById('sync-badge'); el.textContent='Testing…'; try{ await fetch(syncCfg.url,{method:'GET',mode:'no-cors'}); el.textContent='Connected'; el.className='sync-badge ok'; toast('Connection successful!'); }catch(_){ el.textContent='Failed'; el.className='sync-badge no'; toast('Could not connect'); } }
+function copyScript(){ navigator.clipboard.writeText(document.getElementById('gas-script').textContent).then(()=>toast('Script copied!')).catch(()=>toast('Select and copy manually')); }
+async function syncEntry(entry){
+  if(!syncCfg.url) return false;
+  try{
+    // Extract base64 audio if present, skip if over 30 MB (GAS limit)
+    let audioB64=null, audioExt='webm';
+    if(entry.audioDataUrl && entry.audioDataUrl.startsWith('data:')){
+      const m=entry.audioDataUrl.match(/^data:([^;]+);base64,(.+)$/);
+      if(m){ audioExt=m[1].split('/')[1]||'webm'; audioB64=m[2]; }
+      if(audioB64 && audioB64.length>30*1024*1024) audioB64=null; // too large
+    }
+    await fetch(syncCfg.url,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({...entry,audioDataUrl:null,audioB64,audioExt})
+    });
+    return true;
+  }catch(_){ return false; }
+}
+async function syncPending(){ const p=entries.filter(e=>!e.synced&&e.status==='complete'); if(!p.length){toast('No pending complete entries');return;} if(!syncCfg.url){toast('Configure sync URL first');return;} toast(`Syncing ${p.length}…`); let ok=0; for(const e of p){const s=await syncEntry(e);if(s){e.synced=true;ok++;}} saveEntries(); toast(`Synced ${ok}/${p.length}`); }
+
+// ════════════════════════════════════════════════════════════
+// WEBHOOK CONFIG
+// ════════════════════════════════════════════════════════════
+function saveWebhookSettings(){
+  webhookCfg.url  = (document.getElementById('webhook-url')||{value:''}).value.trim();
+  webhookCfg.auth = (document.getElementById('webhook-auth')||{value:''}).value.trim();
+  localStorage.setItem('fr_webhook', JSON.stringify(webhookCfg));
+  updateWebhookBadge();
+}
+function updateWebhookBadge(){
+  const el = document.getElementById('webhook-badge'); if(!el) return;
+  if(webhookCfg.url){ el.textContent='Configured'; el.className='sync-badge ok'; }
+  else { el.textContent='Not configured'; el.className='sync-badge no'; }
+}
+async function testWebhook(){
+  if(!webhookCfg.url){ toast('Enter URL first'); return; }
+  const el=document.getElementById('webhook-badge'); el.textContent='Testing…';
+  try{
+    const h={'Content-Type':'application/json'};
+    if(webhookCfg.auth) h['Authorization']=webhookCfg.auth;
+    await fetch(webhookCfg.url,{method:'GET',headers:h,mode:'no-cors'});
+    el.textContent='Connected'; el.className='sync-badge ok'; toast('Connection successful!');
+  }catch(_){ el.textContent='Failed'; el.className='sync-badge no'; toast('Could not connect'); }
+}
+
+// ════════════════════════════════════════════════════════════
+// PUBLISH SHEET
+// ════════════════════════════════════════════════════════════
+let pubScope = 'filtered';
+
+function getPubEntries(){
+  if(pubScope==='all') return entries.filter(e=>e.status==='complete');
+  const ff=(document.getElementById('filter-form')||{value:''}).value;
+  const fe=(document.getElementById('filter-enum')||{value:''}).value;
+  const fs=(document.getElementById('filter-status')||{value:''}).value;
+  let f=entries;
+  if(ff) f=f.filter(e=>e.formTitle===ff);
+  if(fe) f=f.filter(e=>e.enumerator===fe);
+  if(fs) f=f.filter(e=>e.status===fs);
+  return f;
+}
+
+function openPublishSheet(){
+  pubScope='filtered';
+  document.querySelectorAll('.pub-scope').forEach(b=>b.classList.toggle('on',b.textContent.trim()==='Current filter'));
+  refreshPublishSheet();
+  document.getElementById('publish-sheet').classList.add('on');
+}
+function closePublishSheet(){ document.getElementById('publish-sheet').classList.remove('on'); }
+function setPubScope(scope, el){
+  pubScope=scope;
+  document.querySelectorAll('.pub-scope').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  refreshPublishSheet();
+}
+function refreshPublishSheet(){
+  const list=getPubEntries();
+  const n=list.length;
+  const countEl=document.getElementById('publish-count');
+  if(countEl) countEl.textContent=`${n} entr${n===1?'y':'ies'} selected`;
+
+  const shStatus=document.getElementById('pub-sheets-status');
+  const shBtn=document.getElementById('pub-sheets-btn');
+  if(shStatus){
+    if(syncCfg.url){
+      const unsynced=list.filter(e=>!e.synced&&e.status==='complete').length;
+      shStatus.textContent='Configured · '+unsynced+' unsynced';
+    } else shStatus.textContent='Not configured — set URL in Sync tab';
+  }
+  if(shBtn) shBtn.disabled=!syncCfg.url;
+
+  const whStatus=document.getElementById('pub-webhook-status');
+  const whBtn=document.getElementById('pub-webhook-btn');
+  if(whStatus){
+    whStatus.textContent=webhookCfg.url
+      ? 'Configured · '+webhookCfg.url.replace(/^https?:\/\//,'').slice(0,40)
+      : 'Not configured — set URL in Sync tab';
+  }
+  if(whBtn) whBtn.disabled=!webhookCfg.url;
+}
+
+async function publishToSheets(){
+  if(!syncCfg.url){ toast('Configure Google Sheets URL in Sync tab'); return; }
+  const list=getPubEntries().filter(e=>e.status==='complete');
+  if(!list.length){ toast('No complete entries to push'); return; }
+  const prog=document.getElementById('pub-sheets-prog');
+  const btn=document.getElementById('pub-sheets-btn');
+  prog.style.display='block'; btn.disabled=true;
+  let ok=0, fail=0;
+  for(let i=0;i<list.length;i++){
+    prog.textContent=`Pushing ${i+1}/${list.length}…`;
+    const s=await syncEntry(list[i]);
+    if(s){ list[i].synced=true; ok++; } else fail++;
+  }
+  saveEntries(); renderDataView(); renderAdminDashboard();
+  prog.textContent=`Done — ${ok} pushed${fail?', '+fail+' failed':''}`;
+  btn.disabled=false;
+  refreshPublishSheet();
+  toast(`Pushed ${ok}/${list.length} to Sheets`);
+}
+
+async function publishToWebhook(){
+  if(!webhookCfg.url){ toast('Configure Webhook URL in Sync tab'); return; }
+  const list=getPubEntries();
+  if(!list.length){ toast('No entries selected'); return; }
+  const prog=document.getElementById('pub-webhook-prog');
+  const btn=document.getElementById('pub-webhook-btn');
+  prog.style.display='block'; btn.disabled=true;
+  const hdrs={'Content-Type':'application/json'};
+  if(webhookCfg.auth) hdrs['Authorization']=webhookCfg.auth;
+  let ok=0, fail=0;
+  for(let i=0;i<list.length;i++){
+    prog.textContent=`Sending ${i+1}/${list.length}…`;
+    try{
+      const e=list[i];
+      const payload={id:e.id,formTitle:e.formTitle,enumerator:e.enumerator,
+        status:e.status,createdAt:e.createdAt,completedAt:e.completedAt,
+        quality:e.quality||'',durationSec:e.durationSec||0,answers:e.answers||{}};
+      const r=await fetch(webhookCfg.url,{method:'POST',headers:hdrs,body:JSON.stringify(payload)});
+      if(r.ok||r.type==='opaque') ok++; else fail++;
+    }catch(_){ fail++; }
+  }
+  prog.textContent=`Done — ${ok} sent${fail?', '+fail+' failed':''}`;
+  btn.disabled=false;
+  toast(`Sent ${ok}/${list.length} to webhook`);
+}
+
+function pubDownloadJSON(){
+  const list=getPubEntries(); if(!list.length){toast('No entries');return;}
+  const data=list.map(e=>({...e,audioDataUrl:e.audioDataUrl?'[audio omitted]':null}));
+  dlBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'entries.json');
+}
+function pubDownloadCSV(){
+  const list=getPubEntries(); if(!list.length){toast('No entries');return;}
+  const ks=new Set(); list.forEach(e=>Object.keys(e.answers||{}).forEach(k=>ks.add(k)));
+  const meta=['id','title','enumerator','formTitle','status','createdAt','completedAt','quality','durationSec','synced'];
+  const cols=[...meta,...ks];
+  const rows=list.map(e=>cols.map(c=>{const v=meta.includes(c)?e[c]:(e.answers||{})[c]||'';return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(','));
+  dlBlob(new Blob([cols.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}),'entries.csv');
+}
+async function pubDownloadAudio(){
+  const list=getPubEntries().filter(e=>e.audioDataUrl); if(!list.length){toast('No audio in selection');return;}
+  for(const e of list){const a=document.createElement('a');a.href=e.audioDataUrl;a.download=(e.title||'rec').replace(/[^a-z0-9]/gi,'_')+'-'+e.id+'.webm';a.click();await new Promise(r=>setTimeout(r,400));}
+}
+function pubCopyClipboard(){
+  const list=getPubEntries(); if(!list.length){toast('No entries');return;}
+  const data=list.map(e=>({...e,audioDataUrl:e.audioDataUrl?'[audio omitted]':null}));
+  navigator.clipboard.writeText(JSON.stringify(data,null,2))
+    .then(()=>toast(`Copied ${list.length} entr${list.length===1?'y':'ies'} to clipboard`))
+    .catch(()=>toast('Could not access clipboard'));
+}
+
+// ════════════════════════════════════════════════════════════
+// ENUMERATOR: HOME
+// ════════════════════════════════════════════════════════════
+function renderEnumHome(){
+  document.getElementById('enum-display-name').textContent = currentUser;
+  document.getElementById('enum-form-name').textContent = pForms.length===0?'No surveys loaded':pForms.length===1?pForms[0].title:`${pForms.length} surveys available`;
+  document.getElementById('new-survey-btn').disabled = pForms.length===0;
+  document.getElementById('no-form-notice').style.display = pForms.length?'none':'';
+
+  const mine = entries.filter(e=>e.enumerator===currentUser);
+  const drafts = mine.filter(e=>e.status==='draft');
+  const completed = mine.filter(e=>e.status==='complete');
+
+  // Draft badge in header
+  const draftBadge=document.getElementById('draft-badge');
+  if(drafts.length){ draftBadge.textContent=drafts.length+' draft'+(drafts.length>1?'s':''); draftBadge.style.display=''; }
+  else draftBadge.style.display='none';
+
+  const draftsSection=document.getElementById('ev-drafts-section');
+  const completedSection=document.getElementById('ev-completed-section');
+  const emptyState=document.getElementById('ev-empty');
+
+  if(!drafts.length&&!completed.length){ emptyState.style.display=''; draftsSection.style.display='none'; completedSection.style.display='none'; return; }
+  emptyState.style.display='none';
+
+  if(drafts.length){
+    draftsSection.style.display='';
+    document.getElementById('draft-count').textContent='('+drafts.length+')';
+    document.getElementById('ev-drafts').innerHTML=drafts.sort((a,b)=>new Date(b.lastEditedAt)-new Date(a.lastEditedAt)).map(e=>{
+      const entryForm=pForms.find(f=>f.id===e.formId)||pForms.find(f=>f.title===e.formTitle);
+      const qTotal=entryForm?entryForm.totalQ:1;
+      const qIdx=e.currentQIdx||0;
+      const pct=Math.round((qIdx/Math.max(qTotal,1))*100);
+      return `<div class="survey-card draft">
+        <div class="sc-main">
+          <div class="sc-title">${esc(e.title)}</div>
+          <div class="sc-meta">${esc(e.formTitle||'')} · Edited ${new Date(e.lastEditedAt).toLocaleDateString()} · Q${qIdx+1}${entryForm?' of ~'+qTotal:''}</div>
+          <div class="sc-prog"><div class="sc-prog-fill" style="width:${pct}%"></div></div>
+          <div style="display:flex;gap:5px">
+            <span class="badge warn">Draft</span>
+            ${e.audioDataUrl?'<span class="badge info">Audio saved</span>':''}
+          </div>
+        </div>
+        <div class="sc-actions">
+          <button class="btn btn-primary btn-sm" onclick="resumeSurvey(${e.id})">Resume</button>
+          <button class="btn btn-secondary btn-sm" onclick="deleteEntry(${e.id})">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } else draftsSection.style.display='none';
+
+  if(completed.length){
+    completedSection.style.display='';
+    document.getElementById('ev-completed').innerHTML=completed.sort((a,b)=>new Date(b.completedAt||b.createdAt)-new Date(a.completedAt||a.createdAt)).map(e=>`
+      <div class="survey-card complete">
+        <div class="sc-main">
+          <div class="sc-title">${esc(e.title)}</div>
+          <div class="sc-meta">Completed ${new Date(e.completedAt||e.createdAt).toLocaleDateString()}</div>
+          <div style="display:flex;gap:5px">
+            <span class="badge ok">Complete</span>
+            ${e.audioDataUrl?'<span class="badge info">Audio</span>':''}
+            ${e.synced?'<span class="badge ok">Synced</span>':'<span class="badge grey">Not synced</span>'}
+          </div>
+        </div>
+        <div class="sc-actions">
+          <button class="btn btn-secondary btn-sm" onclick="editCompleted(${e.id})">Edit</button>
+        </div>
+      </div>`).join('');
+  } else completedSection.style.display='none';
+}
+
+// ════════════════════════════════════════════════════════════
+// ENUMERATOR: SURVEY FLOW
+// ════════════════════════════════════════════════════════════
+function startNewSurvey(){
+  if(!pForms.length){ toast('No surveys loaded — ask your administrator'); return; }
+  if(pForms.length===1){ initNewSurvey(pForms[0]); return; }
+  // Multiple surveys — show bottom-sheet picker
+  document.getElementById('form-picker-list').innerHTML=pForms.map(f=>`
+    <div onclick="pickForm('${f.id}')" style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--rad);border:.5px solid var(--bd2);background:var(--bg2);margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+      <div style="width:42px;height:42px;border-radius:11px;background:var(--gl);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gd)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.title)}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">${f.sections.length} sections · ${f.totalQ} questions</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`).join('');
+  document.getElementById('form-picker').style.display='flex';
+}
+
+function pickForm(id){
+  const f=pForms.find(f=>f.id===id); if(!f) return;
+  closeFormPicker();
+  initNewSurvey(f);
+}
+
+function closeFormPicker(){
+  document.getElementById('form-picker').style.display='none';
+}
+
+function initNewSurvey(form){
+  pForm=form;
+  activeDraftId=null;
+  currentAnswers={};
+  currentSection=0; currentQIdx=0;
+  existingAudio=null;
+  document.getElementById('timer').textContent='00:00';
+  document.getElementById('existing-audio-player').style.display='none';
+  clearWaveform();
+  buildFlatQuestions();
+  const first=findNextVisible(0); if(first>-1) currentQIdx=first;
+  showSurveyView(form.title);
+}
+
+function resumeSurvey(id){
+  const entry=entries.find(e=>e.id===id);
+  if(!entry) return;
+  pForm=pForms.find(f=>f.id===entry.formId)||pForms.find(f=>f.title===entry.formTitle)||null;
+  if(!pForm){ toast('Survey form not found — ask admin to re-upload it'); return; }
+  activeDraftId=id;
+  currentAnswers={...entry.answers};
+  buildFlatQuestions();
+  // restore position — prefer saved currentQIdx, fall back to 0
+  const saved=entry.currentQIdx!==undefined?entry.currentQIdx:0;
+  const vis=findNextVisible(saved); currentQIdx=vis>-1?vis:0;
+  existingAudio=entry.audioDataUrl||null;
+  document.getElementById('timer').textContent='00:00';
+  if(existingAudio){
+    const pl=document.getElementById('existing-audio-player');
+    pl.style.display='';
+    pl.innerHTML=`<div class="audio-player">
+      <button class="play-btn" onclick="playExistingAudio(event)" id="existing-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+      <div class="ainfo"><div class="albl">Saved recording · ${fmt((entry.durationSec||0)*1000)}</div><div class="aprog"><div class="apfill" id="ex-prog"></div></div></div>
+    </div>`;
+  } else {
+    document.getElementById('existing-audio-player').style.display='none';
+  }
+  showSurveyView(entry.title);
+}
+
+function editCompleted(id){
+  const entry=entries.find(e=>e.id===id);
+  if(!entry) return;
+  entry.status='draft'; entry.lastEditedAt=new Date().toISOString(); saveEntries();
+  resumeSurvey(id);
+}
+
+function showSurveyView(title){
+  document.getElementById('ev-home').style.display='none';
+  document.getElementById('ev-survey').style.display='flex';
+  document.getElementById('survey-title-display').textContent=title;
+  document.getElementById('survey-enum-display').textContent=currentUser;
+  renderSection();
+}
+
+function backToHome(){
+  if(mediaRecorder){ toast('Stop recording before going back'); return; }
+  if(confirm('Go back? Unsaved changes will be lost. Use "Save draft" to keep progress.')){
+    document.getElementById('ev-home').style.display='flex';
+    document.getElementById('ev-survey').style.display='none';
+    activeDraftId=null;
+    renderEnumHome();
+  }
+}
+
+async function saveDraft(){
+  collectAnswers();
+  const now=new Date().toISOString();
+  const title=currentAnswers.name||currentAnswers._title||currentAnswers.uuid||('Draft '+(entries.length+1));
+
+  let audioDataUrl=existingAudio, durationSec=0;
+  if(audioChunks.length>0){
+    const blob=new Blob(audioChunks,{type:audioChunks[0].type||'audio/webm'});
+    durationSec=Math.round((Date.now()-recStart-pausedMs)/1000);
+    audioDataUrl=await blob2url(blob);
+    if(mediaRecorder) stopRecording();
+    audioChunks=[];
+  }
+
+  if(activeDraftId){
+    const idx=entries.findIndex(e=>e.id===activeDraftId);
+    if(idx>-1){
+      entries[idx]={...entries[idx],title,answers:{...currentAnswers},currentSection,currentQIdx,lastEditedAt:now,status:'draft',audioDataUrl:audioDataUrl||entries[idx].audioDataUrl,durationSec:durationSec||entries[idx].durationSec,transcript:transcriptFull||entries[idx].transcript||''};
+      saveEntries(); toast('Draft saved'); return;
+    }
+  }
+  const entry={id:Date.now(),title,enumerator:currentUser,formTitle:pForm?pForm.title:'',formId:pForm?.id||'',status:'draft',answers:{...currentAnswers},currentSection,currentQIdx,audioDataUrl,durationSec,quality:currentQuality,createdAt:now,lastEditedAt:now,completedAt:null,synced:false,transcript:transcriptFull||''};
+  entries.unshift(entry);
+  activeDraftId=entry.id;
+  saveEntries(); toast('Draft saved — you can resume this later');
+}
+
+async function completeSurvey(){
+  collectAnswers();
+  const now=new Date().toISOString();
+  const title=currentAnswers.name||currentAnswers._title||currentAnswers.uuid||('Survey '+(entries.length+1));
+
+  let audioDataUrl=existingAudio, durationSec=0;
+  if(audioChunks.length>0){
+    const blob=new Blob(audioChunks,{type:audioChunks[0].type||'audio/webm'});
+    durationSec=Math.round((Date.now()-recStart-pausedMs)/1000);
+    audioDataUrl=await blob2url(blob);
+    if(mediaRecorder) stopRecording();
+    audioChunks=[];
+  }
+
+  const entryData={title,enumerator:currentUser,formTitle:pForm?pForm.title:'',formId:pForm?.id||'',status:'complete',answers:{...currentAnswers},currentSection,audioDataUrl,durationSec,quality:currentQuality,lastEditedAt:now,completedAt:now,synced:false,transcript:transcriptFull||''};
+
+  if(activeDraftId){
+    const idx=entries.findIndex(e=>e.id===activeDraftId);
+    if(idx>-1){
+      entries[idx]={...entries[idx],...entryData};
+      if(syncCfg.url){ const ok=await syncEntry(entries[idx]); if(ok) entries[idx].synced=true; }
+      saveEntries();
+      toast(entries[idx].synced?'Survey completed + synced!':'Survey completed!');
+      generateAndSaveReport(entries[idx]);
+      backAfterComplete();
+      return;
+    }
+  }
+  const entry={id:Date.now(),...entryData,createdAt:now};
+  entries.unshift(entry);
+  if(syncCfg.url){ const ok=await syncEntry(entry); if(ok) entry.synced=true; }
+  saveEntries();
+  toast(entry.synced?'Survey completed + synced!':'Survey completed!');
+  generateAndSaveReport(entry);
+  backAfterComplete();
+}
+
+function backAfterComplete(){
+  activeDraftId=null; currentAnswers={}; currentSection=0; currentQIdx=0; flatQuestions=[]; existingAudio=null;
+  audioChunks=[]; document.getElementById('timer').textContent='00:00'; clearWaveform();
+  transcriptFull=''; transcriptBuffer=''; coachLog=[];
+  document.getElementById('ev-home').style.display='flex';
+  document.getElementById('ev-survey').style.display='none';
+  renderEnumHome();
+}
+
+// ════════════════════════════════════════════════════════════
+// FORM RENDERING — one question at a time
+// ════════════════════════════════════════════════════════════
+function buildFlatQuestions(){
+  flatQuestions=[];
+  if(!pForm) return;
+  function walk(qs, secLabel, groupRels){
+    for(const q of qs){
+      if(q.type==='_sub'){ walk(q.questions, q.label||secLabel, q.rel?[...groupRels,q.rel]:groupRels); }
+      else{ flatQuestions.push({...q, secLabel, groupRels:[...groupRels]}); }
+    }
+  }
+  for(const sec of pForm.sections) walk(sec.questions, sec.label, sec.rel?[sec.rel]:[]);
+}
+
+function isQVisible(q){
+  if(!evalRelevance(q.rel, currentAnswers)) return false;
+  for(const gr of (q.groupRels||[])){ if(!evalRelevance(gr, currentAnswers)) return false; }
+  return true;
+}
+
+function findNextVisible(from){
+  for(let i=from;i<flatQuestions.length;i++) if(isQVisible(flatQuestions[i])) return i;
+  return -1;
+}
+function findPrevVisible(from){
+  for(let i=from;i>=0;i--) if(isQVisible(flatQuestions[i])) return i;
+  return -1;
+}
+
+function renderCurrentQ(){
+  if(!pForm||!flatQuestions.length) return;
+  const q=flatQuestions[currentQIdx];
+  const isNote=q.type==='note';
+
+  // Section breadcrumb
+  document.getElementById('q-section-lbl').textContent=q.secLabel||'';
+
+  // Progress — count among non-note visible questions
+  const allVis=flatQuestions.filter(x=>x.type!=='note'&&isQVisible(x));
+  const posIdx=allVis.indexOf(q);
+  const visPos=posIdx>=0?posIdx+1:0;
+  const visTotal=allVis.length;
+  const pct=visTotal>0?Math.round((visPos/visTotal)*100):0;
+  document.getElementById('sec-prog-fill').style.width=pct+'%';
+  document.getElementById('q-counter').textContent=isNote?'Note':`${visPos} / ${visTotal}`;
+
+  // Render question content
+  const val=currentAnswers[q.name]||'';
+  const req=q.required?'<span style="color:var(--r)"> *</span>':'';
+  let html;
+  if(isNote){
+    html=`<div class="q-note-card">${esc(q.label)}</div>`;
+  } else {
+    html=`<div class="q-wrap"><label class="q-card-label">${esc(q.label)}${req}</label>${buildInput(q,val)}</div>`;
+  }
+  const el=document.getElementById('section-questions');
+  el.style.animation='none'; void el.offsetWidth;
+  el.style.animation='_qfade .22s ease';
+  el.innerHTML=html;
+  attachHandlers(el);
+  // Auto-focus text/number inputs
+  const inp=el.querySelector('input[type=text],input[type=number],input[type=date],textarea');
+  if(inp) setTimeout(()=>inp.focus(),60);
+
+  // Nav buttons
+  const isFirst=findPrevVisible(currentQIdx-1)===-1;
+  const isLast =findNextVisible(currentQIdx+1)===-1;
+  const prevBtn=document.getElementById('btn-q-prev');
+  const nextBtn=document.getElementById('btn-q-next');
+  if(prevBtn) prevBtn.disabled=isFirst;
+  if(nextBtn) nextBtn.textContent=isLast?'Complete ✓':'Next →';
+}
+
+function nextQ(){
+  collectAnswers();
+  const next=findNextVisible(currentQIdx+1);
+  if(next===-1){ completeSurvey(); return; }
+  currentQIdx=next;
+  renderCurrentQ();
+  // Milestone encouragement every 25 answered questions
+  const answered=Object.values(currentAnswers).filter(v=>v).length;
+  if(answered>0&&answered%25===0){
+    const msgs=['Great pace — keep going!','25 more done — you\'re on a roll!','Halfway there — excellent work!','Almost done — fantastic effort!'];
+    toast(msgs[Math.floor(answered/25-1)%msgs.length]);
+  }
+  document.getElementById('form-section-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function prevQ(){
+  collectAnswers();
+  const prev=findPrevVisible(currentQIdx-1);
+  if(prev===-1) return;
+  currentQIdx=prev;
+  renderCurrentQ();
+  document.getElementById('form-section-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Legacy — kept so existing call-sites don't crash
+function renderSection(){ buildFlatQuestions(); const f=findNextVisible(0); if(f>-1){ currentQIdx=f; renderCurrentQ(); } }
+function navSection(){}
+
+function renderQList(qs){ return qs.map(renderQ).join(''); }
+function renderQ(q){
+  const rel=q.rel?` data-rel="${esc(q.rel)}"`:'' , hid=q.rel&&!evalRelevance(q.rel,currentAnswers)?' hid':'';
+  if(q.type==='note') return `<div class="q-note${hid}"${rel}>${esc(q.label)}</div>`;
+  if(q.type==='_sub') return `<div class="q-wrap${hid}"${rel}><div class="sub-title">${esc(q.label)}</div>${renderQList(q.questions)}</div>`;
+  const val=currentAnswers[q.name]||'', req=q.required?'<span style="color:var(--r)"> *</span>':'';
+  return `<div class="q-wrap${hid}"${rel}><label class="q-label">${esc(q.label)}${req}</label>${buildInput(q,val)}</div>`;
+}
+
+function buildInput(q,val){
+  const nm=esc(q.name);
+  if(q.type==='select_one'){
+    if((q.choices||[]).length<=7) return `<div class="opts" data-name="${nm}" data-type="so">${(q.choices||[]).map(c=>`<label class="opt${val===String(c.value)?' sel':''}"><input type="radio" name="${nm}" value="${esc(c.value)}"${val===String(c.value)?' checked':''}><span>${esc(c.label)}</span></label>`).join('')}</div>`;
+    return `<select name="${nm}" onchange="setAns('${nm}',this.value)"><option value="">Select...</option>${(q.choices||[]).map(c=>`<option value="${esc(c.value)}"${val===String(c.value)?' selected':''}>${esc(c.label)}</option>`).join('')}</select>`;
+  }
+  if(q.type==='select_multiple'){ const sel=val?val.split(' '):[]; return `<div class="opts scroll" data-name="${nm}" data-type="sm">${(q.choices||[]).map(c=>`<label class="opt${sel.includes(String(c.value))?' sel':''}"><input type="checkbox" name="${nm}" value="${esc(c.value)}"${sel.includes(String(c.value))?' checked':''}><span>${esc(c.label)}</span></label>`).join('')}</div>`; }
+  if(q.rawType==='integer'||q.rawType==='decimal') return `<input type="number" name="${nm}" value="${esc(val)}" inputmode="numeric" placeholder="Number" oninput="setAns('${nm}',this.value)">`;
+  if(q.type==='date') return `<input type="date" name="${nm}" value="${esc(val)}" onchange="setAns('${nm}',this.value)">`;
+  if(q.type==='time') return `<input type="time" name="${nm}" value="${esc(val)}" onchange="setAns('${nm}',this.value)">`;
+  if(q.type==='text'&&String(q.label).length>50) return `<textarea name="${nm}" placeholder="Enter response..." oninput="setAns('${nm}',this.value)">${esc(val)}</textarea>`;
+  return `<input type="text" name="${nm}" value="${esc(val)}" placeholder="Enter response..." oninput="setAns('${nm}',this.value)">`;
+}
+
+function setAns(n,v){ currentAnswers[n]=v; updateVisibility(); }
+
+function attachHandlers(c){
+  c.querySelectorAll('.opts[data-type]').forEach(list=>{
+    const nm=list.dataset.name, tp=list.dataset.type;
+    list.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('change',()=>{
+        if(tp==='so'){ list.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); inp.closest('.opt').classList.toggle('sel',inp.checked); currentAnswers[nm]=inp.value; }
+        else{ inp.closest('.opt').classList.toggle('sel',inp.checked); currentAnswers[nm]=[...list.querySelectorAll('input:checked')].map(i=>i.value).join(' '); }
+        updateVisibility();
+      });
+    });
+    list.querySelectorAll('.opt').forEach(opt=>opt.addEventListener('click',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SPAN')return;opt.querySelector('input')?.click();}));
+  });
+}
+
+function collectAnswers(){
+  const c=document.getElementById('section-questions'); if(!c) return;
+  c.querySelectorAll('input[name]:not([type=radio]):not([type=checkbox]),select[name],textarea[name]').forEach(el=>{if(el.value) currentAnswers[el.name]=el.value;});
+}
+
+// ════════════════════════════════════════════════════════════
+// RELEVANCE EVALUATOR
+// ════════════════════════════════════════════════════════════
+function evalRelevance(expr,a){
+  if(!expr||!String(expr).trim()) return true;
+  try{
+    let js=String(expr)
+      .replace(/[\r\n\t]+/g,' ')
+      .replace(/\$\{([^}]+)\}/g,(_,n)=>`__v(${JSON.stringify(n)})`)
+      // compound functions first (before their shorter substrings)
+      .replace(/\bcount-selected\s*\(/gi,'__csel(')
+      .replace(/\bstring-length\s*\(/gi,'__slen(')
+      // then simple functions
+      .replace(/\bselected\s*\(/gi,'__sel(')
+      .replace(/\bcoalesce\s*\(/gi,'__coal(')
+      .replace(/\bstring\s*\(/gi,'__str(')
+      .replace(/\b(?:int|integer|number|decimal)\s*\(/gi,'__num(')
+      .replace(/\bif\s*\(/gi,'__if(')
+      .replace(/\bnot\s*\(/gi,'__not(')
+      .replace(/\btrue\s*\(\s*\)/gi,'true')
+      .replace(/\bfalse\s*\(\s*\)/gi,'false')
+      // operators — != before = to avoid double-conversion
+      .replace(/!=/g,'!==')
+      .replace(/([^=!<>])=([^=])/g,'$1==$2')
+      .replace(/\band\b/gi,'&&')
+      .replace(/\bor\b/gi,'||');
+    const __v  = n=>{ const v=a[n]; return v!==undefined&&v!==null?String(v):''; };
+    const __sel= (v,t)=>String(v).split(' ').map(s=>s.trim()).filter(Boolean).includes(String(t).trim());
+    const __if = (c,t,f)=>c?t:f;
+    const __not= v=>!v;
+    const __slen=v=>String(v||'').trim().length;
+    const __csel=v=>String(v||'').split(' ').filter(s=>s.trim()).length;
+    const __coal=(...args)=>{ for(const x of args){ if(x!==''&&x!==null&&x!==undefined) return x; } return ''; };
+    const __str= v=>String(v===undefined||v===null?'':v);
+    const __num= v=>{ const n=parseFloat(String(v||'')); return isNaN(n)?0:n; };
+    return !!eval(js);
+  }catch(_){ return true; }
+}
+
+function updateVisibility(){
+  const c=document.getElementById('section-questions'); if(!c) return;
+  c.querySelectorAll('[data-rel]').forEach(el=>el.classList.toggle('hid',!evalRelevance(el.dataset.rel,currentAnswers)));
+}
+
+// ════════════════════════════════════════════════════════════
+// AUDIO RECORDING
+// ════════════════════════════════════════════════════════════
+async function toggleRecord(){ if(!mediaRecorder) await startRecording(); else stopRecording(); }
+
+async function startRecording(){
+  try{
+    const q=QUAL[currentQuality];
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:q.echo,noiseSuppression:q.noise,autoGainControl:q.echo,sampleRate:q.sampleRate,channelCount:q.ch}});
+    setupVisualizer(stream);
+    const opts={};
+    for(const t of['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4;codecs=aac','audio/mp4']) if(MediaRecorder.isTypeSupported(t)){opts.mimeType=t;break;}
+    if(audioCtx?.state==='suspended') await audioCtx.resume();
+    opts.audioBitsPerSecond=q.bitrate;
+    mediaRecorder=new MediaRecorder(stream,opts); audioChunks=[];
+    mediaRecorder.ondataavailable=e=>{if(e.data.size>0) audioChunks.push(e.data);};
+    mediaRecorder.start(100); recStart=Date.now(); pausedMs=0; isPaused=false;
+    document.getElementById('btn-rec').classList.add('recording');
+    document.getElementById('btn-pause').style.display='';
+    document.getElementById('btn-discard').style.display='';
+    document.getElementById('timer').classList.add('rec');
+    timerInterval=setInterval(()=>{ const el=isPaused?(pauseStart-recStart-pausedMs):(Date.now()-recStart-pausedMs); document.getElementById('timer').textContent=fmt(el); },500);
+    startAI();
+  }catch(_){ toast('Microphone access denied'); }
+}
+
+function stopRecording(){
+  if(!mediaRecorder) return;
+  mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t=>t.stop());
+  clearInterval(timerInterval); cancelAnimationFrame(animFrame);
+  if(audioCtx){ audioCtx.close(); audioCtx=null; }
+  document.getElementById('btn-rec').classList.remove('recording');
+  document.getElementById('btn-pause').style.display='none';
+  document.getElementById('timer').classList.remove('rec');
+  mediaRecorder=null;
+  stopAI();
+}
+
+function togglePause(){
+  if(!mediaRecorder) return;
+  if(isPaused){ mediaRecorder.resume(); pausedMs+=Date.now()-pauseStart; isPaused=false; document.getElementById('btn-pause').querySelector('svg').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>'; }
+  else{ mediaRecorder.pause(); pauseStart=Date.now(); isPaused=true; document.getElementById('btn-pause').querySelector('svg').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>'; }
+}
+
+function discardRecording(){
+  if(!mediaRecorder) return;
+  stopRecording(); audioChunks=[];
+  document.getElementById('timer').textContent='00:00';
+  document.getElementById('btn-discard').style.display='none';
+  document.getElementById('lvfill').style.width='0%';
+  clearWaveform(); toast('Recording discarded');
+}
+
+function setupVisualizer(stream){
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  analyser=audioCtx.createAnalyser(); analyser.fftSize=512;
+  audioCtx.createMediaStreamSource(stream).connect(analyser);
+  drawWaveform();
+}
+function clearWaveform(){ const c=document.getElementById('waveform'); if(!c) return; c.getContext('2d').clearRect(0,0,c.width,c.height); }
+function drawWaveform(){
+  const canvas=document.getElementById('waveform'); if(!canvas||!analyser) return;
+  canvas.width=canvas.offsetWidth*devicePixelRatio; canvas.height=canvas.offsetHeight*devicePixelRatio;
+  const ctx=canvas.getContext('2d'), buf=new Uint8Array(analyser.frequencyBinCount);
+  (function draw(){ animFrame=requestAnimationFrame(draw); analyser.getByteTimeDomainData(buf); ctx.clearRect(0,0,canvas.width,canvas.height); let sum=0; for(let i=0;i<buf.length;i++) sum+=Math.abs(buf[i]-128); document.getElementById('lvfill').style.width=Math.min(100,(sum/buf.length)*3)+'%'; ctx.lineWidth=2*devicePixelRatio; ctx.strokeStyle='#1D9E75'; ctx.beginPath(); const sw=canvas.width/buf.length; let x=0; for(let i=0;i<buf.length;i++){const y=(buf[i]/128)*canvas.height/2; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);x+=sw;} ctx.stroke(); })();
+}
+function setQuality(q,el){ currentQuality=q; document.querySelectorAll('.qpill').forEach(p=>p.classList.remove('on')); el.classList.add('on'); }
+function blob2url(b){ return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b);}); }
+
+function playExistingAudio(evt){
+  if(!existingAudio) return;
+  if(activeAudio&&activeAudioId==='existing'){
+    if(activeAudio.paused){activeAudio.play();evt.currentTarget.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';}
+    else{activeAudio.pause();evt.currentTarget.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';}
+    return;
+  }
+  if(activeAudio) activeAudio.pause();
+  const audio=new Audio(existingAudio); activeAudio=audio; activeAudioId='existing';
+  const prog=document.getElementById('ex-prog'), btn=evt.currentTarget;
+  audio.ontimeupdate=()=>{if(audio.duration) prog.style.width=Math.round((audio.currentTime/audio.duration)*100)+'%';};
+  audio.onended=()=>{btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';prog.style.width='0%';activeAudio=null;};
+  audio.play(); btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+}
+
+// ════════════════════════════════════════════════════════════
+// SHARED: EXPORT / DELETE / MODAL
+// ════════════════════════════════════════════════════════════
+function deleteEntry(id){
+  if(!confirm('Delete this entry?')) return;
+  entries=entries.filter(e=>e.id!==id);
+  saveEntries();
+  if(currentRole==='admin') renderDataView();
+  else renderEnumHome();
+  toast('Entry deleted');
+}
+
+function exportJSON(){
+  const data=entries.map(e=>({...e,audioDataUrl:e.audioDataUrl?'[audio omitted]':null}));
+  dlBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'entries.json');
+}
+function exportCSV(){
+  if(!entries.length){toast('No entries');return;}
+  const ks=new Set(); entries.forEach(e=>Object.keys(e.answers||{}).forEach(k=>ks.add(k)));
+  const meta=['id','title','enumerator','formTitle','status','createdAt','completedAt','quality','durationSec','synced'];
+  const cols=[...meta,...ks];
+  const rows=entries.map(e=>cols.map(c=>{const v=meta.includes(c)?e[c]:(e.answers||{})[c]||'';return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(','));
+  dlBlob(new Blob([cols.join(',')+'\n'+rows.join('\n')],{type:'text/csv'}),'entries.csv');
+}
+async function exportAudio(){
+  const wa=entries.filter(e=>e.audioDataUrl); if(!wa.length){toast('No audio');return;}
+  for(const e of wa){ const a=document.createElement('a');a.href=e.audioDataUrl;a.download=(e.title||'rec').replace(/[^a-z0-9]/gi,'_')+'-'+e.id+'.webm';a.click();await new Promise(r=>setTimeout(r,400)); }
+}
+function dlBlob(blob,name){ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); }
+function clearAll(){ if(!confirm('Delete ALL entries? This cannot be undone.')) return; entries=[]; saveEntries(); renderDataView(); renderAdminDashboard(); toast('All entries cleared'); }
+
+function openModal(id){
+  const e=entries.find(e=>e.id===id); if(!e) return;
+  document.getElementById('modal-title').textContent=e.title;
+  const ans=e.answers||{};
+  const pairs=Object.entries(ans).filter(([k,v])=>v);
+  document.getElementById('modal-body').innerHTML=`
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <span class="badge ${e.status==='complete'?'ok':'warn'}">${e.status}</span>
+      <span class="badge grey">${esc(e.enumerator||'')}</span>
+      <span class="badge grey">${new Date(e.createdAt).toLocaleDateString()}</span>
+      ${e.audioDataUrl?'<span class="badge info">Has audio</span>':''}
+      ${e.synced?'<span class="badge ok">Synced</span>':''}
+    </div>
+    ${e.audioDataUrl?`<div class="audio-player" style="margin-bottom:12px"><button class="play-btn" onclick="playModalAudio(event,'${e.id}')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button><div class="ainfo"><div class="albl">${e.quality||''} · ${fmt((e.durationSec||0)*1000)}</div><div class="aprog"><div class="apfill" id="modal-prog"></div></div></div><a href="${e.audioDataUrl}" download="rec-${e.id}.webm" style="color:var(--t3);font-size:15px;text-decoration:none">&#11015;</a></div>`:''}
+    <div style="font-size:12px;color:var(--t3);margin-bottom:8px">${pairs.length} responses</div>
+    ${pairs.map(([k,v])=>`<div style="display:flex;gap:8px;padding:6px 0;border-bottom:.5px solid var(--bd);font-size:12px"><span style="color:var(--t3);flex:0 0 40%;overflow:hidden;text-overflow:ellipsis">${esc(k)}</span><span style="flex:1;font-weight:500">${esc(String(v).slice(0,100))}</span></div>`).join('')}
+    ${e.qualityReport?renderQualityReportHTML(e.qualityReport):''}`;
+  document.getElementById('detail-modal').classList.add('on');
+}
+
+let modalAudio=null;
+function playModalAudio(evt,id){
+  const e=entries.find(e=>String(e.id)===String(id)); if(!e?.audioDataUrl) return;
+  if(modalAudio){if(modalAudio.paused){modalAudio.play();evt.currentTarget.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';}else{modalAudio.pause();evt.currentTarget.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';}return;}
+  modalAudio=new Audio(e.audioDataUrl);
+  const prog=document.getElementById('modal-prog'),btn=evt.currentTarget;
+  modalAudio.ontimeupdate=()=>{if(modalAudio.duration)prog.style.width=Math.round((modalAudio.currentTime/modalAudio.duration)*100)+'%';};
+  modalAudio.onended=()=>{btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>';prog.style.width='0%';modalAudio=null;};
+  modalAudio.play(); btn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+}
+function closeModal(){ document.getElementById('detail-modal').classList.remove('on'); if(modalAudio){modalAudio.pause();modalAudio=null;} }
+
+// ════════════════════════════════════════════════════════════
+// AI COACH
+// ════════════════════════════════════════════════════════════
+let aiCfg        = JSON.parse(localStorage.getItem('fr_ai')||'{"enabled":false,"key":"","model":"claude-haiku-4-5-20251001"}');
+let srInst       = null;
+let transcriptFull   = '';
+let transcriptBuffer = '';
+let coachLog     = [];
+let aiAnalyzing  = false;
+let aiLastCall   = 0;
+const AI_MIN_GAP = 30000;
+
+function saveAICfg(){
+  aiCfg.key   = (document.getElementById('ai-api-key')||{value:''}).value||'';
+  aiCfg.model = (document.getElementById('ai-model-sel')||{value:'claude-haiku-4-5-20251001'}).value||'claude-haiku-4-5-20251001';
+  localStorage.setItem('fr_ai',JSON.stringify(aiCfg));
+}
+
+function toggleAI(){
+  aiCfg.enabled=!aiCfg.enabled;
+  saveAICfg();
+  updateAIToggleUI();
+  toast(aiCfg.enabled?'AI Coach enabled — set API key below':'AI Coach disabled');
+}
+
+function updateAIToggleUI(){
+  const btn=document.getElementById('ai-toggle-btn');
+  if(!btn) return;
+  btn.textContent=aiCfg.enabled?'ON':'OFF';
+  btn.className='ai-toggle-btn '+(aiCfg.enabled?'on':'off');
+}
+
+// ─ Called when recording starts/stops ─
+function startAI(){
+  if(!aiCfg.enabled||!aiCfg.key) return;
+  transcriptFull=''; transcriptBuffer=''; coachLog=[];
+  aiAnalyzing=false; aiLastCall=0;
+  const card=document.getElementById('ai-coach-card');
+  if(card){ card.style.display=''; }
+  clearCoachTip(); renderCoachHistory();
+  setAIStatus('ready','Ready');
+  startSR();
+}
+
+function stopAI(){
+  stopSR();
+  if(transcriptBuffer.trim().split(' ').length>10&&!aiAnalyzing){
+    runCoachAnalysis(transcriptBuffer).catch(()=>{});
+    transcriptBuffer='';
+  }
+}
+
+// ─ Speech recognition ─
+function startSR(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ setAIStatus('error','Speech recognition not available (use Chrome/Edge)'); return; }
+  srInst=new SR();
+  srInst.continuous=true;
+  srInst.interimResults=true;
+  srInst.lang='en-US';
+  srInst.onresult=onSRResult;
+  srInst.onerror=e=>{
+    if(e.error==='not-allowed') setAIStatus('error','Microphone permission denied');
+    else if(e.error!=='no-speech') setAIStatus('error','Speech error: '+e.error);
+  };
+  srInst.onend=()=>{ if(mediaRecorder) try{ srInst.start(); }catch(_){} };
+  try{ srInst.start(); setAIStatus('listening','Listening…'); }
+  catch(_){ setAIStatus('error','Could not start speech recognition'); }
+}
+
+function stopSR(){
+  if(!srInst) return;
+  try{ srInst.stop(); }catch(_){}
+  srInst=null;
+  setAIStatus('idle','Stopped');
+}
+
+function onSRResult(e){
+  let interim='';
+  for(let i=e.resultIndex;i<e.results.length;i++){
+    if(e.results[i].isFinal){
+      const t=e.results[i][0].transcript+' ';
+      transcriptBuffer+=t; transcriptFull+=t;
+    } else { interim+=e.results[i][0].transcript; }
+  }
+  const tx=document.getElementById('ai-tx-box');
+  if(tx) tx.textContent=(transcriptBuffer+interim).slice(-700)||'Waiting for speech…';
+  // Auto-analyze every 30s when buffer has enough words
+  const now=Date.now();
+  if(!aiAnalyzing && transcriptBuffer.trim().split(/\s+/).length>=20 && now-aiLastCall>AI_MIN_GAP){
+    const buf=transcriptBuffer; transcriptBuffer=''; aiLastCall=now;
+    runCoachAnalysis(buf).catch(()=>{});
+  }
+}
+
+// ─ Manual trigger ─
+function triggerAnalysis(){
+  if(!aiCfg.key){ toast('Add API key in Admin → Settings → AI Coach'); return; }
+  const buf=transcriptBuffer.trim()||transcriptFull.slice(-600);
+  if(!buf){ toast('No speech captured yet — start recording and speak'); return; }
+  transcriptBuffer=''; aiLastCall=Date.now();
+  runCoachAnalysis(buf).catch(()=>{ setAIStatus('error','Analysis failed'); aiAnalyzing=false; });
+}
+
+// ─ Claude API: real-time coaching ─
+async function runCoachAnalysis(text){
+  if(aiAnalyzing) return;
+  aiAnalyzing=true;
+  setAIStatus('analyzing','Analyzing…');
+
+  const sec=pForm?.sections?.[currentSection];
+  const qls=sec?sec.questions.filter(q=>q.label&&q.type!=='_sub'&&q.type!=='note').slice(0,4).map(q=>`"${q.label}"`).join(', '):'';
+
+  const prompt=`You are an expert field research interviewer coach listening to a live survey interview.
+
+Form: ${pForm?.title||'Survey'} | Section: ${sec?.label||''} | Questions: ${qls}
+
+Recent conversation transcript (~30 seconds):
+"${text.trim()}"
+
+Your task: identify ONE specific coaching action needed RIGHT NOW. Consider:
+- Vague/incomplete answer → probe for specifics
+- Respondent confused or misunderstood → suggest clarification to enumerator
+- Respondent mentioned something important not followed up → follow-up opportunity
+- Enumerator is leading or answering for the respondent → warn immediately
+
+Only coach when there is a CLEAR, SPECIFIC need. If the interview is going well, say so with "ok".
+
+Respond ONLY as valid JSON (no extra text):
+{"action":"coach"|"ok","type":"probe"|"clarify"|"followup"|"warn"|null,"message":"Actionable tip starting with a verb, max 25 words"|null}`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':aiCfg.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:aiCfg.model||'claude-haiku-4-5-20251001',max_tokens:130,messages:[{role:'user',content:prompt}]})
+    });
+    if(!r.ok) throw new Error('API '+r.status);
+    const d=await r.json();
+    const raw=d.content?.[0]?.text||'{}';
+    const j=JSON.parse(raw.match(/\{[\s\S]*?\}/)?.[0]||'{}');
+    if(j.action==='coach'&&j.message){
+      showCoachTip(j.type||'probe',j.message);
+      coachLog.unshift({type:j.type||'probe',message:j.message,ts:Date.now()});
+      if(coachLog.length>10) coachLog.pop();
+      renderCoachHistory();
+      if(navigator.vibrate) navigator.vibrate([70,30,70]);
+    }
+    setAIStatus('listening','Listening…');
+  }catch(err){
+    setAIStatus('error','AI error — verify API key in Settings');
+  }finally{
+    aiAnalyzing=false;
+  }
+}
+
+// ─ UI helpers ─
+const TIP_META={probe:{lbl:'Probe for detail'},clarify:{lbl:'Clarify'},followup:{lbl:'Follow up'},warn:{lbl:'Caution'}};
+
+function showCoachTip(type,msg){
+  const box=document.getElementById('ai-tip-box'); if(!box) return;
+  const meta=TIP_META[type]||{lbl:type};
+  box.style.display='';
+  box.innerHTML=`<div class="coach-tip ${type}"><div class="tip-lbl">${esc(meta.lbl)}</div>${esc(msg)}</div>`;
+}
+
+function clearCoachTip(){
+  const box=document.getElementById('ai-tip-box'); if(!box) return;
+  box.style.display='none'; box.innerHTML='';
+}
+
+function renderCoachHistory(){
+  const list=document.getElementById('ai-hist-list');
+  const box=document.getElementById('ai-hist-box');
+  if(!list||!box) return;
+  if(!coachLog.length){ box.style.display='none'; return; }
+  box.style.display='';
+  const colors={probe:'var(--a)',clarify:'var(--b)',followup:'var(--pu)',warn:'var(--r)'};
+  list.innerHTML=coachLog.slice(0,6).map(c=>`<div class="ai-hist-item"><span style="font-size:9px;font-weight:700;text-transform:uppercase;color:${colors[c.type]||'var(--t3)'};flex-shrink:0;padding-top:1px">${c.type||''}</span><span>${esc(c.message)}</span></div>`).join('');
+}
+
+function setAIStatus(state,text){
+  const dot=document.getElementById('ai-dot');
+  const txt=document.getElementById('ai-status-text');
+  if(dot) dot.className='ai-dot'+(state==='listening'?' listening':state==='analyzing'?' analyzing':state==='error'?' error':'');
+  if(txt) txt.textContent=text;
+}
+
+function toggleAITranscript(){
+  const box=document.getElementById('ai-tx-box');
+  const btn=document.getElementById('ai-tx-toggle');
+  if(!box) return;
+  const open=box.style.display!=='none';
+  box.style.display=open?'none':'';
+  if(btn) btn.innerHTML=(open?'&#9658;':'&#9660;')+' Live transcript';
+}
+
+// ─ Post-interview quality report ─
+function generateAndSaveReport(entry){
+  if(!aiCfg.enabled||!aiCfg.key) return;
+  generateQualityReport(entry).then(report=>{
+    if(!report||!report.score) return;
+    const idx=entries.findIndex(e=>e.id===entry.id);
+    if(idx>-1){ entries[idx].qualityReport=report; saveEntries(); }
+    toast('AI quality report ready — open the entry to view it');
+  }).catch(()=>{});
+}
+
+async function generateQualityReport(entry){
+  const ans=entry.answers||{};
+  const answered=Object.values(ans).filter(v=>v).length;
+  const formTotal=pForm?.totalQ||0;
+  const pct=formTotal>0?Math.round((answered/formTotal)*100):null;
+  const sample=Object.entries(ans).slice(0,70).map(([k,v])=>`${k}: ${String(v).slice(0,80)}`).join('\n');
+  const tx=entry.transcript?`\n\nInterview transcript excerpt:\n${entry.transcript.slice(0,1800)}`:'';
+
+  const prompt=`You are an expert field research quality evaluator. A survey interview has just been completed.
+
+Form: ${entry.formTitle||'Unknown'} | Enumerator: ${entry.enumerator||'Unknown'}
+Duration: ${Math.round((entry.durationSec||0)/60)} minutes | Questions answered: ${answered}${formTotal?` of ${formTotal} (${pct}%)`:''}
+Has audio recording: ${entry.audioDataUrl?'Yes':'No'}
+
+Sample responses:
+${sample}${tx}
+
+Evaluate interview quality. Consider: completeness, substantiveness of open-ended answers, numeric precision where needed, duration relative to question count, any signs of data quality issues (identical or very short answers, implausible values), and enumerator probing where evident.
+
+Respond ONLY as valid JSON:
+{"score":1-10,"grade":"Excellent"|"Good"|"Fair"|"Needs Improvement"|"Poor","summary":"2-3 sentence honest assessment","strengths":["up to 3 specific strengths"],"improvements":["up to 3 specific actionable improvements"],"missed_probes":["specific questions or topics that likely needed more depth — empty array if none"],"completion_pct":${pct!==null?pct:'null'},"recommendation":"single most important action to improve next interview"}`;
+
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':aiCfg.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:550,messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok) return null;
+  const d=await r.json();
+  const raw=d.content?.[0]?.text||'{}';
+  try{ return JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0]||'{}'); }catch(_){ return null; }
+}
+
+function renderQualityReportHTML(r){
+  if(!r||!r.score) return '';
+  const gc={'Excellent':'E','Good':'G','Fair':'F','Needs Improvement':'N','Poor':'P'}[r.grade]||'G';
+  const scoreColor=r.score>=8?'var(--g)':r.score>=6?'var(--b)':r.score>=4?'var(--a)':'var(--r)';
+  const list=(arr,cls)=>arr?.length?`<ul class="report-list ${cls}">${arr.map(i=>`<li>${esc(String(i))}</li>`).join('')}</ul>`:'';
+  return `<hr class="div">
+  <div class="ct" style="margin-bottom:10px">AI Quality Report</div>
+  <div class="report-hero">
+    <div style="text-align:center">
+      <div class="report-score-num" style="color:${scoreColor}">${r.score}<span style="font-size:13px;color:var(--t3)">/10</span></div>
+      <div class="report-grade-pill grade-${gc}">${esc(r.grade||'')}</div>
+    </div>
+    <div style="flex:1;font-size:12px;color:var(--t2);line-height:1.6">${esc(r.summary||'')}</div>
+  </div>
+  ${r.strengths?.length?`<div class="report-section"><h4>Strengths</h4>${list(r.strengths,'str')}</div>`:''}
+  ${r.improvements?.length?`<div class="report-section"><h4>Areas to improve</h4>${list(r.improvements,'imp')}</div>`:''}
+  ${r.missed_probes?.length?`<div class="report-section"><h4>Missed probing opportunities</h4>${list(r.missed_probes,'miss')}</div>`:''}
+  ${r.recommendation?`<div style="margin-top:10px;background:var(--gl);border-radius:var(--rs);padding:10px 12px;font-size:12px;color:var(--gd)"><b>Key recommendation:</b> ${esc(r.recommendation)}</div>`:''}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  // Initialise user accounts (migrates from legacy single-PIN setup)
+  initUsers();
+
+  // Restore admin fields
+  document.getElementById('gas-url').value=syncCfg.url||'';
+  updateSyncBadge();
+  document.getElementById('webhook-url').value=webhookCfg.url||'';
+  document.getElementById('webhook-auth').value=webhookCfg.auth||'';
+  updateWebhookBadge();
+  renderAdminFormTab();
+
+  // Restore AI settings
+  const aiKeyEl=document.getElementById('ai-api-key');
+  if(aiKeyEl) aiKeyEl.value=aiCfg.key||'';
+  const aiModEl=document.getElementById('ai-model-sel');
+  if(aiModEl) aiModEl.value=aiCfg.model||'claude-haiku-4-5-20251001';
+  updateAIToggleUI();
+
+  // Resume session if active
+  const adminRoles = ['superadmin','admin','viewer'];
+  if(adminRoles.includes(currentRole)){
+    switchScreen('scr-admin');
+    renderAdminDashboard(); renderDataView(); renderUserList(); applyRoleUI();
+  } else if(currentRole==='enum' && currentUser){
+    switchScreen('scr-enum');
+    renderEnumHome();
+  }
+});
+
+// ── PHONE SURVEY ─────────────────────────────────────────────
+function togglePhoneCard(){
+  const card = document.getElementById('phone-call-card');
+  const btn  = document.getElementById('btn-phone-toggle');
+  const hidden = card.style.display === 'none';
+  if(hidden){
+    card.style.display = '';
+    btn.style.color       = 'var(--g)';
+    btn.style.borderColor = 'var(--g)';
+    // Auto-fill from survey answers if a phone-like field exists
+    const phoneKey = Object.keys(currentAnswers).find(k => /phone|mobile|tel|contact/i.test(k));
+    if(phoneKey && currentAnswers[phoneKey]){
+      const inp = document.getElementById('call-number');
+      if(inp && !inp.value) inp.value = currentAnswers[phoneKey];
+    }
+  } else {
+    if(callStarted){ toast('End the call before closing'); return; }
+    card.style.display    = 'none';
+    btn.style.color       = '';
+    btn.style.borderColor = '';
+  }
+}
+
+function dialAndRecord(){
+  const inp = document.getElementById('call-number');
+  const num = (inp?.value || '').trim();
+  if(!num){ toast('Enter a phone number first'); return; }
+  callPhoneNum = num;
+  pendingAutoRecord = true;
+  callStarted = null;
+  document.getElementById('pc-pre').style.display     = 'none';
+  document.getElementById('pc-waiting').style.display = '';
+  document.getElementById('pc-wait-num').textContent  = num;
+  setTimeout(()=>{ window.location.href = 'tel:' + num.replace(/[\s\-()]/g,''); }, 120);
+}
+
+function cancelDial(){
+  pendingAutoRecord = false;
+  document.getElementById('pc-pre').style.display     = '';
+  document.getElementById('pc-waiting').style.display = 'none';
+}
+
+async function activateCallUI(){
+  callStarted = Date.now();
+  document.getElementById('pc-waiting').style.display = 'none';
+  document.getElementById('pc-active').style.display  = '';
+  document.getElementById('pc-num-display').textContent = callPhoneNum;
+  if(!mediaRecorder) await startRecording();
+}
+
+function endPhoneCall(){
+  pendingAutoRecord = false;
+  const dur = callStarted ? Math.round((Date.now() - callStarted) / 1000) : 0;
+  callStarted = null;
+  document.getElementById('pc-active').style.display  = 'none';
+  document.getElementById('pc-pre').style.display     = '';
+  if(mediaRecorder) stopRecording();
+  if(dur > 0) toast(`Call ended · ${Math.floor(dur/60)}:${String(dur%60).padStart(2,'0')} recorded`);
+}
+
+function redialCall(){
+  if(!callPhoneNum) return;
+  window.location.href = 'tel:' + callPhoneNum.replace(/[\s\-()]/g,'');
+}
+
+// ── PWA BOOTSTRAP ────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+// Generate PNG icon for iOS "Add to Home Screen"
+(function(){
+  try{
+    const c=document.createElement('canvas'); c.width=c.height=180;
+    const x=c.getContext('2d');
+    function rr(rx,ry,rw,rh,rc){
+      x.beginPath();
+      x.moveTo(rx+rc,ry);x.lineTo(rx+rw-rc,ry);
+      x.quadraticCurveTo(rx+rw,ry,rx+rw,ry+rc);
+      x.lineTo(rx+rw,ry+rh-rc);x.quadraticCurveTo(rx+rw,ry+rh,rx+rw-rc,ry+rh);
+      x.lineTo(rx+rc,ry+rh);x.quadraticCurveTo(rx,ry+rh,rx,ry+rh-rc);
+      x.lineTo(rx,ry+rc);x.quadraticCurveTo(rx,ry,rx+rc,ry);
+      x.closePath();x.fill();
+    }
+    // Dark maroon radial background
+    const bg=x.createRadialGradient(90,63,0,90,63,112);
+    bg.addColorStop(0,'#2A0808');bg.addColorStop(1,'#080000');
+    x.fillStyle=bg;
+    x.beginPath();
+    const R=31,S=180;
+    x.moveTo(R,0);x.lineTo(S-R,0);x.quadraticCurveTo(S,0,S,R);
+    x.lineTo(S,S-R);x.quadraticCurveTo(S,S,S-R,S);
+    x.lineTo(R,S);x.quadraticCurveTo(0,S,0,S-R);
+    x.lineTo(0,R);x.quadraticCurveTo(0,0,R,0);x.closePath();x.fill();
+    // Gold gradient for geometric shapes
+    const gold=x.createLinearGradient(0,39,0,142);
+    gold.addColorStop(0,'#FFCE3A');gold.addColorStop(1,'#D4920A');
+    x.fillStyle=gold;
+    // Geometric E
+    rr(38,39,18,103,3);   // spine
+    rr(38,39,77,18,3);    // top arm
+    rr(38,84,58,15,3);    // middle arm
+    rr(38,124,77,18,3);   // bottom arm
+    // ! bar
+    rr(126,39,15,69,3);
+    // ! dot (teal)
+    x.fillStyle='#1FA896';
+    x.beginPath();x.arc(134,127,12,0,Math.PI*2);x.fill();
+    // Dot highlight
+    x.fillStyle='rgba(255,255,255,0.22)';
+    x.beginPath();x.arc(129,123,4,0,Math.PI*2);x.fill();
+    const el=document.getElementById('ati');
+    if(el)el.href=c.toDataURL('image/png');
+  }catch(_){}
+})();
+
+// When enumerator returns from native phone app → start recording automatically
+document.addEventListener('visibilitychange', async ()=>{
+  if(!document.hidden && pendingAutoRecord){
+    pendingAutoRecord = false;
+    await activateCallUI();
+    toast('Recording started · Put call on SPEAKER');
+    if(navigator.vibrate) navigator.vibrate([80,40,80]);
+  }
+});
+</script>
+</body>
+</html>
