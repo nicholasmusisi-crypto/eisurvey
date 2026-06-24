@@ -127,9 +127,30 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .note-box{background:var(--pul);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--pud);line-height:1.5;margin-bottom:12px}
 #results{display:none}
 
+/* ── Live Monitor styles ── */
+.mon-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--rs);background:var(--rl);margin-bottom:12px;font-size:13px;font-weight:600;color:var(--r)}
+.mon-status.live{background:var(--gl);color:var(--gd)}
+.pulse{width:9px;height:9px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
+.mon-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.mon-preview{width:100%;border-radius:var(--rs);border:.5px solid var(--bd);background:#000;display:block;max-height:180px;object-fit:contain}
+.evt-item{display:flex;gap:10px;padding:8px 0;border-bottom:.5px solid var(--bd);align-items:flex-start}
+.evt-item:last-child{border:none;padding-bottom:0}
+.evt-item img{margin-top:6px;width:100%;max-width:280px;border-radius:6px;border:.5px solid var(--bd);display:block}
+.evt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.evt-dot.warn{background:var(--r)}
+.evt-dot.info{background:var(--g)}
+.evt-dot.low{background:var(--b)}
+.evt-time{font-size:10px;color:var(--t3);margin-top:2px}
+/* Flash overlay – shown full-width at top when alert fires */
+#mon-flash{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--r);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:opacity .6s;opacity:0;pointer-events:none}
+#mon-flash svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.flash-title{font-size:14px;font-weight:700}
+.flash-body{font-size:12px;opacity:.85;margin-top:1px}
+
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .tabs,.upload-wrap,.btn,.btn-print,.note-box{display:none!important}
+  .tabs,.upload-wrap,.btn,.btn-print,.note-box,#mon-flash{display:none!important}
   .app-hdr{padding-bottom:0}
   .pg.on{display:block!important;padding:0}
   #results{display:block!important}
@@ -152,6 +173,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
   <div class="tabs">
     <button class="tab on" onclick="switchTab('doc',this)">Document Analysis</button>
     <button class="tab" onclick="switchTab('session',this)">Session Log</button>
+    <button class="tab" onclick="switchTab('monitor',this)">Live Monitor</button>
   </div>
 </div>
 
@@ -623,6 +645,259 @@ function toggleChk(id) {
 
 // Default session date
 document.getElementById('s-date').valueAsDate = new Date();
+
+// ── Live Monitor ──────────────────────────────────────────
+let monStream = null, monVideo = null, monCanvas = null;
+let prevFrame = null, monInterval = null, timerInt = null;
+let monStart = null, monActive = false, monLog = [];
+
+async function startMonitor() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    monErr('Screen capture is not supported in this browser. Use Chrome or Edge.');
+    return;
+  }
+
+  try {
+    monStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 2, max: 5 } }, audio: false });
+  } catch(e) {
+    monErr(e.name === 'NotAllowedError'
+      ? 'Permission denied. The candidate must click "Allow" when the browser asks to share their screen.'
+      : 'Could not start screen capture: ' + e.message);
+    return;
+  }
+
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  monVideo  = document.getElementById('mon-vid');
+  monCanvas = document.getElementById('mon-cvs');
+  const preview = document.getElementById('mon-preview');
+
+  monVideo.srcObject  = monStream;
+  preview.srcObject   = monStream;
+  await monVideo.play();
+  await preview.play();
+
+  monActive = true;
+  monStart  = Date.now();
+  monLog    = [];
+  prevFrame = null;
+
+  monAddEvt('info', 'Monitoring session started — screen capture active');
+
+  document.addEventListener('visibilitychange', onVisChange);
+  window.addEventListener('blur', onWinBlur);
+  window.addEventListener('focus', onWinFocus);
+
+  monInterval = setInterval(checkFrame, 4000);
+  timerInt    = setInterval(tickTimer, 1000);
+
+  // User stops sharing from browser UI
+  monStream.getVideoTracks()[0].addEventListener('ended', () => {
+    monAddEvt('warn', 'Screen sharing was stopped by the participant');
+    stopMonitor(true);
+  });
+
+  document.getElementById('mon-setup').style.display  = 'none';
+  document.getElementById('mon-active').style.display = 'block';
+  document.getElementById('mon-status').className     = 'mon-status live';
+  document.getElementById('mon-status-txt').textContent = 'Monitoring active — screen capture running';
+}
+
+// Tab hidden → candidate left this browser tab
+function onVisChange() {
+  if (!monActive) return;
+  if (document.hidden) {
+    monAddEvt('warn', 'Tab switch detected — candidate navigated away from this page');
+    fireAlert('Tab switch detected', 'Candidate left the monitoring tab');
+  } else {
+    monAddEvt('info', 'Returned to monitoring page');
+  }
+}
+
+// Window lost focus → switched to another app (e.g. Chrome to use AI tool)
+let blurTimer = null;
+function onWinBlur() {
+  if (!monActive) return;
+  blurTimer = setTimeout(() => {
+    monAddEvt('warn', 'Window focus lost — candidate switched to another application');
+    fireAlert('App switch detected', 'Candidate moved to a different application');
+  }, 1200); // debounce: ignore very short focus flickers
+}
+function onWinFocus() {
+  if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
+}
+
+// Frame comparison: downscale to 80×45 and count changed pixels
+function checkFrame() {
+  if (!monActive || !monVideo || monVideo.readyState < 2) return;
+
+  monCanvas.width  = 80;
+  monCanvas.height = 45;
+  const ctx = monCanvas.getContext('2d');
+  ctx.drawImage(monVideo, 0, 0, 80, 45);
+  const frame = ctx.getImageData(0, 0, 80, 45);
+
+  if (prevFrame) {
+    const diff = pixelDiff(frame.data, prevFrame.data);
+    if (diff > 0.38) {
+      // Capture a readable screenshot at full resolution
+      const sc = document.createElement('canvas');
+      sc.width  = monVideo.videoWidth  || 640;
+      sc.height = monVideo.videoHeight || 360;
+      sc.getContext('2d').drawImage(monVideo, 0, 0);
+      const shot = sc.toDataURL('image/jpeg', 0.45);
+      monAddEvt('warn', `Major screen change detected — ${Math.round(diff * 100)}% of screen changed`, shot);
+      fireAlert('Screen change detected', `${Math.round(diff * 100)}% of the visible screen changed suddenly`);
+    }
+  }
+  prevFrame = frame;
+}
+
+function pixelDiff(a, b) {
+  let n = 0;
+  for (let i = 0; i < a.length; i += 4) {
+    if (Math.abs(a[i]-b[i]) + Math.abs(a[i+1]-b[i+1]) + Math.abs(a[i+2]-b[i+2]) > 55) n++;
+  }
+  return n / (a.length / 4);
+}
+
+// Show red banner (visible in Google Meet screen share) + browser notification
+function fireAlert(title, body) {
+  const flash = document.getElementById('mon-flash');
+  document.getElementById('flash-title').textContent = title;
+  document.getElementById('flash-body').textContent  = body + '  — ' + new Date().toLocaleTimeString();
+  flash.style.opacity = '1';
+  setTimeout(() => { flash.style.opacity = '0'; }, 5000);
+
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Assessment Alert: ' + title, { body });
+  }
+}
+
+function monAddEvt(type, msg, screenshot) {
+  const time = new Date().toLocaleTimeString();
+  monLog.push({ type, msg, time, screenshot });
+
+  const el = document.getElementById('mon-log');
+  const div = document.createElement('div');
+  div.className = 'evt-item';
+  div.innerHTML = `
+    <div class="evt-dot ${type === 'warn' ? 'warn' : 'info'}"></div>
+    <div style="flex:1;min-width:0">
+      <div class="ftxt">${msg}</div>
+      <div class="evt-time">${time}</div>
+      ${screenshot ? `<img src="${screenshot}" loading="lazy">` : ''}
+    </div>`;
+  el.prepend(div);
+
+  const warns = monLog.filter(e => e.type === 'warn').length;
+  document.getElementById('mon-warn-count').textContent = warns;
+  document.getElementById('mon-evt-count').textContent  = monLog.length;
+}
+
+function tickTimer() {
+  if (!monStart) return;
+  const s = Math.floor((Date.now() - monStart) / 1000);
+  const m = Math.floor(s / 60), sec = s % 60;
+  document.getElementById('mon-timer').textContent = String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function stopMonitor(streamAlreadyStopped) {
+  monActive = false;
+  if (!streamAlreadyStopped && monStream) monStream.getTracks().forEach(t => t.stop());
+  monStream = null;
+  clearInterval(monInterval);
+  clearInterval(timerInt);
+  document.removeEventListener('visibilitychange', onVisChange);
+  window.removeEventListener('blur', onWinBlur);
+  window.removeEventListener('focus', onWinFocus);
+  monAddEvt('info', 'Session ended — monitoring stopped');
+  document.getElementById('mon-status').className = 'mon-status';
+  document.getElementById('mon-status-txt').textContent = 'Session ended';
+  document.getElementById('stop-btn').style.display = 'none';
+  document.getElementById('end-actions').style.display = 'flex';
+  document.getElementById('mon-preview').srcObject = null;
+}
+
+function monErr(msg) {
+  const el = document.getElementById('mon-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
 </script>
+
+<!-- ── Live Monitor Tab ── -->
+<div class="pg" id="pg-monitor">
+  <!-- Flash alert banner: full-width, visible in Google Meet screen share -->
+  <div id="mon-flash">
+    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <div><div class="flash-title" id="flash-title"></div><div class="flash-body" id="flash-body"></div></div>
+  </div>
+
+  <!-- Setup card (hidden once monitoring starts) -->
+  <div id="mon-setup">
+    <div class="card" style="margin-top:12px">
+      <p class="ct">Start Screen Monitor</p>
+      <label class="lbl" style="margin-top:0">Candidate Name</label>
+      <input type="text" id="mon-name" placeholder="Full name" autocomplete="off">
+      <div class="note-box" style="margin-top:12px;margin-bottom:0">
+        The candidate runs this page. When they click Start, the browser will ask them to share their screen. Ensure they share the <strong>entire screen</strong> (not just a tab) so all application switches are captured. Alerts appear here and as a red banner visible through Google Meet screen share.
+      </div>
+    </div>
+    <p id="mon-err" style="display:none;color:var(--r);font-size:13px;padding:8px 2px"></p>
+    <button class="btn btn-g" onclick="startMonitor()">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Start Screen Monitoring
+    </button>
+  </div>
+
+  <!-- Active monitoring UI -->
+  <div id="mon-active" style="display:none">
+    <div class="mon-status" id="mon-status" style="margin-top:12px">
+      <div class="pulse"></div>
+      <span id="mon-status-txt">Starting…</span>
+    </div>
+
+    <div class="mon-stat-row">
+      <div class="sc"><div class="sv" id="mon-timer">00:00</div><div class="sl">Duration</div></div>
+      <div class="sc"><div class="sv" id="mon-warn-count" style="color:var(--r)">0</div><div class="sl">Alerts</div></div>
+      <div class="sc"><div class="sv" id="mon-evt-count">0</div><div class="sl">Events</div></div>
+    </div>
+
+    <!-- Live screen preview -->
+    <div class="card" style="padding:10px">
+      <p class="ct" style="margin-bottom:8px">Live Screen Preview</p>
+      <video id="mon-preview" class="mon-preview" muted playsinline autoplay></video>
+    </div>
+
+    <!-- Event log -->
+    <div class="card">
+      <p class="ct">Activity Log <span style="font-weight:400;font-size:9px;color:var(--t3)">(newest first)</span></p>
+      <div id="mon-log"></div>
+    </div>
+
+    <button id="stop-btn" class="btn btn-dim" onclick="stopMonitor(false)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      End Monitoring Session
+    </button>
+    <div id="end-actions" style="display:none;gap:8px;flex-direction:column">
+      <button class="btn btn-g" onclick="window.print()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save Activity Log
+      </button>
+      <button class="btn btn-dim" onclick="location.reload()">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        Start New Session
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden elements for screen capture processing -->
+<video id="mon-vid" style="display:none" muted playsinline></video>
+<canvas id="mon-cvs" style="display:none"></canvas>
+
 </body>
 </html>
