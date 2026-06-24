@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Assessment Integrity Monitor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAF9F6;--bg2:#F1EFE9;--bg3:#E4E2DA;
+  --t:#28271F;--t2:#6A6858;--t3:#A09E90;
+  --bd:rgba(40,39,31,.11);--bd2:rgba(40,39,31,.20);
+  --g:#1FA896;--gl:#D4F0EB;--gd:#0A6558;
+  --r:#D95640;--rl:#FAEAE6;
+  --b:#3E8FD6;--bl:#E0EEFA;
+  --a:#C67C15;--al:#FDF0D8;
+  --pu:#5E50C2;--pul:#ECEAFA;--pud:#3F35A3;
+  --rad:14px;--rs:9px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
+  --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.17);
+  --gl:#073D33;--gd:#72D9C8;
+  --rl:#4A1509;--r:#F09070;
+  --bl:#04294F;--b:#7AB5EA;
+  --al:#3F2100;--a:#F0A030;
+  --pul:#221D56;--pud:#C6C2F5;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
+
+.app-hdr{background:var(--gd);padding:14px 16px 0}
+.hdr-top{display:flex;align-items:center;gap:10px;padding-bottom:12px}
+.hdr-ico{width:34px;height:34px;background:rgba(255,255,255,.18);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-ico svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-title{font-size:17px;font-weight:700;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:1px}
+.tabs{display:flex;background:rgba(0,0,0,.2)}
+.tab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;border:none;cursor:pointer;border-bottom:2.5px solid transparent;background:none;color:rgba(255,255,255,.5)}
+.tab.on{color:#fff;border-bottom-color:#fff}
+
+.pg{display:none;padding:14px;max-width:680px;margin:0 auto;padding-bottom:36px}
+.pg.on{display:block}
+
+.card{background:var(--bg);border-radius:var(--rad);border:.5px solid var(--bd);padding:14px;margin-bottom:12px}
+.ct{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
+
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:380px){.stat-grid{grid-template-columns:1fr 1fr}}
+.sc{background:var(--bg2);border-radius:var(--rs);padding:11px}
+.sv{font-size:20px;font-weight:600}
+.sl{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.3}
+
+.risk-row{display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--rad);margin-bottom:12px}
+.risk-row.low{background:var(--gl)}
+.risk-row.med{background:var(--al)}
+.risk-row.high{background:var(--rl)}
+.risk-ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.risk-row.low .risk-ico{background:var(--g)}
+.risk-row.med .risk-ico{background:var(--a)}
+.risk-row.high .risk-ico{background:var(--r)}
+.risk-ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.risk-lbl{font-size:17px;font-weight:700}
+.risk-row.low .risk-lbl{color:var(--gd)}
+.risk-row.med .risk-lbl{color:var(--a)}
+.risk-row.high .risk-lbl{color:var(--r)}
+.risk-desc{font-size:12px;color:var(--t2);margin-top:3px}
+.score-track{height:5px;background:rgba(0,0,0,.12);border-radius:3px;margin-top:8px;max-width:200px}
+.score-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.risk-row.low .score-fill{background:var(--g)}
+.risk-row.med .score-fill{background:var(--a)}
+.risk-row.high .score-fill{background:var(--r)}
+
+.flag{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--bd);align-items:flex-start}
+.flag:last-child{border:none;padding-bottom:0}
+.fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.fdot.high{background:var(--r)}
+.fdot.med{background:var(--a)}
+.fdot.low{background:var(--b)}
+.fdot.ok{background:var(--g)}
+.ftxt{font-size:13px;line-height:1.45}
+
+.phrase-tag{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-style:italic;background:var(--rl);color:var(--r);margin:2px 3px 2px 0}
+
+.upload-zone{border:1.5px dashed var(--bd2);border-radius:var(--rad);padding:26px 16px;text-align:center;cursor:pointer;background:var(--bg);transition:background .2s,border-color .2s;margin-top:12px}
+.upload-zone.over{background:var(--gl);border-color:var(--g)}
+.upload-zone svg{display:block;margin:0 auto 10px;color:var(--t3);width:30px;height:30px}
+.upload-zone h3{font-size:14px;font-weight:600;margin-bottom:4px}
+.upload-zone p{font-size:12px;color:var(--t3)}
+#file-in{display:none}
+
+input[type=text],input[type=date],textarea{width:100%;padding:10px 12px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);color:var(--t);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
+input:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(29,158,117,.15)}
+textarea{resize:vertical;min-height:96px;line-height:1.5}
+.lbl{display:block;font-size:12px;font-weight:500;color:var(--t2);margin:12px 0 5px}
+.lbl:first-child{margin-top:0}
+
+.btn{width:100%;padding:11px;border-radius:var(--rs);border:none;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn-g{background:var(--g);color:#fff}
+.btn-g:active{opacity:.82}
+.btn-dim{background:var(--bg3);color:var(--t2);margin-top:8px}
+.btn-dim:active{opacity:.8}
+.btn-print{background:none;border:.5px solid var(--bd2);color:var(--t2);border-radius:var(--rs);padding:7px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-print svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.divider{display:flex;align-items:center;gap:10px;margin:12px 0}
+.divider hr{flex:1;border:none;border-top:.5px solid var(--bd)}
+.divider span{font-size:11px;color:var(--t3);white-space:nowrap}
+
+.meta-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:.5px solid var(--bd);font-size:13px;gap:12px}
+.meta-row:last-child{border:none;padding-bottom:0}
+.meta-k{color:var(--t2);flex-shrink:0}
+.meta-v{font-weight:500;text-align:right;word-break:break-word}
+.meta-v.fl{color:var(--r)}
+
+.check-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:.5px solid var(--bd);cursor:pointer;user-select:none}
+.check-row:last-child{border:none;padding-bottom:0}
+.chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bd2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:all .15s}
+.chk.on{background:var(--g);border-color:var(--g)}
+.chk svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .12s}
+.chk.on svg{opacity:1}
+.chk-lbl{font-size:13px;color:var(--t);line-height:1.4}
+.chk-note{font-size:11px;color:var(--t3);margin-top:2px}
+
+.note-box{background:var(--pul);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--pud);line-height:1.5;margin-bottom:12px}
+#results{display:none}
+
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tabs,.upload-wrap,.btn,.btn-print,.note-box{display:none!important}
+  .app-hdr{padding-bottom:0}
+  .pg.on{display:block!important;padding:0}
+  #results{display:block!important}
+  .card{break-inside:avoid;border:1px solid #ddd}
+}
+</style>
+</head>
+<body>
+
+<div class="app-hdr">
+  <div class="hdr-top">
+    <div class="hdr-ico">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div>
+      <div class="hdr-title">Integrity Monitor</div>
+      <div class="hdr-sub">AI-use detection for assessments</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('doc',this)">Document Analysis</button>
+    <button class="tab" onclick="switchTab('session',this)">Session Log</button>
+  </div>
+</div>
+
+<!-- ── Document Analysis Tab ── -->
+<div class="pg on" id="pg-doc">
+
+  <div class="upload-wrap" id="upload-wrap">
+    <div class="card" style="margin-top:12px">
+      <p class="ct">Candidate Submission</p>
+      <label class="lbl" style="margin-top:0">Candidate Name</label>
+      <input type="text" id="cand-name" placeholder="Full name" autocomplete="off">
+
+      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-in').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <h3>Upload .docx or .txt file</h3>
+        <p id="drop-hint">Drop file here or click to browse</p>
+      </div>
+      <input type="file" id="file-in" accept=".docx,.txt" onchange="onFileChosen(this.files[0])">
+
+      <div class="divider"><hr><span>OR PASTE TEXT BELOW</span><hr></div>
+      <textarea id="paste-area" placeholder="Paste the candidate's answer text here if you cannot upload a file (works for Excel content too)…"></textarea>
+
+      <button class="btn btn-g" style="margin-top:12px" onclick="runAnalysis()">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Analyse Submission
+      </button>
+    </div>
+
+    <div class="note-box">
+      This tool provides statistical indicators only — it is not a definitive AI detector. Use the findings as one input alongside your direct assessment and session observations. A low score does not guarantee authenticity; a high score does not prove misconduct.
+    </div>
+  </div>
+
+  <!-- Results section (hidden until analysis runs) -->
+  <div id="results">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin:12px 0 8px;gap:10px">
+      <div>
+        <div style="font-size:14px;font-weight:600" id="res-name"></div>
+        <div style="font-size:11px;color:var(--t3)" id="res-date"></div>
+      </div>
+      <button class="btn-print" onclick="window.print()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Report
+      </button>
+    </div>
+
+    <!-- Risk banner -->
+    <div class="risk-row" id="risk-row">
+      <div class="risk-ico"><svg id="risk-svg" viewBox="0 0 24 24"></svg></div>
+      <div style="flex:1">
+        <div class="risk-lbl" id="risk-lbl"></div>
+        <div class="risk-desc" id="risk-desc"></div>
+        <div class="score-track"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="ct">Text Statistics</p>
+      <div class="stat-grid" id="stat-grid"></div>
+    </div>
+
+    <div class="card" id="meta-card" style="display:none">
+      <p class="ct">DOCX Document Metadata</p>
+      <div id="meta-rows"></div>
+    </div>
+
+    <div class="card">
+      <p class="ct">Findings</p>
+      <div id="flags"></div>
+    </div>
+
+    <div class="card" id="phrases-card" style="display:none">
+      <p class="ct">AI-Associated Phrases Detected</p>
+      <p style="font-size:11px;color:var(--t2);margin-bottom:8px">These phrases are disproportionately common in AI-generated text. Presence alone is not proof — context matters.</p>
+      <div id="phrases"></div>
+    </div>
+
+    <button class="btn btn-dim" onclick="resetForm()">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+      Analyse Another Submission
+    </button>
+  </div>
+</div>
+
+<!-- ── Session Log Tab ── -->
+<div class="pg" id="pg-session">
+  <div class="card" style="margin-top:12px">
+    <p class="ct">Session Details</p>
+    <label class="lbl" style="margin-top:0">Candidate Name</label>
+    <input type="text" id="s-name" placeholder="Full name" autocomplete="off">
+    <label class="lbl">Date of Session</label>
+    <input type="date" id="s-date">
+    <label class="lbl">Assessor / Proctor</label>
+    <input type="text" id="s-assessor" placeholder="Your name" autocomplete="off">
+  </div>
+
+  <div class="card">
+    <p class="ct">Google Meet Observations</p>
+    <p style="font-size:11px;color:var(--t2);margin-bottom:10px">Tick each item you were able to confirm during the session.</p>
+    <div id="checklist"></div>
+  </div>
+
+  <div class="card">
+    <label class="lbl" style="margin-top:0">Additional Notes</label>
+    <textarea id="s-notes" style="min-height:110px" placeholder="Any other observations — unusual pauses, off-screen activity, connectivity drops during specific questions, verbal inconsistencies with written answers…"></textarea>
+  </div>
+
+  <button class="btn btn-g" onclick="window.print()">
+    <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print / Save Session Notes
+  </button>
+</div>
+
+<script>
+// ── Tab switching ──────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ── File drag & drop ──────────────────────────────────────
+let pickedFile = null;
+const dropZone = document.getElementById('drop-zone');
+
+['dragenter','dragover'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('over'); }));
+['dragleave','drop'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('over'); }));
+dropZone.addEventListener('drop', e => {
+  if (e.dataTransfer.files[0]) onFileChosen(e.dataTransfer.files[0]);
+});
+
+function onFileChosen(f) {
+  if (!f) return;
+  pickedFile = f;
+  document.getElementById('drop-hint').textContent = f.name;
+  dropZone.style.borderColor = 'var(--g)';
+  dropZone.style.background = 'var(--gl)';
+}
+
+// ── DOCX Parser ───────────────────────────────────────────
+async function parseDOCX(file) {
+  if (typeof JSZip === 'undefined') {
+    return { text: await file.text(), metadata: null };
+  }
+  const zip = await JSZip.loadAsync(file);
+  const meta = {};
+
+  const coreF = zip.file('docProps/core.xml');
+  if (coreF) {
+    const x = await coreF.async('string');
+    meta.creator      = xmlTag(x, 'dc:creator');
+    meta.lastBy       = xmlTag(x, 'cp:lastModifiedBy');
+    meta.created      = xmlTag(x, 'dcterms:created');
+    meta.modified     = xmlTag(x, 'dcterms:modified');
+    meta.revision     = xmlTag(x, 'cp:revision');
+  }
+
+  const appF = zip.file('docProps/app.xml');
+  if (appF) {
+    const x = await appF.async('string');
+    meta.totalTime = xmlTag(x, 'TotalTime');  // editing minutes — key signal
+    meta.words     = xmlTag(x, 'Words');
+    meta.app       = xmlTag(x, 'Application');
+  }
+
+  const docF = zip.file('word/document.xml');
+  let text = '';
+  if (docF) {
+    const x = await docF.async('string');
+    text = extractDocxText(x);
+  }
+
+  return { text, metadata: meta };
+}
+
+function xmlTag(xml, tagName) {
+  const esc = tagName.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+  const m = xml.match(new RegExp('<' + esc + '[^>]*>([\\s\\S]*?)<\\/' + esc + '>'));
+  return m ? decodeXml(m[1].trim()) : null;
+}
+
+function decodeXml(s) {
+  return s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&apos;/g,"'").replace(/&quot;/g,'"');
+}
+
+function extractDocxText(xml) {
+  const paras = [];
+  const pRe = /<w:p[ >][\s\S]*?<\/w:p>/g;
+  let pm;
+  while ((pm = pRe.exec(xml)) !== null) {
+    const parts = [];
+    const tRe = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
+    let tm;
+    while ((tm = tRe.exec(pm[0])) !== null) parts.push(tm[1]);
+    const t = decodeXml(parts.join('').replace(/\s+/g,' ').trim());
+    if (t) paras.push(t);
+  }
+  return paras.join('\n');
+}
+
+// ── Text Analysis ─────────────────────────────────────────
+// Phrases over-represented in LLM output based on published research and observation
+const AI_PHRASES = [
+  'furthermore','moreover','additionally',
+  'in conclusion','to summarize','in summary','to conclude',
+  'it is worth noting that','it is important to note','it should be noted that',
+  'first and foremost','last but not least',
+  'it is evident that','it is clear that',
+  'as mentioned above','as previously mentioned',
+  'in today\'s world','in this day and age','in today\'s rapidly',
+  'a wide range of','a variety of','various aspects of',
+  'plays a crucial role','plays a pivotal role','plays a vital role','plays a key role',
+  'it is imperative','it is essential that','it is crucial','it is vital that',
+  'with that being said','that being said','needless to say',
+  'in the realm of','delves into','multifaceted','nuanced approach',
+  'comprehensive understanding','in order to ensure',
+  'it goes without saying','from a holistic perspective',
+  'innovative solutions','cutting-edge','leverage','paradigm shift',
+  'this essay will','this report will','this paper will',
+  'in light of the foregoing','without a doubt','it is noteworthy',
+  'at the end of the day','in terms of overall'
+];
+
+function analyseText(text) {
+  const sents = text.match(/[^.!?\n]{10,}[.!?]/g) ||
+                text.split('\n').filter(s => s.trim().length > 15);
+  const words  = text.match(/\b[a-zA-Z]+\b/g) || [];
+  const unique = new Set(words.map(w => w.toLowerCase()));
+
+  const lens = sents.map(s => (s.match(/\b[a-zA-Z]+\b/g)||[]).length).filter(l=>l>0);
+  const avg  = lens.length ? lens.reduce((a,b)=>a+b,0)/lens.length : 0;
+  const sd   = lens.length ? Math.sqrt(lens.map(l=>Math.pow(l-avg,2)).reduce((a,b)=>a+b,0)/lens.length) : 0;
+  const cv   = avg > 0 ? sd/avg : 1;  // coefficient of variation; low = uniform = AI-like
+
+  const ttr  = words.length ? unique.size/words.length : 0;
+  const low  = text.toLowerCase();
+  const hits = AI_PHRASES.filter(p => low.includes(p));
+
+  return {
+    wordCount:  words.length,
+    sentCount:  lens.length,
+    uniqueWords: unique.size,
+    avgLen: +avg.toFixed(1),
+    cv:    +cv.toFixed(2),
+    ttr:   +ttr.toFixed(2),
+    hits
+  };
+}
+
+// ── Risk Scoring ──────────────────────────────────────────
+function calcRisk(stats, meta) {
+  const flags = [];
+  let score = 0;
+
+  // Metadata signals — most reliable
+  if (meta && meta.totalTime != null) {
+    const t = parseInt(meta.totalTime), w = stats.wordCount;
+    if (w > 80 && t <= 2) {
+      flags.push({l:'high', t:`Editing time: ${t} min for ${w} words — strongly consistent with copy-paste from an external source`});
+      score += 45;
+    } else if (w > 150 && t <= 8) {
+      flags.push({l:'med', t:`Short editing time: ${t} min for ${w} words (~${Math.round(w/Math.max(t,1))} words/min)`});
+      score += 22;
+    }
+  }
+
+  if (meta && meta.revision != null) {
+    const r = parseInt(meta.revision);
+    if (r <= 2 && stats.wordCount > 100) {
+      flags.push({l:'med', t:`Only ${r} document revision(s) on record — typical of content pasted in and saved once`});
+      score += 13;
+    }
+  }
+
+  // AI phrase signals
+  if (stats.hits.length >= 6) {
+    flags.push({l:'high', t:`${stats.hits.length} AI-associated transition phrases detected`});
+    score += 30;
+  } else if (stats.hits.length >= 3) {
+    flags.push({l:'med', t:`${stats.hits.length} AI-associated phrases detected`});
+    score += 15;
+  } else if (stats.hits.length >= 1) {
+    flags.push({l:'low', t:`${stats.hits.length} AI-associated phrase(s) noted`});
+    score += 6;
+  }
+
+  // Sentence uniformity — human writing has more natural variation
+  if (stats.sentCount >= 6 && stats.cv < 0.22) {
+    flags.push({l:'med', t:`Very uniform sentence lengths (variation index: ${stats.cv}) — human writing is typically more variable`});
+    score += 18;
+  }
+
+  // Long sentences — LLMs tend toward verbose constructions
+  if (stats.avgLen > 28 && stats.sentCount >= 4) {
+    flags.push({l:'low', t:`Average sentence length: ${stats.avgLen} words (typical human writing: 15–20 words)`});
+    score += 10;
+  }
+
+  if (flags.length === 0) {
+    flags.push({l:'ok', t:'No significant AI-use indicators detected in this submission.'});
+  }
+
+  score = Math.min(score, 100);
+  const level = score >= 55 ? 'high' : score >= 25 ? 'med' : 'low';
+  return { score, level, flags };
+}
+
+// ── Main Analysis Entry Point ──────────────────────────────
+async function runAnalysis() {
+  const name = document.getElementById('cand-name').value.trim() || 'Unknown Candidate';
+  let text = '', meta = null;
+
+  try {
+    if (pickedFile) {
+      if (pickedFile.name.toLowerCase().endsWith('.docx')) {
+        const r = await parseDOCX(pickedFile);
+        text = r.text;
+        meta = r.metadata;
+      } else {
+        text = await pickedFile.text();
+      }
+    } else {
+      text = document.getElementById('paste-area').value.trim();
+    }
+  } catch(e) {
+    alert('Could not read file: ' + e.message + '\n\nTry pasting the text instead.');
+    return;
+  }
+
+  if (!text || text.length < 30) {
+    alert('Please upload a file or paste some text to analyse.');
+    return;
+  }
+
+  const stats = analyseText(text);
+  const risk  = calcRisk(stats, meta);
+  renderResults(name, stats, meta, risk);
+}
+
+// ── Render Results ─────────────────────────────────────────
+const RISK_LABELS = {low:'Low Risk', med:'Medium Risk', high:'High Risk'};
+const RISK_DESCS  = {
+  low:  'No strong indicators of AI assistance found.',
+  med:  'Some patterns warrant manual follow-up review.',
+  high: 'Multiple strong indicators of AI-assisted content.'
+};
+const RISK_SVGS = {
+  low:  '<polyline points="20 6 9 17 4 12"/>',
+  med:  '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  high: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+};
+
+function renderResults(name, stats, meta, risk) {
+  document.getElementById('res-name').textContent = name;
+  document.getElementById('res-date').textContent = 'Analysed ' + new Date().toLocaleString();
+
+  const rr = document.getElementById('risk-row');
+  rr.className = 'risk-row ' + risk.level;
+  document.getElementById('risk-lbl').textContent = RISK_LABELS[risk.level];
+  document.getElementById('risk-desc').textContent = RISK_DESCS[risk.level];
+  document.getElementById('risk-svg').innerHTML = RISK_SVGS[risk.level];
+  document.getElementById('score-fill').style.width = risk.score + '%';
+
+  document.getElementById('stat-grid').innerHTML = [
+    {v: stats.wordCount,                 l: 'Words'},
+    {v: stats.sentCount,                 l: 'Sentences'},
+    {v: stats.avgLen,                    l: 'Avg Wds/Sent'},
+    {v: Math.round(stats.ttr * 100)+'%', l: 'Vocab Diversity'},
+    {v: stats.hits.length,               l: 'AI Phrases'},
+    {v: risk.score + '%',                l: 'Risk Score'},
+  ].map(s => `<div class="sc"><div class="sv">${s.v}</div><div class="sl">${s.l}</div></div>`).join('');
+
+  // Metadata card (DOCX only)
+  if (meta && Object.values(meta).some(v => v != null)) {
+    document.getElementById('meta-card').style.display = '';
+    const tInt = meta.totalTime != null ? parseInt(meta.totalTime) : null;
+    const rInt = meta.revision   != null ? parseInt(meta.revision)  : null;
+    const tFlag = tInt != null && tInt <= 5 && stats.wordCount > 80;
+    const rFlag = rInt != null && rInt <= 2 && stats.wordCount > 100;
+
+    const rows = [
+      meta.creator  && ['Author',            meta.creator,                     false],
+      meta.lastBy   && meta.lastBy !== meta.creator
+                    && ['Last Modified By',   meta.lastBy,                      false],
+      meta.created  && ['Document Created',   fmtDate(meta.created),            false],
+      meta.modified && ['Last Saved',         fmtDate(meta.modified),           false],
+      tInt != null  && ['Total Editing Time', tInt + ' minute(s)',              tFlag],
+      rInt != null  && ['Revisions Saved',    rInt.toString(),                  rFlag],
+      meta.app      && ['Created With',       meta.app,                         false],
+    ].filter(Boolean);
+
+    document.getElementById('meta-rows').innerHTML = rows.map(([k,v,flag]) =>
+      `<div class="meta-row">
+        <span class="meta-k">${k}</span>
+        <span class="meta-v${flag?' fl':''}">${v}${flag?' ⚑':''}</span>
+      </div>`
+    ).join('');
+  }
+
+  document.getElementById('flags').innerHTML = risk.flags.map(f =>
+    `<div class="flag"><div class="fdot ${f.l}"></div><div class="ftxt">${f.t}</div></div>`
+  ).join('');
+
+  if (stats.hits.length > 0) {
+    document.getElementById('phrases-card').style.display = '';
+    document.getElementById('phrases').innerHTML =
+      stats.hits.map(p => `<span class="phrase-tag">${p}</span>`).join('');
+  }
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('upload-wrap').style.display = 'none';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function fmtDate(iso) {
+  try { return new Date(iso).toLocaleString(); } catch { return iso; }
+}
+
+function resetForm() {
+  pickedFile = null;
+  document.getElementById('cand-name').value = '';
+  document.getElementById('paste-area').value = '';
+  document.getElementById('drop-hint').textContent = 'Drop file here or click to browse';
+  dropZone.style.borderColor = '';
+  dropZone.style.background = '';
+  document.getElementById('file-in').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('meta-card').style.display = 'none';
+  document.getElementById('phrases-card').style.display = 'none';
+  document.getElementById('upload-wrap').style.display = '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Session Checklist ──────────────────────────────────────
+const CHECKS = [
+  {id:'cam',     l:'Camera remained visible throughout the session',       n:'Candidate kept face and workspace on screen at all times'},
+  {id:'screen',  l:'Candidate shared their screen when asked',             n:'Screen sharing was active during the test period'},
+  {id:'solo',    l:'Candidate appeared to be working alone',               n:'No other person visibly present or assisting'},
+  {id:'nophone', l:'No secondary device (phone/tablet) visibly in use',    n:'Candidate did not reach off-screen to use a device'},
+  {id:'eyes',    l:'Candidate\'s gaze was focused on their own screen',    n:'Not looking to the side or downward repeatedly'},
+  {id:'typing',  l:'Typing was observed as work progressed',               n:'Content appeared to be typed incrementally, not appear in large blocks'},
+  {id:'timing',  l:'Completion times seemed appropriate for the tasks',    n:'Not finished suspiciously fast for the volume of work'},
+  {id:'notabs',  l:'No suspicious browser tabs visible during screen share',n:'Only test-relevant windows were open'},
+  {id:'audio',   l:'No suspicious audio/video drops at key moments',       n:'Connection did not conveniently fail during difficult questions'},
+  {id:'verbal',  l:'Any verbal explanations aligned with written answers',  n:'What the candidate said matched what they submitted'},
+];
+const chkState = {};
+CHECKS.forEach(c => chkState[c.id] = false);
+
+document.getElementById('checklist').innerHTML = CHECKS.map(c => `
+  <div class="check-row" onclick="toggleChk('${c.id}')">
+    <div class="chk" id="chk-${c.id}">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div>
+      <div class="chk-lbl">${c.l}</div>
+      <div class="chk-note">${c.n}</div>
+    </div>
+  </div>
+`).join('');
+
+function toggleChk(id) {
+  chkState[id] = !chkState[id];
+  document.getElementById('chk-' + id).classList.toggle('on', chkState[id]);
+}
+
+// Default session date
+document.getElementById('s-date').valueAsDate = new Date();
+</script>
+</body>
+</html>
