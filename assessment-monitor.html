@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Assessment Integrity Monitor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -286,6 +287,9 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
           End Monitoring Session
         </button>
+        <!-- Email send status -->
+        <div id="email-status" style="display:none;border-radius:var(--rs);padding:11px 14px;font-size:13px;margin-top:8px;display:none;align-items:center;gap:10px"></div>
+
         <div id="end-actions" style="display:none;gap:8px;flex-direction:column">
           <button class="btn btn-g" onclick="window.print()">
             <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -446,6 +450,55 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
 
 <script>
+// ── EmailJS config ─────────────────────────────────────────
+// Update ADMIN_EMAIL to change where reports are delivered.
+// Create a template in EmailJS named "template_monitor_report" — see README below.
+const EJS_SVC           = 'service_asopshc';
+const EJS_KEY           = 'p522hjs-x5_VoSCzk';
+const EJS_REPORT_TMPL   = 'template_monitor_report';
+const ADMIN_EMAIL       = 'nicholas.musisi@experienceeducate.org';
+
+emailjs.init(EJS_KEY);
+
+async function sendReport(candName) {
+  const emailEl = document.getElementById('email-status');
+  emailEl.style.display = 'flex';
+  emailEl.style.background = 'var(--al)';
+  emailEl.style.color = 'var(--a)';
+  emailEl.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0"></span> Sending report to admin…';
+
+  const warnings = monLog.filter(e => e.type === 'warn');
+  const duration = document.getElementById('mon-timer').textContent;
+  const alertLines = warnings.length
+    ? warnings.map(w => `• [${w.time}] ${w.msg}`).join('\n')
+    : 'No alerts triggered during this session.';
+  const fullLog = monLog.map(e =>
+    `[${e.time}] ${e.type === 'warn' ? '⚠' : '✓'} ${e.msg}`
+  ).join('\n');
+
+  try {
+    await emailjs.send(EJS_SVC, EJS_REPORT_TMPL, {
+      to_email:       ADMIN_EMAIL,
+      candidate_name: candName,
+      session_start:  new Date(monStart).toLocaleString(),
+      session_end:    new Date().toLocaleString(),
+      duration,
+      total_events:   monLog.length,
+      total_alerts:   warnings.length,
+      alert_details:  alertLines,
+      event_log:      fullLog,
+    });
+    emailEl.style.background = 'var(--gl)';
+    emailEl.style.color = 'var(--gd)';
+    emailEl.innerHTML = '✓ Report sent to admin successfully';
+  } catch(err) {
+    emailEl.style.background = 'var(--rl)';
+    emailEl.style.color = 'var(--r)';
+    emailEl.innerHTML = '⚠ Could not send report automatically — please print it manually';
+    console.error('EmailJS error:', err);
+  }
+}
+
 // ── Role switching ─────────────────────────────────────────
 function enterRole(role) {
   document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
@@ -641,6 +694,9 @@ function stopMonitor(streamAlreadyStopped) {
   document.getElementById('print-session-info').textContent +=
     '  |  Ended: ' + new Date().toLocaleString();
   document.getElementById('mon-preview').srcObject = null;
+
+  const candName = document.getElementById('cand-fullname').value.trim() || 'Unknown';
+  sendReport(candName);
 }
 
 function showCandErr(msg) {
