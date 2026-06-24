@@ -30,7 +30,26 @@
 }}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
 
-.app-hdr{background:var(--gd);padding:14px 16px 0}
+/* ── Screens ── */
+.scr{display:none;min-height:100vh;flex-direction:column}
+.scr.on{display:flex}
+
+/* ── Role selection ── */
+#scr-role{background:var(--gd);justify-content:center;align-items:center;padding:28px 20px}
+.role-wrap{width:100%;max-width:400px}
+.role-logo{text-align:center;margin-bottom:32px}
+.role-logo svg{width:48px;height:48px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px}
+.role-logo h1{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.role-logo p{font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
+.role-card{background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.2);border-radius:16px;padding:18px 20px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:background .15s}
+.role-card:active{background:rgba(255,255,255,.18)}
+.role-card .rc-ico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.role-card .rc-ico svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.role-card h3{font-size:15px;font-weight:600;color:#fff}
+.role-card p{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+
+/* ── Shared header ── */
+.app-hdr{background:var(--gd);padding:14px 16px 0;flex-shrink:0}
 .hdr-top{display:flex;align-items:center;gap:10px;padding-bottom:12px}
 .hdr-ico{width:34px;height:34px;background:rgba(255,255,255,.18);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .hdr-ico svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -40,49 +59,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;border:none;cursor:pointer;border-bottom:2.5px solid transparent;background:none;color:rgba(255,255,255,.5)}
 .tab.on{color:#fff;border-bottom-color:#fff}
 
+/* ── Content / Cards ── */
+.scroll{flex:1;overflow-y:auto}
 .pg{display:none;padding:14px;max-width:680px;margin:0 auto;padding-bottom:36px}
 .pg.on{display:block}
-
 .card{background:var(--bg);border-radius:var(--rad);border:.5px solid var(--bd);padding:14px;margin-bottom:12px}
 .ct{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
 
+/* ── Stat grid ── */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 @media(max-width:380px){.stat-grid{grid-template-columns:1fr 1fr}}
 .sc{background:var(--bg2);border-radius:var(--rs);padding:11px}
 .sv{font-size:20px;font-weight:600}
 .sl{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.3}
 
+/* ── Risk banner ── */
 .risk-row{display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--rad);margin-bottom:12px}
-.risk-row.low{background:var(--gl)}
-.risk-row.med{background:var(--al)}
-.risk-row.high{background:var(--rl)}
+.risk-row.low{background:var(--gl)}.risk-row.med{background:var(--al)}.risk-row.high{background:var(--rl)}
 .risk-ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.risk-row.low .risk-ico{background:var(--g)}
-.risk-row.med .risk-ico{background:var(--a)}
-.risk-row.high .risk-ico{background:var(--r)}
+.risk-row.low .risk-ico{background:var(--g)}.risk-row.med .risk-ico{background:var(--a)}.risk-row.high .risk-ico{background:var(--r)}
 .risk-ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .risk-lbl{font-size:17px;font-weight:700}
-.risk-row.low .risk-lbl{color:var(--gd)}
-.risk-row.med .risk-lbl{color:var(--a)}
-.risk-row.high .risk-lbl{color:var(--r)}
+.risk-row.low .risk-lbl{color:var(--gd)}.risk-row.med .risk-lbl{color:var(--a)}.risk-row.high .risk-lbl{color:var(--r)}
 .risk-desc{font-size:12px;color:var(--t2);margin-top:3px}
 .score-track{height:5px;background:rgba(0,0,0,.12);border-radius:3px;margin-top:8px;max-width:200px}
-.score-fill{height:100%;border-radius:3px;transition:width .5s ease}
-.risk-row.low .score-fill{background:var(--g)}
-.risk-row.med .score-fill{background:var(--a)}
-.risk-row.high .score-fill{background:var(--r)}
+.score-fill{height:100%;border-radius:3px}
+.risk-row.low .score-fill{background:var(--g)}.risk-row.med .score-fill{background:var(--a)}.risk-row.high .score-fill{background:var(--r)}
 
+/* ── Flags / phrases ── */
 .flag{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--bd);align-items:flex-start}
 .flag:last-child{border:none;padding-bottom:0}
 .fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.fdot.high{background:var(--r)}
-.fdot.med{background:var(--a)}
-.fdot.low{background:var(--b)}
-.fdot.ok{background:var(--g)}
+.fdot.high{background:var(--r)}.fdot.med{background:var(--a)}.fdot.low{background:var(--b)}.fdot.ok{background:var(--g)}
 .ftxt{font-size:13px;line-height:1.45}
-
 .phrase-tag{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-style:italic;background:var(--rl);color:var(--r);margin:2px 3px 2px 0}
 
+/* ── Upload zone ── */
 .upload-zone{border:1.5px dashed var(--bd2);border-radius:var(--rad);padding:26px 16px;text-align:center;cursor:pointer;background:var(--bg);transition:background .2s,border-color .2s;margin-top:12px}
 .upload-zone.over{background:var(--gl);border-color:var(--g)}
 .upload-zone svg{display:block;margin:0 auto 10px;color:var(--t3);width:30px;height:30px}
@@ -90,31 +102,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .upload-zone p{font-size:12px;color:var(--t3)}
 #file-in{display:none}
 
+/* ── Inputs ── */
 input[type=text],input[type=date],textarea{width:100%;padding:10px 12px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);color:var(--t);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
 input:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(29,158,117,.15)}
 textarea{resize:vertical;min-height:96px;line-height:1.5}
 .lbl{display:block;font-size:12px;font-weight:500;color:var(--t2);margin:12px 0 5px}
 .lbl:first-child{margin-top:0}
 
+/* ── Buttons ── */
 .btn{width:100%;padding:11px;border-radius:var(--rs);border:none;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.btn-g{background:var(--g);color:#fff}
-.btn-g:active{opacity:.82}
-.btn-dim{background:var(--bg3);color:var(--t2);margin-top:8px}
-.btn-dim:active{opacity:.8}
+.btn-g{background:var(--g);color:#fff}.btn-g:active{opacity:.82}
+.btn-dim{background:var(--bg3);color:var(--t2);margin-top:8px}.btn-dim:active{opacity:.8}
 .btn-print{background:none;border:.5px solid var(--bd2);color:var(--t2);border-radius:var(--rs);padding:7px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-print svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
+/* ── Divider / Misc ── */
 .divider{display:flex;align-items:center;gap:10px;margin:12px 0}
 .divider hr{flex:1;border:none;border-top:.5px solid var(--bd)}
 .divider span{font-size:11px;color:var(--t3);white-space:nowrap}
-
 .meta-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:.5px solid var(--bd);font-size:13px;gap:12px}
 .meta-row:last-child{border:none;padding-bottom:0}
 .meta-k{color:var(--t2);flex-shrink:0}
 .meta-v{font-weight:500;text-align:right;word-break:break-word}
 .meta-v.fl{color:var(--r)}
+.note-box{background:var(--pul);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--pud);line-height:1.5;margin-bottom:12px}
+#results{display:none}
 
+/* ── Session checklist ── */
 .check-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:.5px solid var(--bd);cursor:pointer;user-select:none}
 .check-row:last-child{border:none;padding-bottom:0}
 .chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bd2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:all .15s}
@@ -124,11 +139,8 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .chk-lbl{font-size:13px;color:var(--t);line-height:1.4}
 .chk-note{font-size:11px;color:var(--t3);margin-top:2px}
 
-.note-box{background:var(--pul);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--pud);line-height:1.5;margin-bottom:12px}
-#results{display:none}
-
-/* ── Live Monitor styles ── */
-.mon-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--rs);background:var(--rl);margin-bottom:12px;font-size:13px;font-weight:600;color:var(--r)}
+/* ── Live Monitor ── */
+.mon-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--rs);background:var(--rl);font-size:13px;font-weight:600;color:var(--r);margin-bottom:12px}
 .mon-status.live{background:var(--gl);color:var(--gd)}
 .pulse{width:9px;height:9px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
@@ -138,530 +150,343 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .evt-item:last-child{border:none;padding-bottom:0}
 .evt-item img{margin-top:6px;width:100%;max-width:280px;border-radius:6px;border:.5px solid var(--bd);display:block}
 .evt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.evt-dot.warn{background:var(--r)}
-.evt-dot.info{background:var(--g)}
-.evt-dot.low{background:var(--b)}
+.evt-dot.warn{background:var(--r)}.evt-dot.info{background:var(--g)}
 .evt-time{font-size:10px;color:var(--t3);margin-top:2px}
-/* Flash overlay – shown full-width at top when alert fires */
+
+/* Flash overlay — visible in Google Meet screen share */
 #mon-flash{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--r);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:opacity .6s;opacity:0;pointer-events:none}
 #mon-flash svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .flash-title{font-size:14px;font-weight:700}
 .flash-body{font-size:12px;opacity:.85;margin-top:1px}
 
+/* ── Print ── */
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .tabs,.upload-wrap,.btn,.btn-print,.note-box,#mon-flash{display:none!important}
-  .app-hdr{padding-bottom:0}
+  #scr-role,#scr-admin .tabs,.btn,.btn-print,.note-box,#mon-flash,#mon-setup,.mon-status{display:none!important}
+  .scr.on{display:block!important}
+  .scroll{overflow:visible}
   .pg.on{display:block!important;padding:0}
-  #results{display:block!important}
+  #results,#mon-active{display:block!important}
   .card{break-inside:avoid;border:1px solid #ddd}
+  .print-header{display:block!important}
 }
+.print-header{display:none;margin-bottom:12px}
+.print-header h2{font-size:16px;font-weight:700}
+.print-header p{font-size:12px;color:#555;margin-top:3px}
 </style>
 </head>
 <body>
 
-<div class="app-hdr">
-  <div class="hdr-top">
-    <div class="hdr-ico">
+<!-- Flash banner (candidate screen — visible in Google Meet share) -->
+<div id="mon-flash">
+  <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <div><div class="flash-title" id="flash-title"></div><div class="flash-body" id="flash-body"></div></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROLE SELECTION SCREEN
+══════════════════════════════════════════ -->
+<div class="scr on" id="scr-role">
+  <div class="role-wrap">
+    <div class="role-logo">
       <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h1>Integrity Monitor</h1>
+      <p>Assessment AI-use detection</p>
     </div>
-    <div>
-      <div class="hdr-title">Integrity Monitor</div>
-      <div class="hdr-sub">AI-use detection for assessments</div>
-    </div>
-  </div>
-  <div class="tabs">
-    <button class="tab on" onclick="switchTab('doc',this)">Document Analysis</button>
-    <button class="tab" onclick="switchTab('session',this)">Session Log</button>
-    <button class="tab" onclick="switchTab('monitor',this)">Live Monitor</button>
-  </div>
-</div>
 
-<!-- ── Document Analysis Tab ── -->
-<div class="pg on" id="pg-doc">
-
-  <div class="upload-wrap" id="upload-wrap">
-    <div class="card" style="margin-top:12px">
-      <p class="ct">Candidate Submission</p>
-      <label class="lbl" style="margin-top:0">Candidate Name</label>
-      <input type="text" id="cand-name" placeholder="Full name" autocomplete="off">
-
-      <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-in').click()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <h3>Upload .docx or .txt file</h3>
-        <p id="drop-hint">Drop file here or click to browse</p>
+    <div class="role-card" onclick="enterRole('candidate')">
+      <div class="rc-ico">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
-      <input type="file" id="file-in" accept=".docx,.txt" onchange="onFileChosen(this.files[0])">
-
-      <div class="divider"><hr><span>OR PASTE TEXT BELOW</span><hr></div>
-      <textarea id="paste-area" placeholder="Paste the candidate's answer text here if you cannot upload a file (works for Excel content too)…"></textarea>
-
-      <button class="btn btn-g" style="margin-top:12px" onclick="runAnalysis()">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        Analyse Submission
-      </button>
-    </div>
-
-    <div class="note-box">
-      This tool provides statistical indicators only — it is not a definitive AI detector. Use the findings as one input alongside your direct assessment and session observations. A low score does not guarantee authenticity; a high score does not prove misconduct.
-    </div>
-  </div>
-
-  <!-- Results section (hidden until analysis runs) -->
-  <div id="results">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin:12px 0 8px;gap:10px">
       <div>
-        <div style="font-size:14px;font-weight:600" id="res-name"></div>
-        <div style="font-size:11px;color:var(--t3)" id="res-date"></div>
+        <h3>Candidate</h3>
+        <p>I am taking the assessment</p>
       </div>
-      <button class="btn-print" onclick="window.print()">
+    </div>
+
+    <div class="role-card" onclick="enterRole('admin')">
+      <div class="rc-ico">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <div>
+        <h3>Assessor / Admin</h3>
+        <p>I am administering the assessment</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     CANDIDATE SCREEN — Live Monitor only
+══════════════════════════════════════════ -->
+<div class="scr" id="scr-candidate">
+  <div class="app-hdr">
+    <div class="hdr-top">
+      <div class="hdr-ico">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div>
+        <div class="hdr-title">Screen Monitor</div>
+        <div class="hdr-sub">Assessment integrity — candidate view</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div style="padding:14px;max-width:680px;margin:0 auto;padding-bottom:36px">
+
+      <!-- Setup (hidden once monitoring starts) -->
+      <div id="cand-setup">
+        <div class="card" style="margin-top:12px">
+          <p class="ct">Your Details</p>
+          <label class="lbl" style="margin-top:0">Your Full Name</label>
+          <input type="text" id="cand-fullname" placeholder="e.g. John Mwangi" autocomplete="off">
+          <div class="note-box" style="margin-top:12px;margin-bottom:0">
+            When you click Start, your browser will ask you to share your screen. Please share your <strong>entire screen</strong> (not just one tab). Your activity will be logged and visible to the assessor through Google Meet.
+          </div>
+        </div>
+        <p id="cand-err" style="display:none;color:var(--r);font-size:13px;padding:4px 2px 8px"></p>
+        <button class="btn btn-g" onclick="startMonitor()">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Start Screen Monitoring
+        </button>
+      </div>
+
+      <!-- Active monitoring -->
+      <div id="cand-active" style="display:none">
+        <!-- Print header (shown only in print) -->
+        <div class="print-header">
+          <h2 id="print-cand-name"></h2>
+          <p id="print-session-info"></p>
+        </div>
+
+        <div class="mon-status" id="mon-status" style="margin-top:12px">
+          <div class="pulse"></div>
+          <span id="mon-status-txt">Starting…</span>
+        </div>
+
+        <div class="mon-stat-row">
+          <div class="sc"><div class="sv" id="mon-timer">00:00</div><div class="sl">Duration</div></div>
+          <div class="sc"><div class="sv" id="mon-warn-count" style="color:var(--r)">0</div><div class="sl">Alerts</div></div>
+          <div class="sc"><div class="sv" id="mon-evt-count">0</div><div class="sl">Events</div></div>
+        </div>
+
+        <div class="card" style="padding:10px">
+          <p class="ct" style="margin-bottom:8px">Live Screen Preview</p>
+          <video id="mon-preview" class="mon-preview" muted playsinline autoplay></video>
+        </div>
+
+        <div class="card">
+          <p class="ct">Activity Log <span style="font-weight:400;font-size:9px;color:var(--t3)">(newest first)</span></p>
+          <div id="mon-log"></div>
+        </div>
+
+        <button id="stop-btn" class="btn btn-dim" onclick="stopMonitor(false)">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          End Monitoring Session
+        </button>
+        <div id="end-actions" style="display:none;gap:8px;flex-direction:column">
+          <button class="btn btn-g" onclick="window.print()">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print / Save Activity Report
+          </button>
+          <button class="btn btn-dim" onclick="location.reload()">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            Start New Session
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Hidden capture elements -->
+<video id="mon-vid" style="display:none" muted playsinline></video>
+<canvas id="mon-cvs" style="display:none"></canvas>
+
+
+<!-- ══════════════════════════════════════════
+     ADMIN SCREEN — Document Analysis + Session Log
+══════════════════════════════════════════ -->
+<div class="scr" id="scr-admin">
+  <div class="app-hdr">
+    <div class="hdr-top">
+      <div class="hdr-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div>
+        <div class="hdr-title">Integrity Monitor</div>
+        <div class="hdr-sub">Assessor dashboard</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('doc',this)">Document Analysis</button>
+      <button class="tab" onclick="switchTab('session',this)">Session Log</button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- ── Document Analysis tab ── -->
+    <div class="pg on" id="pg-doc">
+
+      <div class="upload-wrap" id="upload-wrap">
+        <div class="card" style="margin-top:12px">
+          <p class="ct">Candidate Submission</p>
+          <label class="lbl" style="margin-top:0">Candidate Name</label>
+          <input type="text" id="cand-name" placeholder="Full name" autocomplete="off">
+
+          <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-in').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <h3>Upload .docx or .txt file</h3>
+            <p id="drop-hint">Drop file here or click to browse</p>
+          </div>
+          <input type="file" id="file-in" accept=".docx,.txt" onchange="onFileChosen(this.files[0])">
+
+          <div class="divider"><hr><span>OR PASTE TEXT BELOW</span><hr></div>
+          <textarea id="paste-area" placeholder="Paste the candidate's answer text here…"></textarea>
+
+          <button class="btn btn-g" style="margin-top:12px" onclick="runAnalysis()">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            Analyse Submission
+          </button>
+        </div>
+        <div class="note-box">
+          Statistical indicators only — not a definitive AI detector. Use alongside direct assessment and session observations.
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="results">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin:12px 0 8px;gap:10px">
+          <div>
+            <div style="font-size:14px;font-weight:600" id="res-name"></div>
+            <div style="font-size:11px;color:var(--t3)" id="res-date"></div>
+          </div>
+          <button class="btn-print" onclick="window.print()">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print Report
+          </button>
+        </div>
+
+        <div class="risk-row" id="risk-row">
+          <div class="risk-ico"><svg id="risk-svg" viewBox="0 0 24 24"></svg></div>
+          <div style="flex:1">
+            <div class="risk-lbl" id="risk-lbl"></div>
+            <div class="risk-desc" id="risk-desc"></div>
+            <div class="score-track"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="ct">Text Statistics</p>
+          <div class="stat-grid" id="stat-grid"></div>
+        </div>
+
+        <div class="card" id="meta-card" style="display:none">
+          <p class="ct">DOCX Document Metadata</p>
+          <div id="meta-rows"></div>
+        </div>
+
+        <div class="card">
+          <p class="ct">Findings</p>
+          <div id="flags"></div>
+        </div>
+
+        <div class="card" id="phrases-card" style="display:none">
+          <p class="ct">AI-Associated Phrases Detected</p>
+          <p style="font-size:11px;color:var(--t2);margin-bottom:8px">These phrases appear disproportionately in AI-generated text. Presence alone is not proof.</p>
+          <div id="phrases"></div>
+        </div>
+
+        <button class="btn btn-dim" onclick="resetForm()">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          Analyse Another Submission
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Session Log tab ── -->
+    <div class="pg" id="pg-session">
+      <div class="card" style="margin-top:12px">
+        <p class="ct">Session Details</p>
+        <label class="lbl" style="margin-top:0">Candidate Name</label>
+        <input type="text" id="s-name" placeholder="Full name" autocomplete="off">
+        <label class="lbl">Date of Session</label>
+        <input type="date" id="s-date">
+        <label class="lbl">Assessor / Proctor</label>
+        <input type="text" id="s-assessor" placeholder="Your name" autocomplete="off">
+      </div>
+
+      <div class="card">
+        <p class="ct">Google Meet Observations</p>
+        <p style="font-size:11px;color:var(--t2);margin-bottom:10px">Tick each item confirmed during the session.</p>
+        <div id="checklist"></div>
+      </div>
+
+      <div class="card">
+        <label class="lbl" style="margin-top:0">Additional Notes</label>
+        <textarea id="s-notes" style="min-height:110px" placeholder="Unusual pauses, off-screen activity, connectivity drops, verbal inconsistencies…"></textarea>
+      </div>
+
+      <button class="btn btn-g" onclick="window.print()">
         <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print Report
+        Print / Save Session Notes
+      </button>
+      <button class="btn btn-dim" onclick="resetSession()">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        New Candidate Session
       </button>
     </div>
 
-    <!-- Risk banner -->
-    <div class="risk-row" id="risk-row">
-      <div class="risk-ico"><svg id="risk-svg" viewBox="0 0 24 24"></svg></div>
-      <div style="flex:1">
-        <div class="risk-lbl" id="risk-lbl"></div>
-        <div class="risk-desc" id="risk-desc"></div>
-        <div class="score-track"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
-      </div>
-    </div>
+  </div><!-- /scroll -->
+</div><!-- /scr-admin -->
 
-    <div class="card">
-      <p class="ct">Text Statistics</p>
-      <div class="stat-grid" id="stat-grid"></div>
-    </div>
-
-    <div class="card" id="meta-card" style="display:none">
-      <p class="ct">DOCX Document Metadata</p>
-      <div id="meta-rows"></div>
-    </div>
-
-    <div class="card">
-      <p class="ct">Findings</p>
-      <div id="flags"></div>
-    </div>
-
-    <div class="card" id="phrases-card" style="display:none">
-      <p class="ct">AI-Associated Phrases Detected</p>
-      <p style="font-size:11px;color:var(--t2);margin-bottom:8px">These phrases are disproportionately common in AI-generated text. Presence alone is not proof — context matters.</p>
-      <div id="phrases"></div>
-    </div>
-
-    <button class="btn btn-dim" onclick="resetForm()">
-      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-      Analyse Another Submission
-    </button>
-  </div>
-</div>
-
-<!-- ── Session Log Tab ── -->
-<div class="pg" id="pg-session">
-  <div class="card" style="margin-top:12px">
-    <p class="ct">Session Details</p>
-    <label class="lbl" style="margin-top:0">Candidate Name</label>
-    <input type="text" id="s-name" placeholder="Full name" autocomplete="off">
-    <label class="lbl">Date of Session</label>
-    <input type="date" id="s-date">
-    <label class="lbl">Assessor / Proctor</label>
-    <input type="text" id="s-assessor" placeholder="Your name" autocomplete="off">
-  </div>
-
-  <div class="card">
-    <p class="ct">Google Meet Observations</p>
-    <p style="font-size:11px;color:var(--t2);margin-bottom:10px">Tick each item you were able to confirm during the session.</p>
-    <div id="checklist"></div>
-  </div>
-
-  <div class="card">
-    <label class="lbl" style="margin-top:0">Additional Notes</label>
-    <textarea id="s-notes" style="min-height:110px" placeholder="Any other observations — unusual pauses, off-screen activity, connectivity drops during specific questions, verbal inconsistencies with written answers…"></textarea>
-  </div>
-
-  <button class="btn btn-g" onclick="window.print()">
-    <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-    Print / Save Session Notes
-  </button>
-</div>
 
 <script>
-// ── Tab switching ──────────────────────────────────────────
+// ── Role switching ─────────────────────────────────────────
+function enterRole(role) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById('scr-' + role).classList.add('on');
+}
+
+// ── Admin tab switching ────────────────────────────────────
 function switchTab(id, btn) {
-  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('#scr-admin .pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('#scr-admin .tab').forEach(t => t.classList.remove('on'));
   document.getElementById('pg-' + id).classList.add('on');
   btn.classList.add('on');
 }
 
-// ── File drag & drop ──────────────────────────────────────
-let pickedFile = null;
-const dropZone = document.getElementById('drop-zone');
-
-['dragenter','dragover'].forEach(ev =>
-  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('over'); }));
-['dragleave','drop'].forEach(ev =>
-  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('over'); }));
-dropZone.addEventListener('drop', e => {
-  if (e.dataTransfer.files[0]) onFileChosen(e.dataTransfer.files[0]);
-});
-
-function onFileChosen(f) {
-  if (!f) return;
-  pickedFile = f;
-  document.getElementById('drop-hint').textContent = f.name;
-  dropZone.style.borderColor = 'var(--g)';
-  dropZone.style.background = 'var(--gl)';
-}
-
-// ── DOCX Parser ───────────────────────────────────────────
-async function parseDOCX(file) {
-  if (typeof JSZip === 'undefined') {
-    return { text: await file.text(), metadata: null };
-  }
-  const zip = await JSZip.loadAsync(file);
-  const meta = {};
-
-  const coreF = zip.file('docProps/core.xml');
-  if (coreF) {
-    const x = await coreF.async('string');
-    meta.creator      = xmlTag(x, 'dc:creator');
-    meta.lastBy       = xmlTag(x, 'cp:lastModifiedBy');
-    meta.created      = xmlTag(x, 'dcterms:created');
-    meta.modified     = xmlTag(x, 'dcterms:modified');
-    meta.revision     = xmlTag(x, 'cp:revision');
-  }
-
-  const appF = zip.file('docProps/app.xml');
-  if (appF) {
-    const x = await appF.async('string');
-    meta.totalTime = xmlTag(x, 'TotalTime');  // editing minutes — key signal
-    meta.words     = xmlTag(x, 'Words');
-    meta.app       = xmlTag(x, 'Application');
-  }
-
-  const docF = zip.file('word/document.xml');
-  let text = '';
-  if (docF) {
-    const x = await docF.async('string');
-    text = extractDocxText(x);
-  }
-
-  return { text, metadata: meta };
-}
-
-function xmlTag(xml, tagName) {
-  const esc = tagName.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-  const m = xml.match(new RegExp('<' + esc + '[^>]*>([\\s\\S]*?)<\\/' + esc + '>'));
-  return m ? decodeXml(m[1].trim()) : null;
-}
-
-function decodeXml(s) {
-  return s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&apos;/g,"'").replace(/&quot;/g,'"');
-}
-
-function extractDocxText(xml) {
-  const paras = [];
-  const pRe = /<w:p[ >][\s\S]*?<\/w:p>/g;
-  let pm;
-  while ((pm = pRe.exec(xml)) !== null) {
-    const parts = [];
-    const tRe = /<w:t[^>]*>([\s\S]*?)<\/w:t>/g;
-    let tm;
-    while ((tm = tRe.exec(pm[0])) !== null) parts.push(tm[1]);
-    const t = decodeXml(parts.join('').replace(/\s+/g,' ').trim());
-    if (t) paras.push(t);
-  }
-  return paras.join('\n');
-}
-
-// ── Text Analysis ─────────────────────────────────────────
-// Phrases over-represented in LLM output based on published research and observation
-const AI_PHRASES = [
-  'furthermore','moreover','additionally',
-  'in conclusion','to summarize','in summary','to conclude',
-  'it is worth noting that','it is important to note','it should be noted that',
-  'first and foremost','last but not least',
-  'it is evident that','it is clear that',
-  'as mentioned above','as previously mentioned',
-  'in today\'s world','in this day and age','in today\'s rapidly',
-  'a wide range of','a variety of','various aspects of',
-  'plays a crucial role','plays a pivotal role','plays a vital role','plays a key role',
-  'it is imperative','it is essential that','it is crucial','it is vital that',
-  'with that being said','that being said','needless to say',
-  'in the realm of','delves into','multifaceted','nuanced approach',
-  'comprehensive understanding','in order to ensure',
-  'it goes without saying','from a holistic perspective',
-  'innovative solutions','cutting-edge','leverage','paradigm shift',
-  'this essay will','this report will','this paper will',
-  'in light of the foregoing','without a doubt','it is noteworthy',
-  'at the end of the day','in terms of overall'
-];
-
-function analyseText(text) {
-  const sents = text.match(/[^.!?\n]{10,}[.!?]/g) ||
-                text.split('\n').filter(s => s.trim().length > 15);
-  const words  = text.match(/\b[a-zA-Z]+\b/g) || [];
-  const unique = new Set(words.map(w => w.toLowerCase()));
-
-  const lens = sents.map(s => (s.match(/\b[a-zA-Z]+\b/g)||[]).length).filter(l=>l>0);
-  const avg  = lens.length ? lens.reduce((a,b)=>a+b,0)/lens.length : 0;
-  const sd   = lens.length ? Math.sqrt(lens.map(l=>Math.pow(l-avg,2)).reduce((a,b)=>a+b,0)/lens.length) : 0;
-  const cv   = avg > 0 ? sd/avg : 1;  // coefficient of variation; low = uniform = AI-like
-
-  const ttr  = words.length ? unique.size/words.length : 0;
-  const low  = text.toLowerCase();
-  const hits = AI_PHRASES.filter(p => low.includes(p));
-
-  return {
-    wordCount:  words.length,
-    sentCount:  lens.length,
-    uniqueWords: unique.size,
-    avgLen: +avg.toFixed(1),
-    cv:    +cv.toFixed(2),
-    ttr:   +ttr.toFixed(2),
-    hits
-  };
-}
-
-// ── Risk Scoring ──────────────────────────────────────────
-function calcRisk(stats, meta) {
-  const flags = [];
-  let score = 0;
-
-  // Metadata signals — most reliable
-  if (meta && meta.totalTime != null) {
-    const t = parseInt(meta.totalTime), w = stats.wordCount;
-    if (w > 80 && t <= 2) {
-      flags.push({l:'high', t:`Editing time: ${t} min for ${w} words — strongly consistent with copy-paste from an external source`});
-      score += 45;
-    } else if (w > 150 && t <= 8) {
-      flags.push({l:'med', t:`Short editing time: ${t} min for ${w} words (~${Math.round(w/Math.max(t,1))} words/min)`});
-      score += 22;
-    }
-  }
-
-  if (meta && meta.revision != null) {
-    const r = parseInt(meta.revision);
-    if (r <= 2 && stats.wordCount > 100) {
-      flags.push({l:'med', t:`Only ${r} document revision(s) on record — typical of content pasted in and saved once`});
-      score += 13;
-    }
-  }
-
-  // AI phrase signals
-  if (stats.hits.length >= 6) {
-    flags.push({l:'high', t:`${stats.hits.length} AI-associated transition phrases detected`});
-    score += 30;
-  } else if (stats.hits.length >= 3) {
-    flags.push({l:'med', t:`${stats.hits.length} AI-associated phrases detected`});
-    score += 15;
-  } else if (stats.hits.length >= 1) {
-    flags.push({l:'low', t:`${stats.hits.length} AI-associated phrase(s) noted`});
-    score += 6;
-  }
-
-  // Sentence uniformity — human writing has more natural variation
-  if (stats.sentCount >= 6 && stats.cv < 0.22) {
-    flags.push({l:'med', t:`Very uniform sentence lengths (variation index: ${stats.cv}) — human writing is typically more variable`});
-    score += 18;
-  }
-
-  // Long sentences — LLMs tend toward verbose constructions
-  if (stats.avgLen > 28 && stats.sentCount >= 4) {
-    flags.push({l:'low', t:`Average sentence length: ${stats.avgLen} words (typical human writing: 15–20 words)`});
-    score += 10;
-  }
-
-  if (flags.length === 0) {
-    flags.push({l:'ok', t:'No significant AI-use indicators detected in this submission.'});
-  }
-
-  score = Math.min(score, 100);
-  const level = score >= 55 ? 'high' : score >= 25 ? 'med' : 'low';
-  return { score, level, flags };
-}
-
-// ── Main Analysis Entry Point ──────────────────────────────
-async function runAnalysis() {
-  const name = document.getElementById('cand-name').value.trim() || 'Unknown Candidate';
-  let text = '', meta = null;
-
-  try {
-    if (pickedFile) {
-      if (pickedFile.name.toLowerCase().endsWith('.docx')) {
-        const r = await parseDOCX(pickedFile);
-        text = r.text;
-        meta = r.metadata;
-      } else {
-        text = await pickedFile.text();
-      }
-    } else {
-      text = document.getElementById('paste-area').value.trim();
-    }
-  } catch(e) {
-    alert('Could not read file: ' + e.message + '\n\nTry pasting the text instead.');
-    return;
-  }
-
-  if (!text || text.length < 30) {
-    alert('Please upload a file or paste some text to analyse.');
-    return;
-  }
-
-  const stats = analyseText(text);
-  const risk  = calcRisk(stats, meta);
-  renderResults(name, stats, meta, risk);
-}
-
-// ── Render Results ─────────────────────────────────────────
-const RISK_LABELS = {low:'Low Risk', med:'Medium Risk', high:'High Risk'};
-const RISK_DESCS  = {
-  low:  'No strong indicators of AI assistance found.',
-  med:  'Some patterns warrant manual follow-up review.',
-  high: 'Multiple strong indicators of AI-assisted content.'
-};
-const RISK_SVGS = {
-  low:  '<polyline points="20 6 9 17 4 12"/>',
-  med:  '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
-  high: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
-};
-
-function renderResults(name, stats, meta, risk) {
-  document.getElementById('res-name').textContent = name;
-  document.getElementById('res-date').textContent = 'Analysed ' + new Date().toLocaleString();
-
-  const rr = document.getElementById('risk-row');
-  rr.className = 'risk-row ' + risk.level;
-  document.getElementById('risk-lbl').textContent = RISK_LABELS[risk.level];
-  document.getElementById('risk-desc').textContent = RISK_DESCS[risk.level];
-  document.getElementById('risk-svg').innerHTML = RISK_SVGS[risk.level];
-  document.getElementById('score-fill').style.width = risk.score + '%';
-
-  document.getElementById('stat-grid').innerHTML = [
-    {v: stats.wordCount,                 l: 'Words'},
-    {v: stats.sentCount,                 l: 'Sentences'},
-    {v: stats.avgLen,                    l: 'Avg Wds/Sent'},
-    {v: Math.round(stats.ttr * 100)+'%', l: 'Vocab Diversity'},
-    {v: stats.hits.length,               l: 'AI Phrases'},
-    {v: risk.score + '%',                l: 'Risk Score'},
-  ].map(s => `<div class="sc"><div class="sv">${s.v}</div><div class="sl">${s.l}</div></div>`).join('');
-
-  // Metadata card (DOCX only)
-  if (meta && Object.values(meta).some(v => v != null)) {
-    document.getElementById('meta-card').style.display = '';
-    const tInt = meta.totalTime != null ? parseInt(meta.totalTime) : null;
-    const rInt = meta.revision   != null ? parseInt(meta.revision)  : null;
-    const tFlag = tInt != null && tInt <= 5 && stats.wordCount > 80;
-    const rFlag = rInt != null && rInt <= 2 && stats.wordCount > 100;
-
-    const rows = [
-      meta.creator  && ['Author',            meta.creator,                     false],
-      meta.lastBy   && meta.lastBy !== meta.creator
-                    && ['Last Modified By',   meta.lastBy,                      false],
-      meta.created  && ['Document Created',   fmtDate(meta.created),            false],
-      meta.modified && ['Last Saved',         fmtDate(meta.modified),           false],
-      tInt != null  && ['Total Editing Time', tInt + ' minute(s)',              tFlag],
-      rInt != null  && ['Revisions Saved',    rInt.toString(),                  rFlag],
-      meta.app      && ['Created With',       meta.app,                         false],
-    ].filter(Boolean);
-
-    document.getElementById('meta-rows').innerHTML = rows.map(([k,v,flag]) =>
-      `<div class="meta-row">
-        <span class="meta-k">${k}</span>
-        <span class="meta-v${flag?' fl':''}">${v}${flag?' ⚑':''}</span>
-      </div>`
-    ).join('');
-  }
-
-  document.getElementById('flags').innerHTML = risk.flags.map(f =>
-    `<div class="flag"><div class="fdot ${f.l}"></div><div class="ftxt">${f.t}</div></div>`
-  ).join('');
-
-  if (stats.hits.length > 0) {
-    document.getElementById('phrases-card').style.display = '';
-    document.getElementById('phrases').innerHTML =
-      stats.hits.map(p => `<span class="phrase-tag">${p}</span>`).join('');
-  }
-
-  document.getElementById('results').style.display = 'block';
-  document.getElementById('upload-wrap').style.display = 'none';
-  document.getElementById('results').scrollIntoView({behavior:'smooth'});
-}
-
-function fmtDate(iso) {
-  try { return new Date(iso).toLocaleString(); } catch { return iso; }
-}
-
-function resetForm() {
-  pickedFile = null;
-  document.getElementById('cand-name').value = '';
-  document.getElementById('paste-area').value = '';
-  document.getElementById('drop-hint').textContent = 'Drop file here or click to browse';
-  dropZone.style.borderColor = '';
-  dropZone.style.background = '';
-  document.getElementById('file-in').value = '';
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('meta-card').style.display = 'none';
-  document.getElementById('phrases-card').style.display = 'none';
-  document.getElementById('upload-wrap').style.display = '';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ── Session Checklist ──────────────────────────────────────
-const CHECKS = [
-  {id:'cam',     l:'Camera remained visible throughout the session',       n:'Candidate kept face and workspace on screen at all times'},
-  {id:'screen',  l:'Candidate shared their screen when asked',             n:'Screen sharing was active during the test period'},
-  {id:'solo',    l:'Candidate appeared to be working alone',               n:'No other person visibly present or assisting'},
-  {id:'nophone', l:'No secondary device (phone/tablet) visibly in use',    n:'Candidate did not reach off-screen to use a device'},
-  {id:'eyes',    l:'Candidate\'s gaze was focused on their own screen',    n:'Not looking to the side or downward repeatedly'},
-  {id:'typing',  l:'Typing was observed as work progressed',               n:'Content appeared to be typed incrementally, not appear in large blocks'},
-  {id:'timing',  l:'Completion times seemed appropriate for the tasks',    n:'Not finished suspiciously fast for the volume of work'},
-  {id:'notabs',  l:'No suspicious browser tabs visible during screen share',n:'Only test-relevant windows were open'},
-  {id:'audio',   l:'No suspicious audio/video drops at key moments',       n:'Connection did not conveniently fail during difficult questions'},
-  {id:'verbal',  l:'Any verbal explanations aligned with written answers',  n:'What the candidate said matched what they submitted'},
-];
-const chkState = {};
-CHECKS.forEach(c => chkState[c.id] = false);
-
-document.getElementById('checklist').innerHTML = CHECKS.map(c => `
-  <div class="check-row" onclick="toggleChk('${c.id}')">
-    <div class="chk" id="chk-${c.id}">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div>
-      <div class="chk-lbl">${c.l}</div>
-      <div class="chk-note">${c.n}</div>
-    </div>
-  </div>
-`).join('');
-
-function toggleChk(id) {
-  chkState[id] = !chkState[id];
-  document.getElementById('chk-' + id).classList.toggle('on', chkState[id]);
-}
-
-// Default session date
-document.getElementById('s-date').valueAsDate = new Date();
-
-// ── Live Monitor ──────────────────────────────────────────
+// ══════════════════════════════════════════
+// LIVE MONITOR (candidate screen)
+// ══════════════════════════════════════════
 let monStream = null, monVideo = null, monCanvas = null;
 let prevFrame = null, monInterval = null, timerInt = null;
 let monStart = null, monActive = false, monLog = [];
 
 async function startMonitor() {
+  const candName = document.getElementById('cand-fullname').value.trim();
+  if (!candName) {
+    const e = document.getElementById('cand-err');
+    e.textContent = 'Please enter your name before starting.';
+    e.style.display = 'block';
+    return;
+  }
+  document.getElementById('cand-err').style.display = 'none';
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-    monErr('Screen capture is not supported in this browser. Use Chrome or Edge.');
+    showCandErr('Screen capture is not supported in this browser. Please use Chrome or Edge.');
     return;
   }
 
   try {
     monStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: 2, max: 5 } }, audio: false });
   } catch(e) {
-    monErr(e.name === 'NotAllowedError'
-      ? 'Permission denied. The candidate must click "Allow" when the browser asks to share their screen.'
+    showCandErr(e.name === 'NotAllowedError'
+      ? 'Permission denied. You must click "Allow" when the browser asks to share your screen.'
       : 'Could not start screen capture: ' + e.message);
     return;
   }
@@ -673,9 +498,8 @@ async function startMonitor() {
   monVideo  = document.getElementById('mon-vid');
   monCanvas = document.getElementById('mon-cvs');
   const preview = document.getElementById('mon-preview');
-
-  monVideo.srcObject  = monStream;
-  preview.srcObject   = monStream;
+  monVideo.srcObject = monStream;
+  preview.srcObject  = monStream;
   await monVideo.play();
   await preview.play();
 
@@ -684,7 +508,12 @@ async function startMonitor() {
   monLog    = [];
   prevFrame = null;
 
-  monAddEvt('info', 'Monitoring session started — screen capture active');
+  // Set print header
+  document.getElementById('print-cand-name').textContent = candName;
+  document.getElementById('print-session-info').textContent =
+    'Session started: ' + new Date().toLocaleString();
+
+  monAddEvt('info', 'Session started for ' + candName);
 
   document.addEventListener('visibilitychange', onVisChange);
   window.addEventListener('blur', onWinBlur);
@@ -693,46 +522,41 @@ async function startMonitor() {
   monInterval = setInterval(checkFrame, 4000);
   timerInt    = setInterval(tickTimer, 1000);
 
-  // User stops sharing from browser UI
   monStream.getVideoTracks()[0].addEventListener('ended', () => {
     monAddEvt('warn', 'Screen sharing was stopped by the participant');
     stopMonitor(true);
   });
 
-  document.getElementById('mon-setup').style.display  = 'none';
-  document.getElementById('mon-active').style.display = 'block';
-  document.getElementById('mon-status').className     = 'mon-status live';
-  document.getElementById('mon-status-txt').textContent = 'Monitoring active — screen capture running';
+  document.getElementById('cand-setup').style.display  = 'none';
+  document.getElementById('cand-active').style.display = 'block';
+  document.getElementById('mon-status').className      = 'mon-status live';
+  document.getElementById('mon-status-txt').textContent = 'Monitoring active — ' + candName;
 }
 
-// Tab hidden → candidate left this browser tab
 function onVisChange() {
   if (!monActive) return;
   if (document.hidden) {
-    monAddEvt('warn', 'Tab switch detected — candidate navigated away from this page');
+    monAddEvt('warn', 'Tab switch — candidate navigated away from this page');
     fireAlert('Tab switch detected', 'Candidate left the monitoring tab');
   } else {
     monAddEvt('info', 'Returned to monitoring page');
   }
 }
 
-// Window lost focus → switched to another app (e.g. Chrome to use AI tool)
 let blurTimer = null;
 function onWinBlur() {
   if (!monActive) return;
   blurTimer = setTimeout(() => {
     monAddEvt('warn', 'Window focus lost — candidate switched to another application');
     fireAlert('App switch detected', 'Candidate moved to a different application');
-  }, 1200); // debounce: ignore very short focus flickers
+  }, 1200);
 }
 function onWinFocus() {
   if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
 }
 
-// Frame comparison: downscale to 80×45 and count changed pixels
 function checkFrame() {
   if (!monActive || !monVideo || monVideo.readyState < 2) return;
-
   monCanvas.width  = 80;
   monCanvas.height = 45;
   const ctx = monCanvas.getContext('2d');
@@ -742,14 +566,13 @@ function checkFrame() {
   if (prevFrame) {
     const diff = pixelDiff(frame.data, prevFrame.data);
     if (diff > 0.38) {
-      // Capture a readable screenshot at full resolution
-      const sc = document.createElement('canvas');
+      const sc  = document.createElement('canvas');
       sc.width  = monVideo.videoWidth  || 640;
       sc.height = monVideo.videoHeight || 360;
       sc.getContext('2d').drawImage(monVideo, 0, 0);
       const shot = sc.toDataURL('image/jpeg', 0.45);
-      monAddEvt('warn', `Major screen change detected — ${Math.round(diff * 100)}% of screen changed`, shot);
-      fireAlert('Screen change detected', `${Math.round(diff * 100)}% of the visible screen changed suddenly`);
+      monAddEvt('warn', `Major screen change — ${Math.round(diff*100)}% of screen changed`, shot);
+      fireAlert('Screen change detected', `${Math.round(diff*100)}% of the visible screen changed`);
     }
   }
   prevFrame = frame;
@@ -763,14 +586,12 @@ function pixelDiff(a, b) {
   return n / (a.length / 4);
 }
 
-// Show red banner (visible in Google Meet screen share) + browser notification
 function fireAlert(title, body) {
   const flash = document.getElementById('mon-flash');
   document.getElementById('flash-title').textContent = title;
   document.getElementById('flash-body').textContent  = body + '  — ' + new Date().toLocaleTimeString();
   flash.style.opacity = '1';
   setTimeout(() => { flash.style.opacity = '0'; }, 5000);
-
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification('Assessment Alert: ' + title, { body });
   }
@@ -780,7 +601,6 @@ function monAddEvt(type, msg, screenshot) {
   const time = new Date().toLocaleTimeString();
   monLog.push({ type, msg, time, screenshot });
 
-  const el = document.getElementById('mon-log');
   const div = document.createElement('div');
   div.className = 'evt-item';
   div.innerHTML = `
@@ -790,7 +610,7 @@ function monAddEvt(type, msg, screenshot) {
       <div class="evt-time">${time}</div>
       ${screenshot ? `<img src="${screenshot}" loading="lazy">` : ''}
     </div>`;
-  el.prepend(div);
+  document.getElementById('mon-log').prepend(div);
 
   const warns = monLog.filter(e => e.type === 'warn').length;
   document.getElementById('mon-warn-count').textContent = warns;
@@ -813,91 +633,247 @@ function stopMonitor(streamAlreadyStopped) {
   document.removeEventListener('visibilitychange', onVisChange);
   window.removeEventListener('blur', onWinBlur);
   window.removeEventListener('focus', onWinFocus);
-  monAddEvt('info', 'Session ended — monitoring stopped');
+  monAddEvt('info', 'Monitoring session ended');
   document.getElementById('mon-status').className = 'mon-status';
   document.getElementById('mon-status-txt').textContent = 'Session ended';
   document.getElementById('stop-btn').style.display = 'none';
   document.getElementById('end-actions').style.display = 'flex';
+  document.getElementById('print-session-info').textContent +=
+    '  |  Ended: ' + new Date().toLocaleString();
   document.getElementById('mon-preview').srcObject = null;
 }
 
-function monErr(msg) {
-  const el = document.getElementById('mon-err');
-  el.textContent = msg;
-  el.style.display = 'block';
+function showCandErr(msg) {
+  const e = document.getElementById('cand-err');
+  e.textContent = msg;
+  e.style.display = 'block';
 }
+
+// ══════════════════════════════════════════
+// DOCUMENT ANALYSIS (admin)
+// ══════════════════════════════════════════
+let pickedFile = null;
+const dropZone = document.getElementById('drop-zone');
+
+['dragenter','dragover'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('over'); }));
+['dragleave','drop'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('over'); }));
+dropZone.addEventListener('drop', e => { if (e.dataTransfer.files[0]) onFileChosen(e.dataTransfer.files[0]); });
+
+function onFileChosen(f) {
+  if (!f) return;
+  pickedFile = f;
+  document.getElementById('drop-hint').textContent = f.name;
+  dropZone.style.borderColor = 'var(--g)';
+  dropZone.style.background  = 'var(--gl)';
+}
+
+async function parseDOCX(file) {
+  if (typeof JSZip === 'undefined') return { text: await file.text(), metadata: null };
+  const zip = await JSZip.loadAsync(file);
+  const meta = {};
+  const coreF = zip.file('docProps/core.xml');
+  if (coreF) {
+    const x = await coreF.async('string');
+    meta.creator  = xmlTag(x,'dc:creator');
+    meta.lastBy   = xmlTag(x,'cp:lastModifiedBy');
+    meta.created  = xmlTag(x,'dcterms:created');
+    meta.modified = xmlTag(x,'dcterms:modified');
+    meta.revision = xmlTag(x,'cp:revision');
+  }
+  const appF = zip.file('docProps/app.xml');
+  if (appF) {
+    const x = await appF.async('string');
+    meta.totalTime = xmlTag(x,'TotalTime');
+    meta.words     = xmlTag(x,'Words');
+    meta.app       = xmlTag(x,'Application');
+  }
+  const docF = zip.file('word/document.xml');
+  let text = '';
+  if (docF) { const x = await docF.async('string'); text = docxText(x); }
+  return { text, metadata: meta };
+}
+
+function xmlTag(xml, t) {
+  const esc = t.replace(/[.+?^${}()|[\]\\]/g,'\\$&');
+  const m = xml.match(new RegExp('<'+esc+'[^>]*>([\\s\\S]*?)</'+esc+'>'));
+  return m ? decodeXml(m[1].trim()) : null;
+}
+function decodeXml(s){return s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&apos;/g,"'").replace(/&quot;/g,'"');}
+function docxText(xml) {
+  const paras=[];const pr=/<w:p[ >][\s\S]*?<\/w:p>/g;let pm;
+  while((pm=pr.exec(xml))!==null){const parts=[];const tr=/<w:t[^>]*>([\s\S]*?)<\/w:t>/g;let tm;
+  while((tm=tr.exec(pm[0]))!==null)parts.push(tm[1]);
+  const t=decodeXml(parts.join('').replace(/\s+/g,' ').trim());if(t)paras.push(t);}
+  return paras.join('\n');
+}
+
+const AI_PHRASES=[
+  'furthermore','moreover','additionally','in conclusion','to summarize','in summary','to conclude',
+  'it is worth noting that','it is important to note','it should be noted that',
+  'first and foremost','last but not least','it is evident that','it is clear that',
+  'as mentioned above','as previously mentioned','in today\'s world','in this day and age',
+  'a wide range of','a variety of','plays a crucial role','plays a pivotal role',
+  'plays a vital role','plays a key role','it is imperative','it is essential that',
+  'it is crucial','it is vital that','with that being said','that being said',
+  'needless to say','in the realm of','delves into','multifaceted','nuanced approach',
+  'comprehensive understanding','it goes without saying','from a holistic perspective',
+  'this essay will','this report will','this paper will','without a doubt','it is noteworthy',
+  'innovative solutions','cutting-edge','leverage','paradigm shift'
+];
+
+function analyseText(text) {
+  const sents=text.match(/[^.!?\n]{10,}[.!?]/g)||text.split('\n').filter(s=>s.trim().length>15);
+  const words=text.match(/\b[a-zA-Z]+\b/g)||[];
+  const unique=new Set(words.map(w=>w.toLowerCase()));
+  const lens=sents.map(s=>(s.match(/\b[a-zA-Z]+\b/g)||[]).length).filter(l=>l>0);
+  const avg=lens.length?lens.reduce((a,b)=>a+b,0)/lens.length:0;
+  const sd=lens.length?Math.sqrt(lens.map(l=>Math.pow(l-avg,2)).reduce((a,b)=>a+b,0)/lens.length):0;
+  const cv=avg>0?sd/avg:1;
+  const ttr=words.length?unique.size/words.length:0;
+  const low=text.toLowerCase();
+  const hits=AI_PHRASES.filter(p=>low.includes(p));
+  return {wordCount:words.length,sentCount:lens.length,uniqueWords:unique.size,avgLen:+avg.toFixed(1),cv:+cv.toFixed(2),ttr:+ttr.toFixed(2),hits};
+}
+
+function calcRisk(stats,meta){
+  const flags=[];let score=0;
+  if(meta&&meta.totalTime!=null){
+    const t=parseInt(meta.totalTime),w=stats.wordCount;
+    if(w>80&&t<=2){flags.push({l:'high',t:`Editing time: ${t} min for ${w} words — strongly consistent with copy-paste`});score+=45;}
+    else if(w>150&&t<=8){flags.push({l:'med',t:`Short editing time: ${t} min for ${w} words (~${Math.round(w/Math.max(t,1))} wds/min)`});score+=22;}
+  }
+  if(meta&&meta.revision!=null){
+    const r=parseInt(meta.revision);
+    if(r<=2&&stats.wordCount>100){flags.push({l:'med',t:`Only ${r} revision(s) recorded — typical of pasted content`});score+=13;}
+  }
+  if(stats.hits.length>=6){flags.push({l:'high',t:`${stats.hits.length} AI-associated phrases detected`});score+=30;}
+  else if(stats.hits.length>=3){flags.push({l:'med',t:`${stats.hits.length} AI-associated phrases detected`});score+=15;}
+  else if(stats.hits.length>=1){flags.push({l:'low',t:`${stats.hits.length} AI-associated phrase(s) noted`});score+=6;}
+  if(stats.sentCount>=6&&stats.cv<0.22){flags.push({l:'med',t:`Very uniform sentence lengths (variation: ${stats.cv}) — human writing varies more`});score+=18;}
+  if(stats.avgLen>28&&stats.sentCount>=4){flags.push({l:'low',t:`Average sentence: ${stats.avgLen} words (typical human: 15–20)`});score+=10;}
+  if(flags.length===0)flags.push({l:'ok',t:'No significant AI-use indicators detected.'});
+  score=Math.min(score,100);
+  return{score,level:score>=55?'high':score>=25?'med':'low',flags};
+}
+
+async function runAnalysis() {
+  const name=document.getElementById('cand-name').value.trim()||'Unknown Candidate';
+  let text='',meta=null;
+  try{
+    if(pickedFile){
+      if(pickedFile.name.toLowerCase().endsWith('.docx')){const r=await parseDOCX(pickedFile);text=r.text;meta=r.metadata;}
+      else text=await pickedFile.text();
+    }else text=document.getElementById('paste-area').value.trim();
+  }catch(e){alert('Could not read file: '+e.message+'\n\nTry pasting the text instead.');return;}
+  if(!text||text.length<30){alert('Please upload a file or paste some text to analyse.');return;}
+  const stats=analyseText(text);const risk=calcRisk(stats,meta);
+  renderResults(name,stats,meta,risk);
+}
+
+const RISK_LABELS={low:'Low Risk',med:'Medium Risk',high:'High Risk'};
+const RISK_DESCS={low:'No strong indicators of AI assistance found.',med:'Some patterns warrant manual follow-up.',high:'Multiple strong indicators of AI-assisted content.'};
+const RISK_SVGS={
+  low:'<polyline points="20 6 9 17 4 12"/>',
+  med:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  high:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+};
+
+function renderResults(name,stats,meta,risk){
+  document.getElementById('res-name').textContent=name;
+  document.getElementById('res-date').textContent='Analysed '+new Date().toLocaleString();
+  document.getElementById('risk-row').className='risk-row '+risk.level;
+  document.getElementById('risk-lbl').textContent=RISK_LABELS[risk.level];
+  document.getElementById('risk-desc').textContent=RISK_DESCS[risk.level];
+  document.getElementById('risk-svg').innerHTML=RISK_SVGS[risk.level];
+  document.getElementById('score-fill').style.width=risk.score+'%';
+  document.getElementById('stat-grid').innerHTML=[
+    {v:stats.wordCount,l:'Words'},{v:stats.sentCount,l:'Sentences'},
+    {v:stats.avgLen,l:'Avg Wds/Sent'},{v:Math.round(stats.ttr*100)+'%',l:'Vocab Diversity'},
+    {v:stats.hits.length,l:'AI Phrases'},{v:risk.score+'%',l:'Risk Score'},
+  ].map(s=>`<div class="sc"><div class="sv">${s.v}</div><div class="sl">${s.l}</div></div>`).join('');
+
+  if(meta&&Object.values(meta).some(v=>v!=null)){
+    document.getElementById('meta-card').style.display='';
+    const tInt=meta.totalTime!=null?parseInt(meta.totalTime):null;
+    const rInt=meta.revision!=null?parseInt(meta.revision):null;
+    const rows=[
+      meta.creator&&['Author',meta.creator,false],
+      meta.lastBy&&meta.lastBy!==meta.creator&&['Last Modified By',meta.lastBy,false],
+      meta.created&&['Document Created',fmtDate(meta.created),false],
+      meta.modified&&['Last Saved',fmtDate(meta.modified),false],
+      tInt!=null&&['Editing Time',tInt+' minute(s)',tInt<=5&&stats.wordCount>80],
+      rInt!=null&&['Revisions',rInt.toString(),rInt<=2&&stats.wordCount>100],
+      meta.app&&['Created With',meta.app,false],
+    ].filter(Boolean);
+    document.getElementById('meta-rows').innerHTML=rows.map(([k,v,flag])=>
+      `<div class="meta-row"><span class="meta-k">${k}</span><span class="meta-v${flag?' fl':''}">${v}${flag?' ⚑':''}</span></div>`).join('');
+  }
+  document.getElementById('flags').innerHTML=risk.flags.map(f=>
+    `<div class="flag"><div class="fdot ${f.l}"></div><div class="ftxt">${f.t}</div></div>`).join('');
+  if(stats.hits.length>0){
+    document.getElementById('phrases-card').style.display='';
+    document.getElementById('phrases').innerHTML=stats.hits.map(p=>`<span class="phrase-tag">${p}</span>`).join('');
+  }
+  document.getElementById('results').style.display='block';
+  document.getElementById('upload-wrap').style.display='none';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function fmtDate(iso){try{return new Date(iso).toLocaleString();}catch{return iso;}}
+
+function resetForm(){
+  pickedFile=null;
+  document.getElementById('cand-name').value='';
+  document.getElementById('paste-area').value='';
+  document.getElementById('drop-hint').textContent='Drop file here or click to browse';
+  dropZone.style.borderColor='';dropZone.style.background='';
+  document.getElementById('file-in').value='';
+  document.getElementById('results').style.display='none';
+  document.getElementById('meta-card').style.display='none';
+  document.getElementById('phrases-card').style.display='none';
+  document.getElementById('upload-wrap').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════
+// SESSION LOG (admin)
+// ══════════════════════════════════════════
+const CHECKS=[
+  {id:'cam',     l:'Camera remained visible throughout the session',        n:'Candidate kept face and workspace on screen at all times'},
+  {id:'screen',  l:'Candidate shared their screen when asked',              n:'Screen sharing was active during the test period'},
+  {id:'solo',    l:'Candidate appeared to be working alone',                n:'No other person visibly present or assisting'},
+  {id:'nophone', l:'No secondary device (phone/tablet) visibly in use',     n:'Candidate did not reach off-screen for a device'},
+  {id:'eyes',    l:'Candidate\'s gaze focused on their own screen',         n:'Not looking to the side or downward repeatedly'},
+  {id:'typing',  l:'Typing was observed as work progressed',                n:'Content appeared typed incrementally, not in sudden large blocks'},
+  {id:'timing',  l:'Completion times seemed appropriate for the tasks',     n:'Not finished suspiciously quickly'},
+  {id:'notabs',  l:'No suspicious browser tabs visible during screen share',n:'Only test-relevant windows were open'},
+  {id:'audio',   l:'No suspicious audio/video drops at key moments',        n:'Connection did not fail during difficult questions'},
+  {id:'verbal',  l:'Verbal explanations (if any) aligned with written answers',n:'What candidate said matched what they submitted'},
+];
+const chkState={};
+CHECKS.forEach(c=>chkState[c.id]=false);
+
+document.getElementById('checklist').innerHTML=CHECKS.map(c=>`
+  <div class="check-row" onclick="toggleChk('${c.id}')">
+    <div class="chk" id="chk-${c.id}"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div><div class="chk-lbl">${c.l}</div><div class="chk-note">${c.n}</div></div>
+  </div>`).join('');
+
+function toggleChk(id){
+  chkState[id]=!chkState[id];
+  document.getElementById('chk-'+id).classList.toggle('on',chkState[id]);
+}
+
+function resetSession(){
+  document.getElementById('s-name').value='';
+  document.getElementById('s-notes').value='';
+  CHECKS.forEach(c=>{chkState[c.id]=false;document.getElementById('chk-'+c.id).classList.remove('on');});
+  document.getElementById('s-date').valueAsDate=new Date();
+}
+
+document.getElementById('s-date').valueAsDate=new Date();
 </script>
-
-<!-- ── Live Monitor Tab ── -->
-<div class="pg" id="pg-monitor">
-  <!-- Flash alert banner: full-width, visible in Google Meet screen share -->
-  <div id="mon-flash">
-    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    <div><div class="flash-title" id="flash-title"></div><div class="flash-body" id="flash-body"></div></div>
-  </div>
-
-  <!-- Setup card (hidden once monitoring starts) -->
-  <div id="mon-setup">
-    <div class="card" style="margin-top:12px">
-      <p class="ct">Start Screen Monitor</p>
-      <label class="lbl" style="margin-top:0">Candidate Name</label>
-      <input type="text" id="mon-name" placeholder="Full name" autocomplete="off">
-      <div class="note-box" style="margin-top:12px;margin-bottom:0">
-        The candidate runs this page. When they click Start, the browser will ask them to share their screen. Ensure they share the <strong>entire screen</strong> (not just a tab) so all application switches are captured. Alerts appear here and as a red banner visible through Google Meet screen share.
-      </div>
-    </div>
-    <p id="mon-err" style="display:none;color:var(--r);font-size:13px;padding:8px 2px"></p>
-    <button class="btn btn-g" onclick="startMonitor()">
-      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      Start Screen Monitoring
-    </button>
-  </div>
-
-  <!-- Active monitoring UI -->
-  <div id="mon-active" style="display:none">
-    <div class="mon-status" id="mon-status" style="margin-top:12px">
-      <div class="pulse"></div>
-      <span id="mon-status-txt">Starting…</span>
-    </div>
-
-    <div class="mon-stat-row">
-      <div class="sc"><div class="sv" id="mon-timer">00:00</div><div class="sl">Duration</div></div>
-      <div class="sc"><div class="sv" id="mon-warn-count" style="color:var(--r)">0</div><div class="sl">Alerts</div></div>
-      <div class="sc"><div class="sv" id="mon-evt-count">0</div><div class="sl">Events</div></div>
-    </div>
-
-    <!-- Live screen preview -->
-    <div class="card" style="padding:10px">
-      <p class="ct" style="margin-bottom:8px">Live Screen Preview</p>
-      <video id="mon-preview" class="mon-preview" muted playsinline autoplay></video>
-    </div>
-
-    <!-- Event log -->
-    <div class="card">
-      <p class="ct">Activity Log <span style="font-weight:400;font-size:9px;color:var(--t3)">(newest first)</span></p>
-      <div id="mon-log"></div>
-    </div>
-
-    <button id="stop-btn" class="btn btn-dim" onclick="stopMonitor(false)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-      End Monitoring Session
-    </button>
-    <div id="end-actions" style="display:none;gap:8px;flex-direction:column">
-      <button class="btn btn-g" onclick="window.print()">
-        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print / Save Activity Log
-      </button>
-      <button class="btn btn-dim" onclick="location.reload()">
-        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-        Start New Session
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Hidden elements for screen capture processing -->
-<video id="mon-vid" style="display:none" muted playsinline></video>
-<canvas id="mon-cvs" style="display:none"></canvas>
-
 </body>
 </html>
