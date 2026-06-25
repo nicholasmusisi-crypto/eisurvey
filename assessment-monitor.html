@@ -129,6 +129,11 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .meta-v{font-weight:500;text-align:right;word-break:break-word}
 .meta-v.fl{color:var(--r)}
 .note-box{background:var(--pul);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--pud);line-height:1.5;margin-bottom:12px}
+.consent-section{padding:10px 0;border-bottom:.5px solid var(--bd)}
+.cs-head{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--t);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.cs-head svg{width:13px;height:13px;stroke:var(--gd);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.cs-body{font-size:12px;color:var(--t2);line-height:1.6;margin:0}
+.cs-list{margin:0;padding-left:16px;font-size:12px;color:var(--t2);line-height:1.7}
 #results{display:none}
 
 /* ── Session checklist ── */
@@ -240,16 +245,75 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
       <!-- Setup (hidden once monitoring starts) -->
       <div id="cand-setup">
-        <div class="card" style="margin-top:12px">
+
+        <!-- Consent notice -->
+        <div class="card" style="margin-top:12px;border-top:3px solid var(--g)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--gl);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gd)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--t)">Screen Monitoring Consent Notice</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:1px">Please read carefully before proceeding</div>
+            </div>
+          </div>
+
+          <div class="consent-section">
+            <div class="cs-head">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Why We Monitor
+            </div>
+            <p class="cs-body">This assessment is designed to evaluate your individual knowledge, skills, and independent thinking. To ensure the results are fair and genuinely reflect your own capabilities, we monitor screen activity during the session. This safeguard prevents the use of AI tools (such as ChatGPT, Google Gemini, Claude, or similar services) or any other unauthorised resources. Monitoring protects the integrity of the assessment for all participants.</p>
+          </div>
+
+          <div class="consent-section">
+            <div class="cs-head">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              What Will Be Captured
+            </div>
+            <ul class="cs-list">
+              <li>Your screen content via browser screen sharing</li>
+              <li>Tab switches and application changes, with timestamps</li>
+              <li>Significant changes in screen content (e.g. opening a browser or new application)</li>
+              <li>Screenshot images captured at the moment a change is flagged</li>
+              <li>A timestamped log of all detected events during the session</li>
+            </ul>
+          </div>
+
+          <div class="consent-section" style="border-bottom:none;padding-bottom:0">
+            <div class="cs-head">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              How Reports Are Stored &amp; Used
+            </div>
+            <ul class="cs-list">
+              <li>All monitoring data is processed <strong>locally in your browser</strong> during the session — nothing is uploaded in real time</li>
+              <li>A text summary report is automatically sent to your assessor when you end the session</li>
+              <li>A PDF report, which may include screenshots, is downloaded and retained by the assessor for review</li>
+              <li>This data is used <strong>solely to verify assessment integrity</strong> and will not be shared with third parties</li>
+              <li>Reports are retained only for as long as necessary to support the assessment process</li>
+            </ul>
+          </div>
+
+          <!-- Consent checkbox -->
+          <div style="border-top:.5px solid var(--bd);margin-top:14px;padding-top:14px">
+            <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+              <div class="chk" id="consent-chk" onclick="toggleConsent()" style="margin-top:1px;flex-shrink:0">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span style="font-size:13px;color:var(--t);line-height:1.5">I have read and understood this notice. I <strong>consent</strong> to my screen being monitored during this assessment session and acknowledge that a report may be shared with my assessor.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Candidate name (below consent) -->
+        <div class="card">
           <p class="ct">Your Details</p>
           <label class="lbl" style="margin-top:0">Your Full Name</label>
           <input type="text" id="cand-fullname" placeholder="e.g. John Mwangi" autocomplete="off">
-          <div class="note-box" style="margin-top:12px;margin-bottom:0">
-            When you click Start, your browser will ask you to share your screen. Please share your <strong>entire screen</strong> (not just one tab). Your activity will be logged and visible to the assessor through Google Meet.
-          </div>
         </div>
+
         <p id="cand-err" style="display:none;color:var(--r);font-size:13px;padding:4px 2px 8px"></p>
-        <button class="btn btn-g" onclick="startMonitor()">
+        <button class="btn btn-g" id="start-btn" onclick="startMonitor()" disabled style="opacity:.45;cursor:not-allowed">
           <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           Start Screen Monitoring
         </button>
@@ -619,8 +683,25 @@ function switchTab(id, btn) {
 let monStream = null, monVideo = null, monCanvas = null;
 let prevFrame = null, monInterval = null, timerInt = null;
 let monStart = null, monActive = false, monLog = [];
+let consentGiven = false;
+
+function toggleConsent() {
+  consentGiven = !consentGiven;
+  const chk = document.getElementById('consent-chk');
+  const btn = document.getElementById('start-btn');
+  chk.classList.toggle('on', consentGiven);
+  btn.disabled = !consentGiven;
+  btn.style.opacity = consentGiven ? '1' : '.45';
+  btn.style.cursor  = consentGiven ? 'pointer' : 'not-allowed';
+}
 
 async function startMonitor() {
+  if (!consentGiven) {
+    const e = document.getElementById('cand-err');
+    e.textContent = 'Please read and accept the consent notice before starting.';
+    e.style.display = 'block';
+    return;
+  }
   const candName = document.getElementById('cand-fullname').value.trim();
   if (!candName) {
     const e = document.getElementById('cand-err');
