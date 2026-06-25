@@ -180,6 +180,14 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .print-header{display:none;margin-bottom:12px}
 .print-header h2{font-size:16px;font-weight:700}
 .print-header p{font-size:12px;color:#555;margin-top:3px}
+
+/* ── Password modal ── */
+#pass-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
+#pass-modal.on{display:flex}
+.pass-box{background:var(--bg);border-radius:18px;padding:28px 24px;width:100%;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.22)}
+.pass-box h2{font-size:17px;font-weight:700;color:var(--t);margin-bottom:4px}
+.pass-box p{font-size:13px;color:var(--t2);margin-bottom:18px}
+#pass-err{font-size:12px;color:var(--r);margin-top:8px;display:none}
 </style>
 </head>
 <body>
@@ -218,7 +226,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
       </div>
     </div>
 
-    <div class="role-card" onclick="enterRole('admin')">
+    <div class="role-card" onclick="showPassModal()">
       <div class="rc-ico">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       </div>
@@ -1151,6 +1159,51 @@ function resetSession(){
 }
 
 document.getElementById('s-date').valueAsDate=new Date();
+
+// ── Assessor password gate ──────────────────────────────────
+const ADMIN_HASH = 'a4d95e9bc5a3efa2ef941cafb403165aaf5bbc753ac5f3187a18d52c98aac7d5';
+
+function showPassModal() {
+  document.getElementById('pass-input').value = '';
+  document.getElementById('pass-err').style.display = 'none';
+  document.getElementById('pass-modal').classList.add('on');
+  setTimeout(() => document.getElementById('pass-input').focus(), 80);
+}
+function hidePassModal() {
+  document.getElementById('pass-modal').classList.remove('on');
+}
+async function checkPass() {
+  const val = document.getElementById('pass-input').value;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(val));
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  if (hash === ADMIN_HASH) {
+    hidePassModal();
+    enterRole('admin');
+  } else {
+    const err = document.getElementById('pass-err');
+    err.textContent = 'Incorrect password. Please try again.';
+    err.style.display = 'block';
+    document.getElementById('pass-input').select();
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') hidePassModal();
+});
 </script>
+
+<!-- Password modal -->
+<div id="pass-modal" onclick="if(event.target===this)hidePassModal()">
+  <div class="pass-box">
+    <h2>Assessor Access</h2>
+    <p>Enter the password to open the assessor dashboard.</p>
+    <label class="lbl">Password</label>
+    <input type="password" id="pass-input" class="inp" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')checkPass()" autocomplete="current-password">
+    <p id="pass-err"></p>
+    <button class="btn" style="margin-top:14px;width:100%" onclick="checkPass()">Continue</button>
+    <button onclick="hidePassModal()" style="margin-top:8px;width:100%;background:none;border:none;color:var(--t2);font-size:13px;cursor:pointer;padding:6px">Cancel</button>
+  </div>
+</div>
+
 </body>
 </html>
