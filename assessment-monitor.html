@@ -492,9 +492,10 @@ async function sendReport(candName) {
     emailEl.style.color = 'var(--gd)';
     emailEl.innerHTML = '✓ Report sent to admin successfully';
   } catch(err) {
+    const reason = err && (err.text || err.message || JSON.stringify(err));
     emailEl.style.background = 'var(--rl)';
     emailEl.style.color = 'var(--r)';
-    emailEl.innerHTML = '⚠ Could not send report automatically — please print it manually';
+    emailEl.innerHTML = '⚠ Email failed: ' + (reason || 'unknown error') + ' — please print manually';
     console.error('EmailJS error:', err);
   }
 }
