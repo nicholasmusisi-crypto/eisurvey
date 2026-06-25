@@ -37,18 +37,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .scr.on{display:flex}
 
 /* ── Role selection ── */
-#scr-role{background:var(--gd);justify-content:center;align-items:center;padding:28px 20px}
-.role-wrap{width:100%;max-width:400px}
-.role-logo{text-align:center;margin-bottom:32px}
-.role-logo svg{width:48px;height:48px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px}
-.role-logo h1{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.4px}
-.role-logo p{font-size:13px;color:rgba(255,255,255,.6);margin-top:3px}
-.role-card{background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.2);border-radius:16px;padding:18px 20px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:background .15s}
-.role-card:active{background:rgba(255,255,255,.18)}
-.role-card .rc-ico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#scr-role{
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(255,210,120,.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(100,180,255,.09) 0%, transparent 55%),
+    linear-gradient(155deg, #03201C 0%, #075045 30%, #0A6558 60%, #04332C 100%);
+  justify-content:center;align-items:center;padding:32px 20px;
+  position:relative;overflow:hidden;
+}
+/* floating paw print decorations */
+.paw-deco{position:absolute;pointer-events:none;fill:rgba(255,255,255,.055);stroke:none}
+@keyframes pawfloat{0%,100%{transform:translateY(0) rotate(var(--pr))} 50%{transform:translateY(-14px) rotate(var(--pr))}}
+.paw-deco{animation:pawfloat var(--pd,7s) ease-in-out infinite;animation-delay:var(--pde,0s)}
+
+.role-wrap{width:100%;max-width:400px;position:relative;z-index:1}
+
+/* logo ring */
+.role-logo{text-align:center;margin-bottom:36px}
+.role-logo-ring{width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 0 12px rgba(255,255,255,.04),0 0 0 24px rgba(255,255,255,.02)}
+.role-logo svg{width:52px;height:52px;stroke:#fff;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.role-logo h1{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.6px}
+.role-logo .role-tag{font-size:12px;color:rgba(255,255,255,.55);margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
+
+/* role cards */
+.role-card{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:18px;padding:18px 20px;margin-bottom:12px;
+  cursor:pointer;display:flex;align-items:center;gap:14px;
+  transition:background .2s, transform .2s, box-shadow .2s;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.role-card:hover{background:rgba(255,255,255,.16);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.role-card:active{transform:translateY(0);box-shadow:none}
+.role-card .rc-ico{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .role-card .rc-ico svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.role-card h3{font-size:15px;font-weight:600;color:#fff}
+.role-card .rc-txt{flex:1}
+.role-card h3{font-size:15px;font-weight:700;color:#fff}
 .role-card p{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+.role-card .rc-arrow{width:20px;height:20px;stroke:rgba(255,255,255,.4);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:stroke .2s}
+.role-card:hover .rc-arrow{stroke:rgba(255,255,255,.85)}
+
+.role-footer{text-align:center;margin-top:24px;font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.03em}
 
 /* ── Shared header ── */
 .app-hdr{background:var(--gd);padding:14px 16px 0;flex-shrink:0}
@@ -202,39 +232,60 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
      ROLE SELECTION SCREEN
 ══════════════════════════════════════════ -->
 <div class="scr on" id="scr-role">
+
+  <!-- Floating paw print decorations -->
+  <svg class="paw-deco" style="width:110px;top:6%;left:-2%;--pr:-18deg;--pd:8s;--pde:0s" viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="16" ry="13"/><ellipse cx="14" cy="24" rx="6.5" ry="8.5" transform="rotate(-20,14,24)"/><ellipse cx="24" cy="16" rx="6.5" ry="8.5" transform="rotate(-5,24,16)"/><ellipse cx="36" cy="16" rx="6.5" ry="8.5" transform="rotate(5,36,16)"/><ellipse cx="46" cy="24" rx="6.5" ry="8.5" transform="rotate(20,46,24)"/></svg>
+
+  <svg class="paw-deco" style="width:70px;top:18%;right:4%;--pr:30deg;--pd:10s;--pde:-3s" viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="16" ry="13"/><ellipse cx="14" cy="24" rx="6.5" ry="8.5" transform="rotate(-20,14,24)"/><ellipse cx="24" cy="16" rx="6.5" ry="8.5" transform="rotate(-5,24,16)"/><ellipse cx="36" cy="16" rx="6.5" ry="8.5" transform="rotate(5,36,16)"/><ellipse cx="46" cy="24" rx="6.5" ry="8.5" transform="rotate(20,46,24)"/></svg>
+
+  <svg class="paw-deco" style="width:55px;top:55%;left:3%;--pr:10deg;--pd:9s;--pde:-1.5s" viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="16" ry="13"/><ellipse cx="14" cy="24" rx="6.5" ry="8.5" transform="rotate(-20,14,24)"/><ellipse cx="24" cy="16" rx="6.5" ry="8.5" transform="rotate(-5,24,16)"/><ellipse cx="36" cy="16" rx="6.5" ry="8.5" transform="rotate(5,36,16)"/><ellipse cx="46" cy="24" rx="6.5" ry="8.5" transform="rotate(20,46,24)"/></svg>
+
+  <svg class="paw-deco" style="width:90px;top:72%;right:-1%;--pr:-25deg;--pd:11s;--pde:-4s" viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="16" ry="13"/><ellipse cx="14" cy="24" rx="6.5" ry="8.5" transform="rotate(-20,14,24)"/><ellipse cx="24" cy="16" rx="6.5" ry="8.5" transform="rotate(-5,24,16)"/><ellipse cx="36" cy="16" rx="6.5" ry="8.5" transform="rotate(5,36,16)"/><ellipse cx="46" cy="24" rx="6.5" ry="8.5" transform="rotate(20,46,24)"/></svg>
+
+  <svg class="paw-deco" style="width:48px;top:88%;left:25%;--pr:15deg;--pd:7.5s;--pde:-2s" viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="16" ry="13"/><ellipse cx="14" cy="24" rx="6.5" ry="8.5" transform="rotate(-20,14,24)"/><ellipse cx="24" cy="16" rx="6.5" ry="8.5" transform="rotate(-5,24,16)"/><ellipse cx="36" cy="16" rx="6.5" ry="8.5" transform="rotate(5,36,16)"/><ellipse cx="46" cy="24" rx="6.5" ry="8.5" transform="rotate(20,46,24)"/></svg>
+
+  <svg class="paw-deco" style="width:62px;top:38%;right:6%;--pr:-8deg;--pd:12s;--pde:-5s" viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="16" ry="13"/><ellipse cx="14" cy="24" rx="6.5" ry="8.5" transform="rotate(-20,14,24)"/><ellipse cx="24" cy="16" rx="6.5" ry="8.5" transform="rotate(-5,24,16)"/><ellipse cx="36" cy="16" rx="6.5" ry="8.5" transform="rotate(5,36,16)"/><ellipse cx="46" cy="24" rx="6.5" ry="8.5" transform="rotate(20,46,24)"/></svg>
+
   <div class="role-wrap">
     <div class="role-logo">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="13.5" r="6.5"/>
-        <path d="M6.5 10.5 C4.5 8.5 4 4.5 6.5 3.5 C8.5 3 9 7.5 7.5 10.5"/>
-        <path d="M17.5 10.5 C19.5 8.5 20 4.5 17.5 3.5 C15.5 3 15 7.5 16.5 10.5"/>
-        <circle cx="9.8" cy="12.5" r="0.9" fill="#fff" stroke="none"/>
-        <circle cx="14.2" cy="12.5" r="0.9" fill="#fff" stroke="none"/>
-        <ellipse cx="12" cy="14.8" rx="1.2" ry="0.8" fill="#fff" stroke="none"/>
-        <path d="M10.2 16.2 Q12 18 13.8 16.2"/>
-      </svg>
+      <div class="role-logo-ring">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="13.5" r="6.5"/>
+          <path d="M6.5 10.5 C4.5 8.5 4 4.5 6.5 3.5 C8.5 3 9 7.5 7.5 10.5"/>
+          <path d="M17.5 10.5 C19.5 8.5 20 4.5 17.5 3.5 C15.5 3 15 7.5 16.5 10.5"/>
+          <circle cx="9.8" cy="12.5" r="0.9" fill="#fff" stroke="none"/>
+          <circle cx="14.2" cy="12.5" r="0.9" fill="#fff" stroke="none"/>
+          <ellipse cx="12" cy="14.8" rx="1.2" ry="0.8" fill="#fff" stroke="none"/>
+          <path d="M10.2 16.2 Q12 18 13.8 16.2"/>
+        </svg>
+      </div>
       <h1>Puppy</h1>
+      <p class="role-tag">Assessment Monitoring Platform</p>
     </div>
 
     <div class="role-card" onclick="enterRole('candidate')">
       <div class="rc-ico">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
-      <div>
+      <div class="rc-txt">
         <h3>Candidate</h3>
         <p>I am taking the assessment</p>
       </div>
+      <svg class="rc-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
 
     <div class="role-card" onclick="showPassModal()">
       <div class="rc-ico">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       </div>
-      <div>
+      <div class="rc-txt">
         <h3>Assessor / Admin</h3>
         <p>I am administering the assessment</p>
       </div>
+      <svg class="rc-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </div>
+
+    <p class="role-footer">Powered by Experience Educate</p>
   </div>
 </div>
 
