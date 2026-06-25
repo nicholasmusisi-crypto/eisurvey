@@ -769,10 +769,10 @@ async function startMonitor() {
 function onVisChange() {
   if (!monActive) return;
   if (document.hidden) {
-    monAddEvt('warn', 'Tab switch — candidate navigated away from this page');
+    monAddEvt('warn', 'Tab switch — candidate navigated away from this page', captureShot());
     fireAlert('Tab switch detected', 'Candidate left the monitoring tab');
   } else {
-    monAddEvt('info', 'Returned to monitoring page');
+    monAddEvt('info', 'Returned to monitoring page', captureShot());
   }
 }
 
@@ -780,12 +780,22 @@ let blurTimer = null;
 function onWinBlur() {
   if (!monActive) return;
   blurTimer = setTimeout(() => {
-    monAddEvt('warn', 'Window focus lost — candidate switched to another application');
+    monAddEvt('warn', 'Window focus lost — candidate switched to another application', captureShot());
     fireAlert('App switch detected', 'Candidate moved to a different application');
   }, 1200);
 }
 function onWinFocus() {
   if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
+  monAddEvt('info', 'Returned to application', captureShot());
+}
+
+function captureShot() {
+  if (!monVideo || monVideo.readyState < 2) return null;
+  const sc = document.createElement('canvas');
+  sc.width  = monVideo.videoWidth  || 640;
+  sc.height = monVideo.videoHeight || 360;
+  sc.getContext('2d').drawImage(monVideo, 0, 0);
+  return sc.toDataURL('image/jpeg', 0.45);
 }
 
 function checkFrame() {
@@ -799,12 +809,7 @@ function checkFrame() {
   if (prevFrame) {
     const diff = pixelDiff(frame.data, prevFrame.data);
     if (diff > 0.38) {
-      const sc  = document.createElement('canvas');
-      sc.width  = monVideo.videoWidth  || 640;
-      sc.height = monVideo.videoHeight || 360;
-      sc.getContext('2d').drawImage(monVideo, 0, 0);
-      const shot = sc.toDataURL('image/jpeg', 0.45);
-      monAddEvt('warn', `Major screen change — ${Math.round(diff*100)}% of screen changed`, shot);
+      monAddEvt('warn', `Major screen change — ${Math.round(diff*100)}% of screen changed`, captureShot());
       fireAlert('Screen change detected', `${Math.round(diff*100)}% of the visible screen changed`);
     }
   }
