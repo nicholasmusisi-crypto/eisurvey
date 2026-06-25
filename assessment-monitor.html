@@ -622,52 +622,79 @@ async function sendReport(candName) {
   emailEl.style.color = 'var(--a)';
   emailEl.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;margin-right:6px"></span> Generating PDF and sending report…';
 
-  // Generate and auto-download PDF with screenshots
-  let pdfFileName = '';
+  // Generate PDF — blob for email attachment, also auto-download for candidate records
+  let pdfBlob = null, pdfFileName = '';
   try {
     const pdf = await generatePDF(candName);
-    pdfFileName = `monitor-report-${candName.replace(/\s+/g,'-')}.pdf`;
+    pdfFileName = `puppy-report-${candName.replace(/\s+/g,'-')}.pdf`;
+    pdfBlob = pdf.output('blob');
     pdf.save(pdfFileName);
   } catch(e) { console.warn('PDF generation failed:', e); }
 
-  // Send text summary email
-  const warnings = monLog.filter(e => e.type === 'warn');
-  const duration  = document.getElementById('mon-timer').textContent;
-  const alertLines = warnings.length
+  const warnings    = monLog.filter(e => e.type === 'warn');
+  const duration    = document.getElementById('mon-timer').textContent;
+  const alertLines  = warnings.length
     ? warnings.map(w => `• [${w.time}] ${w.msg}`).join('\n')
     : 'No alerts triggered during this session.';
-  const fullLog = monLog.map(e =>
+  const fullLog     = monLog.map(e =>
     `[${e.time}] ${e.type === 'warn' ? '⚠' : '✓'} ${e.msg}`
   ).join('\n');
 
-  try {
-    await emailjs.send(EJS_SVC, EJS_REPORT_TMPL, {
-      to_email:       ADMIN_EMAIL,
-      candidate_name: candName,
-      session_start:  new Date(monStart).toLocaleString(),
-      session_end:    new Date().toLocaleString(),
-      duration,
-      total_events:   monLog.length,
-      total_alerts:   warnings.length,
-      alert_details:  alertLines,
-      event_log:      fullLog,
-    });
-    emailEl.style.background = 'var(--gl)';
-    emailEl.style.color = 'var(--gd)';
-    emailEl.innerHTML = `✓ Text report emailed to admin. PDF with screenshots saved to your Downloads — forward it using the button below.`;
-  } catch(err) {
-    const reason = err && (err.text || err.message || JSON.stringify(err));
-    emailEl.style.background = 'var(--rl)';
-    emailEl.style.color = 'var(--r)';
-    emailEl.innerHTML = `⚠ Email failed (${reason || 'unknown'}) — PDF saved to Downloads, please send it manually.`;
-    console.error('EmailJS error:', err);
+  const templateParams = {
+    to_email:       ADMIN_EMAIL,
+    candidate_name: candName,
+    session_start:  new Date(monStart).toLocaleString(),
+    session_end:    new Date().toLocaleString(),
+    duration,
+    total_events:   monLog.length,
+    total_alerts:   warnings.length,
+    alert_details:  alertLines,
+    event_log:      fullLog,
+  };
+
+  // Try sending with PDF attached via EmailJS multipart form API
+  let emailSentWithPdf = false;
+  if (pdfBlob) {
+    try {
+      const fd = new FormData();
+      fd.append('service_id',      EJS_SVC);
+      fd.append('template_id',     EJS_REPORT_TMPL);
+      fd.append('user_id',         EJS_KEY);
+      fd.append('template_params', JSON.stringify(templateParams));
+      fd.append('attachments',     new File([pdfBlob], pdfFileName, { type: 'application/pdf' }), pdfFileName);
+
+      const resp = await fetch('https://api.emailjs.com/api/v1.1/email/send-form', {
+        method: 'POST',
+        body: fd,
+      });
+      if (resp.ok || resp.status === 200) {
+        emailSentWithPdf = true;
+        emailEl.style.background = 'var(--gl)';
+        emailEl.style.color = 'var(--gd)';
+        emailEl.innerHTML = '✓ Report with PDF emailed to assessor automatically.';
+      }
+    } catch(e) { console.warn('PDF attachment send failed, falling back:', e); }
   }
 
-  // Show forward button if PDF was generated
-  if (pdfFileName) {
-    const fwdBtn = document.getElementById('fwd-btn');
-    fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Puppy Report — ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the Puppy session report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
-    fwdBtn.style.display = 'flex';
+  // Fallback: text-only email + manual forward button
+  if (!emailSentWithPdf) {
+    try {
+      await emailjs.send(EJS_SVC, EJS_REPORT_TMPL, templateParams);
+      emailEl.style.background = 'var(--gl)';
+      emailEl.style.color = 'var(--gd)';
+      emailEl.innerHTML = '✓ Text report emailed. PDF saved to Downloads — forward it using the button below.';
+    } catch(err) {
+      const reason = err && (err.text || err.message || JSON.stringify(err));
+      emailEl.style.background = 'var(--rl)';
+      emailEl.style.color = 'var(--r)';
+      emailEl.innerHTML = `⚠ Email failed (${reason || 'unknown'}) — PDF saved to Downloads, please send it manually.`;
+      console.error('EmailJS error:', err);
+    }
+    if (pdfFileName) {
+      const fwdBtn = document.getElementById('fwd-btn');
+      fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Puppy Report — ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the Puppy session report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
+      fwdBtn.style.display = 'flex';
+    }
   }
 }
 
