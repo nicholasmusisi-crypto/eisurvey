@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Assessment Integrity Monitor</title>
+<title>Puppy</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -196,8 +196,16 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 <div class="scr on" id="scr-role">
   <div class="role-wrap">
     <div class="role-logo">
-      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <h1>Integrity Monitor</h1>
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="13.5" r="6.5"/>
+        <path d="M6.5 10.5 C4.5 8.5 4 4.5 6.5 3.5 C8.5 3 9 7.5 7.5 10.5"/>
+        <path d="M17.5 10.5 C19.5 8.5 20 4.5 17.5 3.5 C15.5 3 15 7.5 16.5 10.5"/>
+        <circle cx="9.8" cy="12.5" r="0.9" fill="#fff" stroke="none"/>
+        <circle cx="14.2" cy="12.5" r="0.9" fill="#fff" stroke="none"/>
+        <ellipse cx="12" cy="14.8" rx="1.2" ry="0.8" fill="#fff" stroke="none"/>
+        <path d="M10.2 16.2 Q12 18 13.8 16.2"/>
+      </svg>
+      <h1>Puppy</h1>
     </div>
 
     <div class="role-card" onclick="enterRole('candidate')">
@@ -230,11 +238,11 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
   <div class="app-hdr">
     <div class="hdr-top">
       <div class="hdr-ico">
-        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="6.5"/><path d="M6.5 10.5 C4.5 8.5 4 4.5 6.5 3.5 C8.5 3 9 7.5 7.5 10.5"/><path d="M17.5 10.5 C19.5 8.5 20 4.5 17.5 3.5 C15.5 3 15 7.5 16.5 10.5"/><circle cx="9.8" cy="12.5" r="0.9" fill="#fff" stroke="none"/><circle cx="14.2" cy="12.5" r="0.9" fill="#fff" stroke="none"/><ellipse cx="12" cy="14.8" rx="1.2" ry="0.8" fill="#fff" stroke="none"/><path d="M10.2 16.2 Q12 18 13.8 16.2"/></svg>
       </div>
       <div>
-        <div class="hdr-title">Screen Monitor</div>
-        <div class="hdr-sub">Assessment integrity — candidate view</div>
+        <div class="hdr-title">Puppy</div>
+        <div class="hdr-sub">Candidate session</div>
       </div>
     </div>
   </div>
@@ -387,10 +395,10 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
   <div class="app-hdr">
     <div class="hdr-top">
       <div class="hdr-ico">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="6.5"/><path d="M6.5 10.5 C4.5 8.5 4 4.5 6.5 3.5 C8.5 3 9 7.5 7.5 10.5"/><path d="M17.5 10.5 C19.5 8.5 20 4.5 17.5 3.5 C15.5 3 15 7.5 16.5 10.5"/><circle cx="9.8" cy="12.5" r="0.9" fill="#fff" stroke="none"/><circle cx="14.2" cy="12.5" r="0.9" fill="#fff" stroke="none"/><ellipse cx="12" cy="14.8" rx="1.2" ry="0.8" fill="#fff" stroke="none"/><path d="M10.2 16.2 Q12 18 13.8 16.2"/></svg>
       </div>
       <div>
-        <div class="hdr-title">Integrity Monitor</div>
+        <div class="hdr-title">Puppy</div>
         <div class="hdr-sub">Assessor dashboard</div>
       </div>
     </div>
@@ -540,7 +548,7 @@ async function generatePDF(candName) {
   pdf.rect(0, 0, W, 34, 'F');
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16); pdf.setFont('helvetica', 'bold');
-  pdf.text('Assessment Monitor Report', M, 16);
+  pdf.text('Puppy — Session Report', M, 16);
   pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
 
   y = 44;
@@ -657,7 +665,7 @@ async function sendReport(candName) {
   // Show forward button if PDF was generated
   if (pdfFileName) {
     const fwdBtn = document.getElementById('fwd-btn');
-    fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Monitor Report — ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the monitoring report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
+    fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Puppy Report — ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the Puppy session report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
     fwdBtn.style.display = 'flex';
   }
 }
