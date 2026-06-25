@@ -6,6 +6,7 @@
 <title>Assessment Integrity Monitor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -288,7 +289,12 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
           End Monitoring Session
         </button>
         <!-- Email send status -->
-        <div id="email-status" style="display:none;border-radius:var(--rs);padding:11px 14px;font-size:13px;margin-top:8px;display:none;align-items:center;gap:10px"></div>
+        <div id="email-status" style="display:none;border-radius:var(--rs);padding:11px 14px;font-size:13px;margin-top:8px;line-height:1.5"></div>
+        <!-- Forward PDF button -->
+        <a id="fwd-btn" href="#" style="display:none;margin-top:8px;padding:11px;border-radius:var(--rs);background:var(--b);color:#fff;font-size:14px;font-weight:600;text-decoration:none;align-items:center;justify-content:center;gap:7px">
+          <svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Forward PDF to Assessor
+        </a>
 
         <div id="end-actions" style="display:none;gap:8px;flex-direction:column">
           <button class="btn btn-g" onclick="window.print()">
@@ -460,15 +466,101 @@ const ADMIN_EMAIL       = 'nicholas.musisi@experienceeducate.org';
 
 emailjs.init(EJS_KEY);
 
+async function generatePDF(candName) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, M = 15, CW = W - M * 2;
+  let y = M;
+
+  // Header bar
+  pdf.setFillColor(10, 101, 88);
+  pdf.rect(0, 0, W, 34, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(16); pdf.setFont('helvetica', 'bold');
+  pdf.text('Assessment Monitor Report', M, 16);
+  pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
+  pdf.text('AI-use detection for assessments', M, 25);
+  y = 44;
+
+  // Candidate info block
+  pdf.setTextColor(40, 39, 31);
+  pdf.setFontSize(14); pdf.setFont('helvetica', 'bold');
+  pdf.text(candName, M, y); y += 7;
+
+  pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(106, 104, 88);
+  pdf.text('Session start: ' + new Date(monStart).toLocaleString(), M, y); y += 5;
+  pdf.text('Session end:   ' + new Date().toLocaleString(), M, y); y += 5;
+  pdf.text('Duration: ' + document.getElementById('mon-timer').textContent, M, y); y += 7;
+
+  const warns = monLog.filter(e => e.type === 'warn');
+  pdf.setFontSize(11); pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(warns.length > 0 ? 217 : 31, warns.length > 0 ? 86 : 168, warns.length > 0 ? 64 : 150);
+  pdf.text(`Alerts: ${warns.length}   Total events: ${monLog.length}`, M, y); y += 8;
+
+  pdf.setDrawColor(220, 218, 210);
+  pdf.line(M, y, W - M, y); y += 7;
+
+  // Event list (oldest first)
+  for (const evt of [...monLog].reverse()) {
+    const isWarn = evt.type === 'warn';
+    if (y > 262) { pdf.addPage(); y = M; }
+
+    // Coloured dot
+    pdf.setFillColor(isWarn ? 217 : 31, isWarn ? 86 : 168, isWarn ? 64 : 150);
+    pdf.circle(M + 1.5, y - 1.2, 1.5, 'F');
+
+    // Event text
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', isWarn ? 'bold' : 'normal');
+    pdf.setTextColor(isWarn ? 217 : 40, isWarn ? 86 : 39, isWarn ? 64 : 31);
+    const lines = pdf.splitTextToSize(evt.msg, CW - 8);
+    pdf.text(lines, M + 6, y);
+    y += lines.length * 4.5;
+
+    // Timestamp
+    pdf.setFontSize(7.5); pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(160, 158, 144);
+    pdf.text(evt.time, M + 6, y); y += 4;
+
+    // Screenshot for warnings
+    if (isWarn && evt.screenshot) {
+      if (y > 230) { pdf.addPage(); y = M; }
+      try {
+        const img = await new Promise((res, rej) => {
+          const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = evt.screenshot;
+        });
+        const ih = (CW / img.width) * img.height;
+        pdf.addImage(evt.screenshot, 'JPEG', M, y, CW, ih);
+        y += ih + 4;
+      } catch(e) { /* skip if image fails */ }
+    }
+
+    pdf.setDrawColor(235, 233, 226);
+    pdf.line(M, y, W - M, y); y += 5;
+  }
+
+  return pdf;
+}
+
 async function sendReport(candName) {
   const emailEl = document.getElementById('email-status');
   emailEl.style.display = 'flex';
   emailEl.style.background = 'var(--al)';
   emailEl.style.color = 'var(--a)';
-  emailEl.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0"></span> Sending report to admin…';
+  emailEl.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;margin-right:6px"></span> Generating PDF and sending report…';
 
+  // Generate and auto-download PDF with screenshots
+  let pdfFileName = '';
+  try {
+    const pdf = await generatePDF(candName);
+    pdfFileName = `monitor-report-${candName.replace(/\s+/g,'-')}.pdf`;
+    pdf.save(pdfFileName);
+  } catch(e) { console.warn('PDF generation failed:', e); }
+
+  // Send text summary email
   const warnings = monLog.filter(e => e.type === 'warn');
-  const duration = document.getElementById('mon-timer').textContent;
+  const duration  = document.getElementById('mon-timer').textContent;
   const alertLines = warnings.length
     ? warnings.map(w => `• [${w.time}] ${w.msg}`).join('\n')
     : 'No alerts triggered during this session.';
@@ -490,13 +582,20 @@ async function sendReport(candName) {
     });
     emailEl.style.background = 'var(--gl)';
     emailEl.style.color = 'var(--gd)';
-    emailEl.innerHTML = '✓ Report sent to admin successfully';
+    emailEl.innerHTML = `✓ Text report emailed to admin. PDF with screenshots saved to your Downloads — forward it using the button below.`;
   } catch(err) {
     const reason = err && (err.text || err.message || JSON.stringify(err));
     emailEl.style.background = 'var(--rl)';
     emailEl.style.color = 'var(--r)';
-    emailEl.innerHTML = '⚠ Email failed: ' + (reason || 'unknown error') + ' — please print manually';
+    emailEl.innerHTML = `⚠ Email failed (${reason || 'unknown'}) — PDF saved to Downloads, please send it manually.`;
     console.error('EmailJS error:', err);
+  }
+
+  // Show forward button if PDF was generated
+  if (pdfFileName) {
+    const fwdBtn = document.getElementById('fwd-btn');
+    fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Monitor Report — ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the monitoring report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
+    fwdBtn.style.display = 'flex';
   }
 }
 
