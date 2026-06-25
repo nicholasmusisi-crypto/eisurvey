@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -32,11 +32,11 @@
 }}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
 
-/* ── Screens ── */
+/* â”€â”€ Screens â”€â”€ */
 .scr{display:none;min-height:100vh;flex-direction:column}
 .scr.on{display:flex}
 
-/* ── Role selection ── */
+/* â”€â”€ Role selection â”€â”€ */
 #scr-role{
   background:
     radial-gradient(ellipse at 15% 15%, rgba(255,180,240,.12) 0%, transparent 55%),
@@ -56,7 +56,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rp{position:absolute;left:0;pointer-events:none;z-index:0}
 .pup-bob{animation:pup-bob .75s ease-in-out infinite var(--bd,0s)}
 .pup-bob-l{animation:pup-bob-l .75s ease-in-out infinite var(--bd,0s)}
-/* right-wander patterns — pauses at held translateX values */
+/* right-wander patterns â€” pauses at held translateX values */
 @keyframes pup-wander-r1{0%{transform:translateX(-70px)}22%{transform:translateX(18vw)}32%{transform:translateX(18vw)}65%{transform:translateX(65vw)}74%{transform:translateX(65vw)}100%{transform:translateX(calc(100vw + 70px))}}
 @keyframes pup-wander-r2{0%{transform:translateX(-70px)}38%{transform:translateX(38vw)}51%{transform:translateX(38vw)}100%{transform:translateX(calc(100vw + 70px))}}
 @keyframes pup-wander-r3{0%{transform:translateX(-70px)}12%{transform:translateX(10vw)}21%{transform:translateX(10vw)}48%{transform:translateX(48vw)}58%{transform:translateX(48vw)}80%{transform:translateX(80vw)}89%{transform:translateX(80vw)}100%{transform:translateX(calc(100vw + 70px))}}
@@ -107,7 +107,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 .role-footer{text-align:center;margin-top:24px;font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.03em}
 
-/* ── Shared header ── */
+/* â”€â”€ Shared header â”€â”€ */
 .app-hdr{background:var(--gd);padding:14px 16px 0;flex-shrink:0}
 .hdr-top{display:flex;align-items:center;gap:10px;padding-bottom:12px}
 .hdr-ico{width:34px;height:34px;background:rgba(255,255,255,.18);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -118,21 +118,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;border:none;cursor:pointer;border-bottom:2.5px solid transparent;background:none;color:rgba(255,255,255,.5)}
 .tab.on{color:#fff;border-bottom-color:#fff}
 
-/* ── Content / Cards ── */
+/* â”€â”€ Content / Cards â”€â”€ */
 .scroll{flex:1;overflow-y:auto}
 .pg{display:none;padding:14px;max-width:680px;margin:0 auto;padding-bottom:36px}
 .pg.on{display:block}
 .card{background:var(--bg);border-radius:var(--rad);border:.5px solid var(--bd);padding:14px;margin-bottom:12px}
 .ct{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
 
-/* ── Stat grid ── */
+/* â”€â”€ Stat grid â”€â”€ */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 @media(max-width:380px){.stat-grid{grid-template-columns:1fr 1fr}}
 .sc{background:var(--bg2);border-radius:var(--rs);padding:11px}
 .sv{font-size:20px;font-weight:600}
 .sl{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.3}
 
-/* ── Risk banner ── */
+/* â”€â”€ Risk banner â”€â”€ */
 .risk-row{display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--rad);margin-bottom:12px}
 .risk-row.low{background:var(--gl)}.risk-row.med{background:var(--al)}.risk-row.high{background:var(--rl)}
 .risk-ico{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -145,7 +145,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .score-fill{height:100%;border-radius:3px}
 .risk-row.low .score-fill{background:var(--g)}.risk-row.med .score-fill{background:var(--a)}.risk-row.high .score-fill{background:var(--r)}
 
-/* ── Flags / phrases ── */
+/* â”€â”€ Flags / phrases â”€â”€ */
 .flag{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--bd);align-items:flex-start}
 .flag:last-child{border:none;padding-bottom:0}
 .fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
@@ -153,7 +153,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ftxt{font-size:13px;line-height:1.45}
 .phrase-tag{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-style:italic;background:var(--rl);color:var(--r);margin:2px 3px 2px 0}
 
-/* ── Upload zone ── */
+/* â”€â”€ Upload zone â”€â”€ */
 .upload-zone{border:1.5px dashed var(--bd2);border-radius:var(--rad);padding:26px 16px;text-align:center;cursor:pointer;background:var(--bg);transition:background .2s,border-color .2s;margin-top:12px}
 .upload-zone.over{background:var(--gl);border-color:var(--g)}
 .upload-zone svg{display:block;margin:0 auto 10px;color:var(--t3);width:30px;height:30px}
@@ -161,14 +161,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .upload-zone p{font-size:12px;color:var(--t3)}
 #file-in{display:none}
 
-/* ── Inputs ── */
+/* â”€â”€ Inputs â”€â”€ */
 input[type=text],input[type=date],textarea{width:100%;padding:10px 12px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);color:var(--t);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
 input:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(29,158,117,.15)}
 textarea{resize:vertical;min-height:96px;line-height:1.5}
 .lbl{display:block;font-size:12px;font-weight:500;color:var(--t2);margin:12px 0 5px}
 .lbl:first-child{margin-top:0}
 
-/* ── Buttons ── */
+/* â”€â”€ Buttons â”€â”€ */
 .btn{width:100%;padding:11px;border-radius:var(--rs);border:none;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .btn-g{background:var(--g);color:#fff}.btn-g:active{opacity:.82}
@@ -176,7 +176,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .btn-print{background:none;border:.5px solid var(--bd2);color:var(--t2);border-radius:var(--rs);padding:7px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-print svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* ── Divider / Misc ── */
+/* â”€â”€ Divider / Misc â”€â”€ */
 .divider{display:flex;align-items:center;gap:10px;margin:12px 0}
 .divider hr{flex:1;border:none;border-top:.5px solid var(--bd)}
 .divider span{font-size:11px;color:var(--t3);white-space:nowrap}
@@ -193,7 +193,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .cs-list{margin:0;padding-left:16px;font-size:12px;color:var(--t2);line-height:1.7}
 #results{display:none}
 
-/* ── Session checklist ── */
+/* â”€â”€ Session checklist â”€â”€ */
 .check-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:.5px solid var(--bd);cursor:pointer;user-select:none}
 .check-row:last-child{border:none;padding-bottom:0}
 .chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bd2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:all .15s}
@@ -203,7 +203,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .chk-lbl{font-size:13px;color:var(--t);line-height:1.4}
 .chk-note{font-size:11px;color:var(--t3);margin-top:2px}
 
-/* ── Live Monitor ── */
+/* â”€â”€ Live Monitor â”€â”€ */
 .mon-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--rs);background:var(--rl);font-size:13px;font-weight:600;color:var(--r);margin-bottom:12px}
 .mon-status.live{background:var(--gl);color:var(--gd)}
 .pulse{width:9px;height:9px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 1.4s infinite}
@@ -217,13 +217,13 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .evt-dot.warn{background:var(--r)}.evt-dot.info{background:var(--g)}
 .evt-time{font-size:10px;color:var(--t3);margin-top:2px}
 
-/* Flash overlay — visible in Google Meet screen share */
+/* Flash overlay â€” visible in Google Meet screen share */
 #mon-flash{position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--r);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:opacity .6s;opacity:0;pointer-events:none}
 #mon-flash svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .flash-title{font-size:14px;font-weight:700}
 .flash-body{font-size:12px;opacity:.85;margin-top:1px}
 
-/* ── Print ── */
+/* â”€â”€ Print â”€â”€ */
 @media print{
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #scr-role,#scr-admin .tabs,.btn,.btn-print,.note-box,#mon-flash,#mon-setup,.mon-status{display:none!important}
@@ -238,7 +238,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 .print-header h2{font-size:16px;font-weight:700}
 .print-header p{font-size:12px;color:#555;margin-top:3px}
 
-/* ── Password modal ── */
+/* â”€â”€ Password modal â”€â”€ */
 #pass-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
 #pass-modal.on{display:flex}
 .pass-box{background:var(--bg);border-radius:18px;padding:28px 24px;width:100%;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.22)}
@@ -249,15 +249,15 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 </head>
 <body>
 
-<!-- Flash banner (candidate screen — visible in Google Meet share) -->
+<!-- Flash banner (candidate screen â€” visible in Google Meet share) -->
 <div id="mon-flash">
   <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
   <div><div class="flash-title" id="flash-title"></div><div class="flash-body" id="flash-body"></div></div>
 </div>
 
-<!-- ══════════════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      ROLE SELECTION SCREEN
-══════════════════════════════════════════ -->
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="scr on" id="scr-role">
 
   <!-- Paw prints -->
@@ -286,26 +286,15 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
   <!-- 20 running puppies -->
   <div class="rp" style="top:4%;animation:pup-wander-r1 15s ease-in-out infinite -5s"><div class="pup-bob" style="--bd:0s"><svg width="44" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:9%;animation:pup-wander-l1 16s ease-in-out infinite -6s"><div class="pup-bob-l" style="--bd:0.12s"><svg width="38" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:14%;animation:pup-wander-r2 12s ease-in-out infinite -4s"><div class="pup-bob" style="--bd:0.06s"><svg width="50" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:19%;animation:pup-wander-l2 14s ease-in-out infinite -2s"><div class="pup-bob-l" style="--bd:0.18s"><svg width="42" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:24%;animation:pup-wander-r3 20s ease-in-out infinite -8s"><div class="pup-bob" style="--bd:0.03s"><svg width="36" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:29%;animation:pup-wander-l3 18s ease-in-out infinite -7s"><div class="pup-bob-l" style="--bd:0.15s"><svg width="52" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:34%;animation:pup-wander-r4 16s ease-in-out infinite -3s"><div class="pup-bob" style="--bd:0.09s"><svg width="40" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:39%;animation:pup-wander-l4 12s ease-in-out infinite -4s"><div class="pup-bob-l" style="--bd:0.21s"><svg width="46" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:44%;animation:pup-wander-r5 11s ease-in-out infinite -2s"><div class="pup-bob" style="--bd:0.07s"><svg width="48" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:49%;animation:pup-wander-l5 19s ease-in-out infinite -8s"><div class="pup-bob-l" style="--bd:0.14s"><svg width="35" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:54%;animation:pup-wander-r1 18s ease-in-out infinite -7s"><div class="pup-bob" style="--bd:0.02s"><svg width="54" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:59%;animation:pup-wander-l1 13s ease-in-out infinite -3s"><div class="pup-bob-l" style="--bd:0.17s"><svg width="40" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:64%;animation:pup-wander-r2 13s ease-in-out infinite -1s"><div class="pup-bob" style="--bd:0.11s"><svg width="45" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:69%;animation:pup-wander-l2 21s ease-in-out infinite -9s"><div class="pup-bob-l" style="--bd:0.2s"><svg width="38" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:74%;animation:pup-wander-r3 22s ease-in-out infinite -9s"><div class="pup-bob" style="--bd:0.05s"><svg width="50" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:79%;animation:pup-wander-l3 15s ease-in-out infinite -5s"><div class="pup-bob-l" style="--bd:0.13s"><svg width="44" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:84%;animation:pup-wander-r4 14s ease-in-out infinite -4s"><div class="pup-bob" style="--bd:0.08s"><svg width="36" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:89%;animation:pup-wander-l4 11s ease-in-out infinite -1s"><div class="pup-bob-l" style="--bd:0.16s"><svg width="48" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
   <div class="rp" style="top:93%;animation:pup-wander-r5 17s ease-in-out infinite -6s"><div class="pup-bob" style="--bd:0.04s"><svg width="42" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-  <div class="rp" style="top:97%;animation:pup-wander-l5 17s ease-in-out infinite -7s"><div class="pup-bob-l" style="--bd:0.19s"><svg width="40" viewBox="0 0 64 48"><ellipse cx="42" cy="10" rx="7" ry="10" transform="rotate(-20 42 10)" fill="rgba(255,255,255,.1)" stroke="none"/><ellipse cx="28" cy="30" rx="18" ry="11" fill="rgba(255,255,255,.1)" stroke="none"/><circle cx="48" cy="18" r="11" fill="rgba(255,255,255,.12)" stroke="none"/><circle cx="52" cy="15" r="1.8" fill="rgba(0,0,0,.25)" stroke="none"/><circle cx="57" cy="20" r="2" fill="rgba(255,255,255,.45)" stroke="none"/><path d="M12 26 Q4 18 8 8" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="39" x2="33" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="43" y1="39" x2="52" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="19" y1="39" x2="12" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/><line x1="23" y1="39" x2="30" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="4" stroke-linecap="round"/></svg></div></div>
-
   <div class="role-wrap">
     <div class="role-logo">
       <div class="role-logo-ring">
@@ -349,9 +338,9 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 </div>
 
 
-<!-- ══════════════════════════════════════════
-     CANDIDATE SCREEN — Live Monitor only
-══════════════════════════════════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     CANDIDATE SCREEN â€” Live Monitor only
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="scr" id="scr-candidate">
   <div class="app-hdr">
     <div class="hdr-top">
@@ -412,7 +401,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
               How Reports Are Stored &amp; Used
             </div>
             <ul class="cs-list">
-              <li>All monitoring data is processed <strong>locally in your browser</strong> during the session — nothing is uploaded in real time</li>
+              <li>All monitoring data is processed <strong>locally in your browser</strong> during the session â€” nothing is uploaded in real time</li>
               <li>A text summary report is automatically sent to your assessor when you end the session</li>
               <li>A PDF report, which may include screenshots, is downloaded and retained by the assessor for review</li>
               <li>This data is used <strong>solely to verify assessment integrity</strong> and will not be shared with third parties</li>
@@ -455,7 +444,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
         <div class="mon-status" id="mon-status" style="margin-top:12px">
           <div class="pulse"></div>
-          <span id="mon-status-txt">Starting…</span>
+          <span id="mon-status-txt">Startingâ€¦</span>
         </div>
 
         <div class="mon-stat-row">
@@ -507,9 +496,9 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 <canvas id="mon-cvs" style="display:none"></canvas>
 
 
-<!-- ══════════════════════════════════════════
-     ADMIN SCREEN — Document Analysis + Session Log
-══════════════════════════════════════════ -->
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     ADMIN SCREEN â€” Document Analysis + Session Log
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="scr" id="scr-admin">
   <div class="app-hdr">
     <div class="hdr-top">
@@ -529,7 +518,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
   <div class="scroll">
 
-    <!-- ── Document Analysis tab ── -->
+    <!-- â”€â”€ Document Analysis tab â”€â”€ -->
     <div class="pg on" id="pg-doc">
 
       <div class="upload-wrap" id="upload-wrap">
@@ -546,7 +535,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
           <input type="file" id="file-in" accept=".docx,.txt" onchange="onFileChosen(this.files[0])">
 
           <div class="divider"><hr><span>OR PASTE TEXT BELOW</span><hr></div>
-          <textarea id="paste-area" placeholder="Paste the candidate's answer text here…"></textarea>
+          <textarea id="paste-area" placeholder="Paste the candidate's answer text hereâ€¦"></textarea>
 
           <button class="btn btn-g" style="margin-top:12px" onclick="runAnalysis()">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -554,7 +543,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
           </button>
         </div>
         <div class="note-box">
-          Statistical indicators only — not a definitive AI detector. Use alongside direct assessment and session observations.
+          Statistical indicators only â€” not a definitive AI detector. Use alongside direct assessment and session observations.
         </div>
       </div>
 
@@ -608,7 +597,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
       </div>
     </div>
 
-    <!-- ── Session Log tab ── -->
+    <!-- â”€â”€ Session Log tab â”€â”€ -->
     <div class="pg" id="pg-session">
       <div class="card" style="margin-top:12px">
         <p class="ct">Session Details</p>
@@ -628,7 +617,7 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
       <div class="card">
         <label class="lbl" style="margin-top:0">Additional Notes</label>
-        <textarea id="s-notes" style="min-height:110px" placeholder="Unusual pauses, off-screen activity, connectivity drops, verbal inconsistencies…"></textarea>
+        <textarea id="s-notes" style="min-height:110px" placeholder="Unusual pauses, off-screen activity, connectivity drops, verbal inconsistenciesâ€¦"></textarea>
       </div>
 
       <button class="btn btn-g" onclick="window.print()">
@@ -646,9 +635,9 @@ textarea{resize:vertical;min-height:96px;line-height:1.5}
 
 
 <script>
-// ── EmailJS config ─────────────────────────────────────────
+// â”€â”€ EmailJS config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Update ADMIN_EMAIL to change where reports are delivered.
-// Create a template in EmailJS named "template_monitor_report" — see README below.
+// Create a template in EmailJS named "template_monitor_report" â€” see README below.
 const EJS_SVC           = 'service_asopshc';
 const EJS_KEY           = 'p522hjs-x5_VoSCzk';
 const EJS_REPORT_TMPL   = 'template_aepfcte';
@@ -667,7 +656,7 @@ async function generatePDF(candName) {
   pdf.rect(0, 0, W, 34, 'F');
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(16); pdf.setFont('helvetica', 'bold');
-  pdf.text('Puppy — Session Report', M, 16);
+  pdf.text('Puppy â€” Session Report', M, 16);
   pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
 
   y = 44;
@@ -738,9 +727,9 @@ async function sendReport(candName) {
   emailEl.style.display = 'flex';
   emailEl.style.background = 'var(--al)';
   emailEl.style.color = 'var(--a)';
-  emailEl.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;margin-right:6px"></span> Generating PDF and sending report…';
+  emailEl.innerHTML = '<span style="animation:pulse 1s infinite;display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;margin-right:6px"></span> Generating PDF and sending reportâ€¦';
 
-  // Generate PDF — blob for email attachment, also auto-download for candidate records
+  // Generate PDF â€” blob for email attachment, also auto-download for candidate records
   let pdfBlob = null, pdfFileName = '';
   try {
     const pdf = await generatePDF(candName);
@@ -752,10 +741,10 @@ async function sendReport(candName) {
   const warnings    = monLog.filter(e => e.type === 'warn');
   const duration    = document.getElementById('mon-timer').textContent;
   const alertLines  = warnings.length
-    ? warnings.map(w => `• [${w.time}] ${w.msg}`).join('\n')
+    ? warnings.map(w => `â€¢ [${w.time}] ${w.msg}`).join('\n')
     : 'No alerts triggered during this session.';
   const fullLog     = monLog.map(e =>
-    `[${e.time}] ${e.type === 'warn' ? '⚠' : '✓'} ${e.msg}`
+    `[${e.time}] ${e.type === 'warn' ? 'âš ' : 'âœ“'} ${e.msg}`
   ).join('\n');
 
   const templateParams = {
@@ -789,7 +778,7 @@ async function sendReport(candName) {
         emailSentWithPdf = true;
         emailEl.style.background = 'var(--gl)';
         emailEl.style.color = 'var(--gd)';
-        emailEl.innerHTML = '✓ Report with PDF emailed to assessor automatically.';
+        emailEl.innerHTML = 'âœ“ Report with PDF emailed to assessor automatically.';
       }
     } catch(e) { console.warn('PDF attachment send failed, falling back:', e); }
   }
@@ -800,29 +789,29 @@ async function sendReport(candName) {
       await emailjs.send(EJS_SVC, EJS_REPORT_TMPL, templateParams);
       emailEl.style.background = 'var(--gl)';
       emailEl.style.color = 'var(--gd)';
-      emailEl.innerHTML = '✓ Text report emailed. PDF saved to Downloads — forward it using the button below.';
+      emailEl.innerHTML = 'âœ“ Text report emailed. PDF saved to Downloads â€” forward it using the button below.';
     } catch(err) {
       const reason = err && (err.text || err.message || JSON.stringify(err));
       emailEl.style.background = 'var(--rl)';
       emailEl.style.color = 'var(--r)';
-      emailEl.innerHTML = `⚠ Email failed (${reason || 'unknown'}) — PDF saved to Downloads, please send it manually.`;
+      emailEl.innerHTML = `âš  Email failed (${reason || 'unknown'}) â€” PDF saved to Downloads, please send it manually.`;
       console.error('EmailJS error:', err);
     }
     if (pdfFileName) {
       const fwdBtn = document.getElementById('fwd-btn');
-      fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Puppy Report — ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the Puppy session report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
+      fwdBtn.href = `mailto:${ADMIN_EMAIL}?subject=Puppy Report â€” ${encodeURIComponent(candName)}&body=${encodeURIComponent(`Hi,\n\nPlease find attached the Puppy session report PDF for ${candName}.\n\nFile saved as: ${pdfFileName}\n\nPlease attach it from your Downloads folder.`)}`;
       fwdBtn.style.display = 'flex';
     }
   }
 }
 
-// ── Role switching ─────────────────────────────────────────
+// â”€â”€ Role switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function enterRole(role) {
   document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
   document.getElementById('scr-' + role).classList.add('on');
 }
 
-// ── Admin tab switching ────────────────────────────────────
+// â”€â”€ Admin tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function switchTab(id, btn) {
   document.querySelectorAll('#scr-admin .pg').forEach(p => p.classList.remove('on'));
   document.querySelectorAll('#scr-admin .tab').forEach(t => t.classList.remove('on'));
@@ -830,9 +819,9 @@ function switchTab(id, btn) {
   btn.classList.add('on');
 }
 
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LIVE MONITOR (candidate screen)
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let monStream = null, monVideo = null, monCanvas = null;
 let prevFrame = null, monInterval = null, timerInt = null;
 let monStart = null, monActive = false, monLog = [];
@@ -917,13 +906,13 @@ async function startMonitor() {
   document.getElementById('cand-setup').style.display  = 'none';
   document.getElementById('cand-active').style.display = 'block';
   document.getElementById('mon-status').className      = 'mon-status live';
-  document.getElementById('mon-status-txt').textContent = 'Monitoring active — ' + candName;
+  document.getElementById('mon-status-txt').textContent = 'Monitoring active â€” ' + candName;
 }
 
 function onVisChange() {
   if (!monActive) return;
   if (document.hidden) {
-    monAddEvt('warn', 'Tab switch — candidate navigated away from this page', captureShot());
+    monAddEvt('warn', 'Tab switch â€” candidate navigated away from this page', captureShot());
     fireAlert('Tab switch detected', 'Candidate left the monitoring tab');
   } else {
     monAddEvt('info', 'Returned to monitoring page', captureShot());
@@ -934,7 +923,7 @@ let blurTimer = null;
 function onWinBlur() {
   if (!monActive) return;
   blurTimer = setTimeout(() => {
-    monAddEvt('warn', 'Window focus lost — candidate switched to another application', captureShot());
+    monAddEvt('warn', 'Window focus lost â€” candidate switched to another application', captureShot());
     fireAlert('App switch detected', 'Candidate moved to a different application');
   }, 1200);
 }
@@ -963,7 +952,7 @@ function checkFrame() {
   if (prevFrame) {
     const diff = pixelDiff(frame.data, prevFrame.data);
     if (diff > 0.38) {
-      monAddEvt('warn', `Major screen change — ${Math.round(diff*100)}% of screen changed`, captureShot());
+      monAddEvt('warn', `Major screen change â€” ${Math.round(diff*100)}% of screen changed`, captureShot());
       fireAlert('Screen change detected', `${Math.round(diff*100)}% of the visible screen changed`);
     }
   }
@@ -981,7 +970,7 @@ function pixelDiff(a, b) {
 function fireAlert(title, body) {
   const flash = document.getElementById('mon-flash');
   document.getElementById('flash-title').textContent = title;
-  document.getElementById('flash-body').textContent  = body + '  — ' + new Date().toLocaleTimeString();
+  document.getElementById('flash-body').textContent  = body + '  â€” ' + new Date().toLocaleTimeString();
   flash.style.opacity = '1';
   setTimeout(() => { flash.style.opacity = '0'; }, 5000);
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -1044,9 +1033,9 @@ function showCandErr(msg) {
   e.style.display = 'block';
 }
 
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // DOCUMENT ANALYSIS (admin)
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let pickedFile = null;
 const dropZone = document.getElementById('drop-zone');
 
@@ -1136,18 +1125,18 @@ function calcRisk(stats,meta){
   const flags=[];let score=0;
   if(meta&&meta.totalTime!=null){
     const t=parseInt(meta.totalTime),w=stats.wordCount;
-    if(w>80&&t<=2){flags.push({l:'high',t:`Editing time: ${t} min for ${w} words — strongly consistent with copy-paste`});score+=45;}
+    if(w>80&&t<=2){flags.push({l:'high',t:`Editing time: ${t} min for ${w} words â€” strongly consistent with copy-paste`});score+=45;}
     else if(w>150&&t<=8){flags.push({l:'med',t:`Short editing time: ${t} min for ${w} words (~${Math.round(w/Math.max(t,1))} wds/min)`});score+=22;}
   }
   if(meta&&meta.revision!=null){
     const r=parseInt(meta.revision);
-    if(r<=2&&stats.wordCount>100){flags.push({l:'med',t:`Only ${r} revision(s) recorded — typical of pasted content`});score+=13;}
+    if(r<=2&&stats.wordCount>100){flags.push({l:'med',t:`Only ${r} revision(s) recorded â€” typical of pasted content`});score+=13;}
   }
   if(stats.hits.length>=6){flags.push({l:'high',t:`${stats.hits.length} AI-associated phrases detected`});score+=30;}
   else if(stats.hits.length>=3){flags.push({l:'med',t:`${stats.hits.length} AI-associated phrases detected`});score+=15;}
   else if(stats.hits.length>=1){flags.push({l:'low',t:`${stats.hits.length} AI-associated phrase(s) noted`});score+=6;}
-  if(stats.sentCount>=6&&stats.cv<0.22){flags.push({l:'med',t:`Very uniform sentence lengths (variation: ${stats.cv}) — human writing varies more`});score+=18;}
-  if(stats.avgLen>28&&stats.sentCount>=4){flags.push({l:'low',t:`Average sentence: ${stats.avgLen} words (typical human: 15–20)`});score+=10;}
+  if(stats.sentCount>=6&&stats.cv<0.22){flags.push({l:'med',t:`Very uniform sentence lengths (variation: ${stats.cv}) â€” human writing varies more`});score+=18;}
+  if(stats.avgLen>28&&stats.sentCount>=4){flags.push({l:'low',t:`Average sentence: ${stats.avgLen} words (typical human: 15â€“20)`});score+=10;}
   if(flags.length===0)flags.push({l:'ok',t:'No significant AI-use indicators detected.'});
   score=Math.min(score,100);
   return{score,level:score>=55?'high':score>=25?'med':'low',flags};
@@ -1203,7 +1192,7 @@ function renderResults(name,stats,meta,risk){
       meta.app&&['Created With',meta.app,false],
     ].filter(Boolean);
     document.getElementById('meta-rows').innerHTML=rows.map(([k,v,flag])=>
-      `<div class="meta-row"><span class="meta-k">${k}</span><span class="meta-v${flag?' fl':''}">${v}${flag?' ⚑':''}</span></div>`).join('');
+      `<div class="meta-row"><span class="meta-k">${k}</span><span class="meta-v${flag?' fl':''}">${v}${flag?' âš‘':''}</span></div>`).join('');
   }
   document.getElementById('flags').innerHTML=risk.flags.map(f=>
     `<div class="flag"><div class="fdot ${f.l}"></div><div class="ftxt">${f.t}</div></div>`).join('');
@@ -1232,9 +1221,9 @@ function resetForm(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SESSION LOG (admin)
-// ══════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const CHECKS=[
   {id:'cam',     l:'Camera remained visible throughout the session',        n:'Candidate kept face and workspace on screen at all times'},
   {id:'screen',  l:'Candidate shared their screen when asked',              n:'Screen sharing was active during the test period'},
@@ -1270,7 +1259,7 @@ function resetSession(){
 
 document.getElementById('s-date').valueAsDate=new Date();
 
-// ── Assessor password gate ──────────────────────────────────
+// â”€â”€ Assessor password gate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ADMIN_HASH = 'a4d95e9bc5a3efa2ef941cafb403165aaf5bbc753ac5f3187a18d52c98aac7d5';
 
 function showPassModal() {
@@ -1307,7 +1296,7 @@ document.addEventListener('keydown', e => {
     <h2>Assessor Access</h2>
     <p>Enter the password to open the assessor dashboard.</p>
     <label class="lbl">Password</label>
-    <input type="password" id="pass-input" class="inp" placeholder="••••••••"
+    <input type="password" id="pass-input" class="inp" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
       onkeydown="if(event.key==='Enter')checkPass()" autocomplete="current-password">
     <p id="pass-err"></p>
     <button class="btn" style="margin-top:14px;width:100%" onclick="checkPass()">Continue</button>
