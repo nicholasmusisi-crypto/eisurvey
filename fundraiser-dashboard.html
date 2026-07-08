@@ -31,29 +31,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;flex-wrap:wrap;gap:8px}
 h1{font-size:22px;font-weight:700}
 .sub{color:var(--t2);font-size:13px}
-.heroRow{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px}
-.hero{flex:2;min-width:240px;background:var(--g);color:#fff;border-radius:var(--rad);padding:28px 26px;margin-bottom:0;text-align:center}
-.hero.mini{flex:1;min-width:180px;padding:20px 22px;background:var(--grn)}
-.hero.mini .total{font-size:clamp(24px,4vw,36px)}
-.hero .total{font-size:clamp(38px,7vw,64px);font-weight:800;line-height:1.1}
-.hero .label{font-size:13px;opacity:.8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-.barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:14px;margin-top:16px;overflow:hidden}
+.heroRow{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.hero{flex:2;min-width:280px;background:var(--g);color:#fff;border-radius:var(--rad);padding:48px 40px;margin-bottom:0;text-align:center}
+.hero.mini{flex:1;min-width:220px;padding:32px 28px;background:var(--grn)}
+.hero.mini .total{font-size:clamp(30px,5vw,46px)}
+.hero .total{font-size:clamp(52px,10vw,96px);font-weight:800;line-height:1.1}
+.hero .label{font-size:16px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-weight:600}
+.barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:18px;margin-top:22px;overflow:hidden}
 .barInner{background:#fff;height:100%;border-radius:999px;transition:width .6s ease;width:0%}
-.goalRow{display:flex;justify-content:space-between;font-size:12px;opacity:.85;margin-top:6px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
-.stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:16px;text-align:center}
-.stat .n{font-size:26px;font-weight:800}
-.stat .l{font-size:12px;color:var(--t2);margin-top:2px}
+.goalRow{display:flex;justify-content:space-between;font-size:14px;opacity:.9;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:16px}
+.stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:22px}
+.stat .n{font-size:34px;font-weight:800}
+.stat .l{font-size:13px;color:var(--t2);margin-top:4px}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px}
 .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
-.feed{max-height:420px;overflow-y:auto}
-.gift{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--bd)}
-.gift:last-child{border-bottom:none}
-.gift .who{font-weight:600;font-size:14px}
-.gift .meta{font-size:12px;color:var(--t2)}
-.gift .amt{font-weight:800;color:var(--g)}
-.gift.new{animation:pop .5s ease}
-@keyframes pop{from{background:var(--gl);transform:scale(1.01)}to{background:transparent;transform:scale(1)}}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
@@ -94,11 +86,6 @@ h1{font-size:22px;font-weight:700}
   <div class="stats">
     <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
     <div class="stat"><div class="n" id="largest">—</div><div class="l">Largest gift</div></div>
-  </div>
-
-  <div class="panel">
-    <h2>Recent gifts</h2>
-    <div class="feed" id="feed"><div class="empty">Waiting for the first gift…</div></div>
   </div>
 
   <div class="panel" id="categoryPanel" style="display:none">
@@ -145,7 +132,6 @@ function categoryBreakdown(list){
 }
 
 let goal = 0;
-let lastCount = 0;
 let lastData = {};
 
 onValue(goalRef, snap => {
@@ -215,7 +201,6 @@ onValue(donationsRef, snap => {
   lastData = snap.val() || {};
   renderTotals(lastData);
   renderExtraCurrencies(lastData);
-  renderFeed(lastData);
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
 });
@@ -250,30 +235,6 @@ function renderExtraCurrencies(data){
     `;
     heroRow.appendChild(el);
   });
-}
-
-function timeAgo(ts){
-  if (!ts) return 'just now';
-  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
-  if (s < 60) return 'just now';
-  if (s < 3600) return Math.floor(s / 60) + 'm ago';
-  return Math.floor(s / 3600) + 'h ago';
-}
-
-function renderFeed(data){
-  const entries = Object.entries(data || {}).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-  const feed = document.getElementById('feed');
-  if (!entries.length) { feed.innerHTML = '<div class="empty">Waiting for the first gift…</div>'; return; }
-  feed.innerHTML = entries.slice(0, 30).map(([id, d], i) => `
-    <div class="gift${i === 0 && entries.length > lastCount ? ' new' : ''}">
-      <div>
-        <div class="who">${escapeHtml(d.giverName || 'Anonymous')}</div>
-        <div class="meta">${escapeHtml(d.method || '')}${d.note ? ' · ' + escapeHtml(d.note) : ''} · ${timeAgo(d.timestamp)}</div>
-      </div>
-      <div class="amt">${fmt(d.amount || 0, d.currency)}</div>
-    </div>
-  `).join('');
-  lastCount = entries.length;
 }
 
 function renderCategories(data){
@@ -365,8 +326,6 @@ function generateReport(){
 
   doc.save('cheerful-giving-report.pdf');
 }
-
-setInterval(() => renderFeed(lastData), 30000);
 </script>
 </body>
 </html>
