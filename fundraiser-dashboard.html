@@ -27,7 +27,7 @@ body::before{
   content:'';position:fixed;inset:0;z-index:-1;
   background-image:url('currency-bg.jpg');
   background-size:cover;background-position:center;background-attachment:fixed;
-  opacity:.32;filter:saturate(.65) brightness(1.05) sepia(.15);
+  opacity:.55;filter:saturate(.85) brightness(1.05) sepia(.1);
   pointer-events:none
 }
 @media(prefers-color-scheme:dark){:root{
@@ -39,7 +39,7 @@ body::before{
   --al:#3F2100;--a:#F0A030;
   --grn:#2E9E62;
 }
-body::before{opacity:.16;filter:saturate(.55) brightness(.55) contrast(1.15)}
+body::before{opacity:.3;filter:saturate(.75) brightness(.6) contrast(1.15)}
 }
 .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
 .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;flex-wrap:wrap;gap:8px}
@@ -76,14 +76,6 @@ h1{font-size:22px;font-weight:700}
 .stat .l{font-size:13px;color:var(--t2);margin-top:4px}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
-.feed{max-height:420px;overflow-y:auto}
-.gift{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--bd)}
-.gift:last-child{border-bottom:none}
-.gift .who{font-weight:600;font-size:14px}
-.gift .meta{font-size:12px;color:var(--t2)}
-.gift .amt{font-weight:800;color:var(--g)}
-.gift.new{animation:pop .5s ease}
-@keyframes pop{from{background:var(--gl);transform:scale(1.01)}to{background:transparent;transform:scale(1)}}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
@@ -156,11 +148,6 @@ h1{font-size:22px;font-weight:700}
     <div class="stat"><div class="n" id="largest">—</div><div class="l">Largest gift</div></div>
   </div>
 
-  <div class="panel" id="feedPanel" style="display:none">
-    <h2>Recent gifts</h2>
-    <div class="feed" id="feed"><div class="empty">Waiting for the first gift…</div></div>
-  </div>
-
   <div class="panel" id="categoryPanel" style="display:none">
     <h2 id="categoryTitle">By category</h2>
     <div id="categoryList"></div>
@@ -206,7 +193,6 @@ function categoryBreakdown(list){
 
 let goal = 0;
 let lastData = {};
-let lastCount = 0;
 let lastPingCount = 0;
 
 // --- Number rendering: auto-shrink-to-fit + smooth count-up ---
@@ -312,7 +298,6 @@ const reportBtn = document.getElementById('reportBtn');
 const setGoalBtn = document.getElementById('setGoalBtn');
 const resetBtn = document.getElementById('resetBtn');
 const categoryPanel = document.getElementById('categoryPanel');
-const feedPanel = document.getElementById('feedPanel');
 let dashRole = sessionStorage.getItem('cg_dash_role') || null;
 
 function applyRole(){
@@ -331,11 +316,9 @@ function applyRole(){
     resetBtn.style.display = 'none';
   }
   categoryPanel.style.display = unlocked ? '' : 'none';
-  feedPanel.style.display = unlocked ? '' : 'none';
   reportBtn.style.display = unlocked ? '' : 'none';
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
-  renderFeed(lastData);
 }
 applyRole();
 
@@ -373,7 +356,6 @@ onValue(donationsRef, snap => {
   renderExtraCurrencies(lastData);
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
-  renderFeed(lastData);
   checkMilestones(total);
   if (!isFirstDonationsRender && allCount > lastPingCount) showGiftPing();
   lastPingCount = allCount;
@@ -528,31 +510,6 @@ function renderExtraCurrencies(data){
   }
 }
 
-function timeAgo(ts){
-  if (!ts) return 'just now';
-  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
-  if (s < 60) return 'just now';
-  if (s < 3600) return Math.floor(s / 60) + 'm ago';
-  return Math.floor(s / 3600) + 'h ago';
-}
-
-function renderFeed(data){
-  if (dashRole !== 'admin' && dashRole !== 'manage') return;
-  const entries = Object.entries(data || {}).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-  const feed = document.getElementById('feed');
-  if (!entries.length) { feed.innerHTML = '<div class="empty">Waiting for the first gift…</div>'; return; }
-  feed.innerHTML = entries.slice(0, 30).map(([id, d], i) => `
-    <div class="gift${i === 0 && entries.length > lastCount ? ' new' : ''}">
-      <div>
-        <div class="who">${escapeHtml(d.giverName || 'Anonymous')}</div>
-        <div class="meta">${escapeHtml(d.method || '')}${d.note ? ' · ' + escapeHtml(d.note) : ''} · ${timeAgo(d.timestamp)}</div>
-      </div>
-      <div class="amt">${fmt(d.amount || 0, d.currency)}</div>
-    </div>
-  `).join('');
-  lastCount = entries.length;
-}
-
 function renderCategories(data){
   if (dashRole !== 'admin' && dashRole !== 'manage') return;
   const groups = groupByCurrency(data);
@@ -656,8 +613,6 @@ function generateReport(){
 
   doc.save('cheerful-giving-report.pdf');
 }
-
-setInterval(() => renderFeed(lastData), 30000);
 </script>
 </body>
 </html>
