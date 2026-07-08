@@ -222,10 +222,11 @@ onValue(donationsRef, snap => {
 });
 
 function renderTotals(data){
-  const list = (Object.values(data || {})).filter(d => (d.currency || CURRENCY) === CURRENCY);
+  const allList = Object.values(data || {});
+  const list = allList.filter(d => (d.currency || CURRENCY) === CURRENCY);
   const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
   document.getElementById('total').textContent = fmt(total);
-  document.getElementById('count').textContent = list.length;
+  document.getElementById('count').textContent = allList.length;
   document.getElementById('avg').textContent = list.length ? fmt(total / list.length) : '—';
   document.getElementById('largest').textContent = list.length ? fmt(Math.max(...list.map(d => Number(d.amount) || 0))) : '—';
 
