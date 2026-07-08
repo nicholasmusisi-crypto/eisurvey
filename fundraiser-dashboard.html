@@ -281,12 +281,23 @@ function checkMilestones(total){
   }
 }
 
-function showBanner(text){
+const CELEBRATION_DURATION_MS = 60 * 60 * 1000; // keep the vibe going for ~1 hour
+const CELEBRATION_INTERVAL_MS = 5 * 60 * 1000;  // re-burst every 5 minutes
+const COLOR_PALETTES = [
+  ['#F0A030', '#D95640', '#5E50C2'],
+  ['#1E7145', '#3E8FD6', '#F0A030'],
+  ['#D95640', '#5E50C2', '#1E3A5F'],
+  ['#3E8FD6', '#F0A030', '#1E7145'],
+  ['#5E50C2', '#D95640', '#3E8FD6'],
+];
+
+function showBanner(text, colors){
   const el = document.getElementById('celebrateBanner');
   el.textContent = text;
+  el.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]} 60%, ${colors[2]})`;
   el.classList.add('show');
   clearTimeout(showBanner._t);
-  showBanner._t = setTimeout(() => el.classList.remove('show'), 6000);
+  showBanner._t = setTimeout(() => el.classList.remove('show'), 12000);
 }
 
 function floatBalloons(count){
@@ -306,23 +317,37 @@ function floatBalloons(count){
   }
 }
 
-function celebrate(message, kind){
-  showBanner(message);
+function burstOnce(message, kind, colors){
+  showBanner(message, colors);
   if (typeof confetti !== 'function') return;
   if (kind === 'goal') {
     floatBalloons(18);
     const end = Date.now() + 4000;
     (function frame(){
-      confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#F0A030', '#D95640', '#5E50C2', '#1E7145'] });
-      confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#F0A030', '#D95640', '#5E50C2', '#1E7145'] });
+      confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors });
+      confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors });
       if (Date.now() < end) requestAnimationFrame(frame);
     })();
-    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors });
   } else {
     floatBalloons(10);
-    confetti({ particleCount: 100, spread: 90, origin: { y: 0.6 } });
-    setTimeout(() => confetti({ particleCount: 80, spread: 120, origin: { y: 0.5 } }), 300);
+    confetti({ particleCount: 100, spread: 90, origin: { y: 0.6 }, colors });
+    setTimeout(() => confetti({ particleCount: 80, spread: 120, origin: { y: 0.5 }, colors }), 300);
   }
+}
+
+function celebrate(message, kind){
+  const start = Date.now();
+  let paletteIndex = 0;
+  const fire = () => {
+    burstOnce(message, kind, COLOR_PALETTES[paletteIndex % COLOR_PALETTES.length]);
+    paletteIndex++;
+  };
+  fire();
+  const timer = setInterval(() => {
+    if (Date.now() - start >= CELEBRATION_DURATION_MS) { clearInterval(timer); return; }
+    fire();
+  }, CELEBRATION_INTERVAL_MS);
 }
 
 function renderExtraCurrencies(data){
