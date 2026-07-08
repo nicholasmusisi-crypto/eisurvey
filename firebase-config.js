@@ -17,6 +17,10 @@ export const CURRENCY = "UGX";
 // total card on the dashboard and its own section in the report.
 export const CURRENCIES = ["UGX", "USD", "EUR", "GBP", "KES"];
 
+// Last year's total (primary currency). The dashboard throws a one-time
+// confetti/balloons celebration the moment this year's total overtakes it.
+export const PREVIOUS_YEAR_TOTAL = 102000000;
+
 // Access-level PINs. These are a soft deterrent, not real security —
 // don't share the entry-page link publicly, and change these before the event.
 export const ENTRY_PIN = "2026";   // Add / self-correct gifts on the entry page
