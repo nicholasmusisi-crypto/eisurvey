@@ -33,7 +33,7 @@ input[type=text],input[type=number],select,textarea{
   width:100%;padding:12px 13px;border-radius:var(--rs);border:.5px solid var(--bd2);
   background:var(--bg2);color:var(--t);font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;margin-bottom:14px
 }
-input[type=number]{font-size:28px;font-weight:700}
+#amount{font-size:28px;font-weight:700}
 .field:last-child input,.field:last-child select{margin-bottom:0}
 .row{display:flex;gap:10px}
 .row>div{flex:1}
@@ -105,7 +105,7 @@ a.dashlink{display:block;text-align:center;margin-top:16px;color:var(--g);font-s
     <div class="row">
       <div class="field">
         <label>Amount</label>
-        <input type="number" id="amount" inputmode="decimal" placeholder="0" required min="0" step="any">
+        <input type="text" id="amount" inputmode="decimal" placeholder="0" required>
       </div>
       <div class="field" style="max-width:110px">
         <label>Currency</label>
@@ -242,6 +242,23 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// --- Live comma-formatted amount input ---
+function parseAmount(el){
+  return parseFloat(el.value.replace(/,/g, '')) || 0;
+}
+
+function formatAmountEl(el){
+  const cursorFromEnd = el.value.length - el.selectionStart;
+  let raw = el.value.replace(/[^\d.]/g, '');
+  const firstDot = raw.indexOf('.');
+  if (firstDot !== -1) raw = raw.slice(0, firstDot + 1) + raw.slice(firstDot + 1).replace(/\./g, '');
+  const [intPart, decPart] = raw.split('.');
+  const formattedInt = intPart ? Number(intPart).toLocaleString('en-US') : '';
+  el.value = decPart !== undefined ? formattedInt + '.' + decPart : formattedInt;
+  const pos = Math.max(0, el.value.length - cursorFromEnd);
+  el.setSelectionRange(pos, pos);
+}
+
 function renderRecent(){
   const list = document.getElementById('recentList');
   const term = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -256,7 +273,7 @@ function renderRecent(){
           <div class="editRow">
             <input type="text" data-f="giverName" value="${escapeHtml(d.giverName || '')}" placeholder="Giver's name">
             <div class="row">
-              <input type="number" data-f="amount" value="${d.amount || 0}" step="any">
+              <input type="text" data-f="amount" inputmode="decimal" value="${(d.amount || 0).toLocaleString('en-US')}">
               <select data-f="currency" style="max-width:110px">${currencyOptions.map(c => `<option ${c === (d.currency || CURRENCY) ? 'selected' : ''}>${c}</option>`).join('')}</select>
             </div>
             <select data-f="method">${METHODS.map(m => `<option ${m === d.method ? 'selected' : ''}>${m}</option>`).join('')}</select>
@@ -288,6 +305,12 @@ function renderRecent(){
 
 document.getElementById('searchInput').addEventListener('input', renderRecent);
 
+document.getElementById('amount').addEventListener('input', e => formatAmountEl(e.target));
+
+document.getElementById('recentList').addEventListener('input', e => {
+  if (e.target.matches('[data-f=amount]')) formatAmountEl(e.target);
+});
+
 document.getElementById('recentList').addEventListener('click', async e => {
   const editBtn = e.target.closest('[data-edit]');
   const cancelBtn = e.target.closest('[data-cancel]');
@@ -304,7 +327,7 @@ document.getElementById('recentList').addEventListener('click', async e => {
     const id = saveBtn.dataset.save;
     const row = saveBtn.closest('.entry');
     const giverName = row.querySelector('[data-f=giverName]').value.trim() || 'Anonymous';
-    const amount = parseFloat(row.querySelector('[data-f=amount]').value);
+    const amount = parseAmount(row.querySelector('[data-f=amount]'));
     const currency = row.querySelector('[data-f=currency]').value;
     const method = row.querySelector('[data-f=method]').value;
     const category = row.querySelector('[data-f=category]').value;
@@ -346,7 +369,7 @@ const submitBtn = document.getElementById('submitBtn');
 form.addEventListener('submit', async e => {
   e.preventDefault();
   const enteredBy = enteredByEl.value.trim();
-  const amount = parseFloat(document.getElementById('amount').value);
+  const amount = parseAmount(document.getElementById('amount'));
   if (!enteredBy || !amount || amount <= 0) { toast('Please fill in your name and a valid amount', true); return; }
 
   const currency = currencySelect.value === '__other__'
