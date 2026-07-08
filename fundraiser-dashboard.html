@@ -31,21 +31,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
 .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;flex-wrap:wrap;gap:8px}
 h1{font-size:22px;font-weight:700}
-.sub{color:var(--t2);font-size:13px}
-.heroRow{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px}
-.hero{flex:2;min-width:280px;background:var(--g);color:#fff;border-radius:var(--rad);padding:48px 40px;margin-bottom:0;text-align:center}
-.hero.mini{flex:1;min-width:220px;padding:32px 28px;background:var(--grn)}
-.hero.mini .total{font-size:clamp(30px,5vw,46px)}
-.hero .total{font-size:clamp(52px,10vw,96px);font-weight:800;line-height:1.1}
+.sub{color:var(--t2);font-size:13px;display:flex;align-items:center;gap:6px}
+.liveDot{width:8px;height:8px;border-radius:50%;background:#3EA65C;box-shadow:0 0 0 rgba(62,166,92,.5);animation:liveDotPulse 2s infinite}
+@keyframes liveDotPulse{
+  0%{box-shadow:0 0 0 0 rgba(62,166,92,.5)}
+  70%{box-shadow:0 0 0 6px rgba(62,166,92,0)}
+  100%{box-shadow:0 0 0 0 rgba(62,166,92,0)}
+}
+.giftPing{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--bg);color:var(--t);border:.5px solid var(--bd2);padding:10px 20px;
+  border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 8px 20px rgba(0,0,0,.15);
+  opacity:0;transition:opacity .35s ease,transform .35s ease;pointer-events:none;z-index:98;white-space:nowrap
+}
+.giftPing.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.heroRow{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.heroRow:empty{margin-bottom:0}
+.hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:48px 40px;margin-bottom:24px;text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
+.hero.mini{flex:1;min-width:220px;padding:32px 28px;background:var(--grn);box-shadow:0 10px 30px rgba(15,54,34,.25);margin-bottom:0}
+.hero.mini .total{font-size:clamp(30px,5vw,46px);white-space:nowrap}
+.hero .total{font-size:clamp(52px,10vw,96px);font-weight:800;line-height:1.1;white-space:nowrap}
 .hero .label{font-size:16px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-weight:600}
+.hero.pulse{animation:heroPulse .7s ease}
+@keyframes heroPulse{0%{transform:scale(1)}35%{transform:scale(1.035)}100%{transform:scale(1)}}
 .barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:18px;margin-top:22px;overflow:hidden}
 .barInner{background:#fff;height:100%;border-radius:999px;transition:width .6s ease;width:0%}
 .goalRow{display:flex;justify-content:space-between;font-size:14px;opacity:.9;margin-top:8px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:16px}
-.stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:22px}
-.stat .n{font-size:34px;font-weight:800}
+.stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:22px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.stat .n{font-size:34px;font-weight:800;white-space:nowrap}
 .stat .l{font-size:13px;color:var(--t2);margin-top:4px}
-.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px}
+.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
 .feed{max-height:420px;overflow-y:auto}
 .gift{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--bd)}
@@ -70,6 +86,10 @@ h1{font-size:22px;font-weight:700}
 .catBarInner{background:var(--g);height:100%;border-radius:999px;transition:width .6s ease}
 .catBarLabel{font-size:11px;color:var(--t2);margin-top:4px}
 .panel + .panel{margin-top:16px}
+@media(max-width:480px){
+  .hero{padding:32px 16px}
+  .hero.mini{padding:22px 16px}
+}
 .celebrateBanner{
   position:fixed;top:24px;left:50%;z-index:100;
   transform:translateX(-50%) translateY(-30px) scale(.9);
@@ -93,11 +113,12 @@ h1{font-size:22px;font-weight:700}
 </head>
 <body>
 <div class="celebrateBanner" id="celebrateBanner"></div>
+<div class="giftPing" id="giftPing"></div>
 <div class="wrap">
   <div class="top">
     <div>
       <h1>🎁 Cheerful Giving</h1>
-      <div class="sub">Live fundraiser dashboard</div>
+      <div class="sub"><span class="liveDot"></span>Live fundraiser dashboard</div>
     </div>
     <div class="topBtns">
       <button class="goalBtn" id="adminBtn">🔒 Admin</button>
@@ -107,14 +128,14 @@ h1{font-size:22px;font-weight:700}
     </div>
   </div>
 
-  <div class="heroRow" id="heroRow">
-    <div class="hero">
-      <div class="label">Total raised</div>
-      <div class="total" id="total">UGX 0</div>
-      <div class="barOuter"><div class="barInner" id="bar"></div></div>
-      <div class="goalRow"><span id="pct">0%</span><span id="goalLabel">Goal: —</span></div>
-    </div>
+  <div class="hero">
+    <div class="label">Total raised</div>
+    <div class="total" id="total">UGX 0</div>
+    <div class="barOuter"><div class="barInner" id="bar"></div></div>
+    <div class="goalRow"><span id="pct">0%</span><span id="goalLabel">Goal: —</span></div>
   </div>
+
+  <div class="heroRow" id="heroRow"></div>
 
   <div class="stats">
     <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
@@ -172,6 +193,82 @@ function categoryBreakdown(list){
 let goal = 0;
 let lastData = {};
 let lastCount = 0;
+let lastPingCount = 0;
+
+// --- Number rendering: auto-shrink-to-fit + smooth count-up ---
+const MIN_NUMBER_SIZE = 13; // floor for very long figures on narrow screens
+const numberState = new WeakMap();
+
+const measureCtx = document.createElement('canvas').getContext('2d');
+
+function fitText(el, text, minSize){
+  el.textContent = text;
+  const container = el.parentElement;
+  if (!container) return;
+  const cs = getComputedStyle(container);
+  const available = container.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+
+  // Reset first so we measure against the CSS-intended (clamp) size, not a
+  // previously-shrunk inline size left over from a shorter number.
+  el.style.fontSize = '';
+  const elCs = getComputedStyle(el);
+  let size = parseFloat(elCs.fontSize);
+
+  // The element is a block box that fills its container regardless of content,
+  // so DOM scrollWidth can't tell us the text's true rendered width — measure
+  // it directly on a canvas instead.
+  while (size > minSize) {
+    measureCtx.font = `${elCs.fontWeight} ${size}px ${elCs.fontFamily}`;
+    if (measureCtx.measureText(text).width <= available - 4) break;
+    size -= 1;
+  }
+  el.style.fontSize = size + 'px';
+}
+
+function animateNumber(el, to, formatFn, opts = {}){
+  if (!el) return;
+  const minSize = opts.minSize || MIN_NUMBER_SIZE;
+  const duration = opts.duration || 800;
+  const from = numberState.get(el) ?? 0;
+  numberState.set(el, to);
+  const finalText = formatFn(to);
+  fitText(el, finalText, minSize);
+  if (from === to) return;
+  const start = performance.now();
+  function frame(now){
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatFn(from + (to - from) * eased);
+    if (t < 1) requestAnimationFrame(frame);
+    else el.textContent = finalText;
+  }
+  requestAnimationFrame(frame);
+}
+
+function pulse(el){
+  if (!el) return;
+  el.classList.remove('pulse');
+  void el.offsetWidth;
+  el.classList.add('pulse');
+}
+
+function refitAllNumbers(){
+  const els = [document.getElementById('total'), document.getElementById('count'), document.getElementById('largest'), ...document.querySelectorAll('.hero.mini .total')];
+  els.forEach(el => { if (el) fitText(el, el.textContent, MIN_NUMBER_SIZE); });
+}
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(refitAllNumbers, 200);
+});
+
+function showGiftPing(){
+  const el = document.getElementById('giftPing');
+  el.textContent = '🎁 A new gift just came in!';
+  el.classList.add('show');
+  clearTimeout(showGiftPing._t);
+  showGiftPing._t = setTimeout(() => el.classList.remove('show'), 3000);
+}
 
 onValue(goalRef, snap => {
   goal = Number(snap.val()) || 0;
@@ -241,12 +338,15 @@ reportBtn.addEventListener('click', generateReport);
 
 onValue(donationsRef, snap => {
   lastData = snap.val() || {};
+  const allCount = Object.keys(lastData).length;
   const total = renderTotals(lastData);
   renderExtraCurrencies(lastData);
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
   renderFeed(lastData);
   checkMilestones(total);
+  if (!isFirstDonationsRender && allCount > lastPingCount) showGiftPing();
+  lastPingCount = allCount;
   isFirstDonationsRender = false;
 });
 
@@ -254,9 +354,20 @@ function renderTotals(data){
   const allList = Object.values(data || {});
   const list = allList.filter(d => (d.currency || CURRENCY) === CURRENCY);
   const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
-  document.getElementById('total').textContent = fmt(total);
-  document.getElementById('count').textContent = allList.length;
-  document.getElementById('largest').textContent = list.length ? fmt(Math.max(...list.map(d => Number(d.amount) || 0))) : '—';
+
+  const totalEl = document.getElementById('total');
+  const prevTotal = numberState.get(totalEl) ?? 0;
+  animateNumber(totalEl, total, v => fmt(v));
+  if (total > prevTotal && !isFirstDonationsRender) pulse(document.querySelector('.hero:not(.mini)'));
+
+  animateNumber(document.getElementById('count'), allList.length, v => Math.round(v).toLocaleString('en-US'));
+
+  const largestEl = document.getElementById('largest');
+  if (list.length) {
+    animateNumber(largestEl, Math.max(...list.map(d => Number(d.amount) || 0)), v => fmt(v));
+  } else {
+    largestEl.textContent = '—';
+  }
 
   const pct = goal > 0 ? Math.min(100, (total / goal) * 100) : 0;
   document.getElementById('bar').style.width = pct + '%';
@@ -350,23 +461,41 @@ function celebrate(message, kind){
   }, CELEBRATION_INTERVAL_MS);
 }
 
+const miniHeroEls = new Map(); // currency -> element, reused across renders so animations/pulses work
+
 function renderExtraCurrencies(data){
   const groups = groupByCurrency(data);
   const heroRow = document.getElementById('heroRow');
-  document.querySelectorAll('.hero.mini').forEach(el => el.remove());
+  const present = new Set();
+
   Object.keys(groups).filter(c => c !== CURRENCY).sort().forEach(cur => {
     const list = groups[cur];
     const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
     if (!total) return;
-    const el = document.createElement('div');
-    el.className = 'hero mini';
-    el.innerHTML = `
-      <div class="label">${escapeHtml(cur)} raised</div>
-      <div class="total">${fmt(total, cur)}</div>
-      <div class="goalRow"><span>${list.length} gift${list.length === 1 ? '' : 's'}</span><span></span></div>
-    `;
-    heroRow.appendChild(el);
+    present.add(cur);
+
+    let el = miniHeroEls.get(cur);
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'hero mini';
+      el.innerHTML = `
+        <div class="label">${escapeHtml(cur)} raised</div>
+        <div class="total"></div>
+        <div class="goalRow"><span class="miniCount"></span><span></span></div>
+      `;
+      heroRow.appendChild(el);
+      miniHeroEls.set(cur, el);
+    }
+    const totalEl = el.querySelector('.total');
+    const prevTotal = numberState.get(totalEl) ?? 0;
+    animateNumber(totalEl, total, v => fmt(v, cur));
+    if (total > prevTotal && !isFirstDonationsRender) pulse(el);
+    el.querySelector('.miniCount').textContent = `${list.length} gift${list.length === 1 ? '' : 's'}`;
   });
+
+  for (const [cur, el] of miniHeroEls) {
+    if (!present.has(cur)) { el.remove(); miniHeroEls.delete(cur); }
+  }
 }
 
 function timeAgo(ts){
