@@ -93,7 +93,6 @@ h1{font-size:22px;font-weight:700}
 
   <div class="stats">
     <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
-    <div class="stat"><div class="n" id="avg">—</div><div class="l">Average gift</div></div>
     <div class="stat"><div class="n" id="largest">—</div><div class="l">Largest gift</div></div>
   </div>
 
@@ -227,7 +226,6 @@ function renderTotals(data){
   const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
   document.getElementById('total').textContent = fmt(total);
   document.getElementById('count').textContent = allList.length;
-  document.getElementById('avg').textContent = list.length ? fmt(total / list.length) : '—';
   document.getElementById('largest').textContent = list.length ? fmt(Math.max(...list.map(d => Number(d.amount) || 0))) : '—';
 
   const pct = goal > 0 ? Math.min(100, (total / goal) * 100) : 0;
