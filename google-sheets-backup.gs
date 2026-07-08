@@ -37,7 +37,7 @@ const FIREBASE_URL = 'https://cheerful-giving-default-rtdb.firebaseio.com';
 const CURRENCY = 'UGX';
 
 const CATEGORY_TARGETS = {
-  'Bishop & Pr Diama': 10000000,
+  'Bishop & Pr Diana': 10000000,
   'Mengo Pastors': 24000000,
   'Location Pastors': 18000000,
   'Location churches': 15000000,

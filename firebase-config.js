@@ -29,7 +29,7 @@ export const MANAGE_PIN = "9090";  // Everything: entry + category view + goal +
 
 // Giving categories, in entry-form order.
 export const CATEGORIES = [
-  "Bishop & Pr Diama",
+  "Bishop & Pr Diana",
   "Mengo Pastors",
   "Location Pastors",
   "Location churches",
@@ -57,7 +57,7 @@ export const CATEGORIES = [
 // known target (e.g. "Praying wives") is left out — its breakdown row on
 // the dashboard just shows the running total with no progress bar.
 export const CATEGORY_TARGETS = {
-  "Bishop & Pr Diama": 10000000,
+  "Bishop & Pr Diana": 10000000,
   "Mengo Pastors": 24000000,
   "Location Pastors": 18000000,
   "Location churches": 15000000,
