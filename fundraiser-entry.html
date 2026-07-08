@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cheerful Giving — Enter a Gift</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAF9F6;--bg2:#F1EFE9;--bg3:#E4E2DA;
+  --t:#28271F;--t2:#6A6858;--t3:#A09E90;
+  --bd:rgba(40,39,31,.11);--bd2:rgba(40,39,31,.20);
+  --g:#1E3A5F;--gl:#DBEAFE;--gd:#0F2440;
+  --r:#D95640;--rl:#FAEAE6;
+  --a:#C67C15;--al:#FDF0D8;
+  --rad:14px;--rs:9px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
+  --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.17);
+  --gl:#0D2137;--gd:#60A5FA;
+  --rl:#4A1509;--r:#F09070;
+  --al:#3F2100;--a:#F0A030;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:2px}
+.sub{text-align:center;color:var(--t2);font-size:13px;margin-bottom:20px}
+.card{background:var(--bg);border-radius:var(--rad);padding:18px;margin-bottom:14px;border:.5px solid var(--bd)}
+label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin:0 0 6px;text-transform:uppercase;letter-spacing:.03em}
+input[type=text],input[type=number],select,textarea{
+  width:100%;padding:12px 13px;border-radius:var(--rs);border:.5px solid var(--bd2);
+  background:var(--bg2);color:var(--t);font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;margin-bottom:14px
+}
+input[type=number]{font-size:28px;font-weight:700}
+.field:last-child input,.field:last-child select{margin-bottom:0}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+button.submit{
+  width:100%;padding:15px;border:none;border-radius:var(--rs);background:var(--g);color:#fff;
+  font-size:16px;font-weight:700;cursor:pointer;margin-top:4px
+}
+button.submit:active{opacity:.85}
+button.submit:disabled{opacity:.5;cursor:default}
+.live{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--t2);padding:2px 4px}
+.live b{color:var(--t);font-size:15px}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:var(--g);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;
+  opacity:0;transition:.25s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.2)
+}
+.toast.err{background:var(--r)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+a.dashlink{display:block;text-align:center;margin-top:16px;color:var(--g);font-size:13px;text-decoration:none;font-weight:600}
+.entry{padding:11px 0;border-bottom:.5px solid var(--bd)}
+.entry:last-child{border-bottom:none}
+.entry .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.entry .who{font-weight:600;font-size:14px}
+.entry .meta{font-size:12px;color:var(--t2);margin-top:2px}
+.entry .amt{font-weight:800;color:var(--g);white-space:nowrap}
+.entry .acts{display:flex;gap:6px;margin-top:8px}
+.entry .acts button{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
+.entry .acts button.del{color:var(--r);border-color:var(--r)}
+.editRow{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.editRow input,.editRow select{margin-bottom:0}
+.editRow .acts button{flex:1;border-radius:var(--rs);padding:9px}
+.editRow .acts button.save{background:var(--g);color:#fff;border:none}
+.empty{color:var(--t3);font-size:13px;text-align:center;padding:16px 0}
+.feed{max-height:400px;overflow-y:auto}
+#searchInput{margin-bottom:10px}
+#gate{position:fixed;inset:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+#gate .card{width:100%;max-width:340px;text-align:center}
+#gate input{text-align:center;font-size:22px;letter-spacing:.2em}
+#gate button{width:100%;padding:13px;border:none;border-radius:var(--rs);background:var(--g);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+#gate p.err{color:var(--r);font-size:13px;margin-top:8px;display:none}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="card">
+    <h1 style="margin-bottom:14px">Enter Volunteer PIN</h1>
+    <input type="text" inputmode="numeric" id="pinInput" placeholder="••••">
+    <button id="pinBtn">Unlock</button>
+    <p class="err" id="pinErr">Incorrect PIN, try again.</p>
+  </div>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+  <h1>🎁 Cheerful Giving</h1>
+  <div class="sub">Enter a gift as it's declared</div>
+
+  <div class="card" id="liveTotals"></div>
+
+  <form class="card" id="form">
+    <div class="field">
+      <label>Entered by (volunteer)</label>
+      <input type="text" id="enteredBy" placeholder="Your name" required>
+    </div>
+    <div class="field">
+      <label>Giver's name</label>
+      <input type="text" id="giverName" placeholder="Anonymous">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Amount</label>
+        <input type="number" id="amount" inputmode="decimal" placeholder="0" required min="0" step="any">
+      </div>
+      <div class="field" style="max-width:110px">
+        <label>Currency</label>
+        <select id="currency"></select>
+      </div>
+    </div>
+    <div class="field" id="customCurrencyField" style="display:none">
+      <label>Currency code</label>
+      <input type="text" id="customCurrency" placeholder="e.g. KES" maxlength="6" style="text-transform:uppercase">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Method</label>
+        <select id="method">
+          <option>Cash</option>
+          <option>Mobile Money</option>
+          <option>Bank Transfer</option>
+          <option>Card</option>
+          <option>Pledge</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="category"></select>
+    </div>
+    <div class="field">
+      <label>Note (optional)</label>
+      <input type="text" id="note" placeholder="e.g. building fund">
+    </div>
+    <button type="submit" class="submit" id="submitBtn">Add Gift</button>
+  </form>
+
+  <div class="card">
+    <label style="margin-bottom:10px">All entries</label>
+    <input type="text" id="searchInput" placeholder="Search by giver's name…">
+    <div class="feed" id="recentList"><div class="empty">No gifts entered yet</div></div>
+  </div>
+
+  <a class="dashlink" href="fundraiser-dashboard.html" target="_blank">Open live dashboard →</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { firebaseConfig, CURRENCY, CURRENCIES, ENTRY_PIN, MANAGE_PIN, CATEGORIES } from './firebase-config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const donationsRef = ref(db, 'donations');
+
+function fmt(n, currency){ return (currency || CURRENCY) + ' ' + Math.round(n).toLocaleString('en-US'); }
+
+function groupByCurrency(data){
+  const groups = {};
+  Object.entries(data || {}).forEach(([id, d]) => {
+    const cur = d.currency || CURRENCY;
+    (groups[cur] = groups[cur] || []).push([id, d]);
+  });
+  return groups;
+}
+
+// --- PIN gate ---
+const gate = document.getElementById('gate');
+const appEl = document.getElementById('app');
+if (sessionStorage.getItem('cg_unlocked') === '1') {
+  gate.style.display = 'none'; appEl.style.display = 'block';
+}
+document.getElementById('pinBtn').addEventListener('click', unlock);
+document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+function unlock(){
+  const val = document.getElementById('pinInput').value.trim();
+  if (val === ENTRY_PIN || val === MANAGE_PIN) {
+    sessionStorage.setItem('cg_unlocked', '1');
+    gate.style.display = 'none'; appEl.style.display = 'block';
+  } else {
+    document.getElementById('pinErr').style.display = 'block';
+  }
+}
+
+// --- Restore volunteer name ---
+const enteredByEl = document.getElementById('enteredBy');
+enteredByEl.value = localStorage.getItem('cg_enteredBy') || '';
+
+// --- Category options ---
+const categorySelect = document.getElementById('category');
+categorySelect.innerHTML = CATEGORIES.map(c => `<option>${escapeHtml(c)}</option>`).join('');
+
+// --- Currency options ---
+const currencySelect = document.getElementById('currency');
+const customCurrencyField = document.getElementById('customCurrencyField');
+const customCurrencyInput = document.getElementById('customCurrency');
+currencySelect.innerHTML = CURRENCIES.map(c => `<option>${c}</option>`).join('') + '<option value="__other__">Other…</option>';
+currencySelect.addEventListener('change', () => {
+  customCurrencyField.style.display = currencySelect.value === '__other__' ? 'block' : 'none';
+});
+
+// --- Live running total + recent entries ---
+const METHODS = ['Cash', 'Mobile Money', 'Bank Transfer', 'Card', 'Pledge'];
+let entriesData = {};
+let editingId = null;
+
+onValue(donationsRef, snap => {
+  entriesData = snap.val() || {};
+  renderLiveTotals();
+  renderRecent();
+});
+
+function renderLiveTotals(){
+  const groups = groupByCurrency(entriesData);
+  const currencies = Object.keys(groups).sort((a, b) => a === CURRENCY ? -1 : b === CURRENCY ? 1 : 0);
+  if (!currencies.length) {
+    document.getElementById('liveTotals').innerHTML = `<div class="live"><span>Raised so far</span><b>${fmt(0)} · 0 gifts</b></div>`;
+    return;
+  }
+  document.getElementById('liveTotals').innerHTML = currencies.map(cur => {
+    const list = groups[cur];
+    const total = list.reduce((s, [, d]) => s + (Number(d.amount) || 0), 0);
+    return `<div class="live"><span>${cur === CURRENCY ? 'Raised so far' : cur + ' raised'}</span><b>${fmt(total, cur)} · ${list.length} gift${list.length === 1 ? '' : 's'}</b></div>`;
+  }).join('');
+}
+
+function timeAgo(ts){
+  if (!ts) return 'just now';
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  return Math.floor(s / 3600) + 'h ago';
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderRecent(){
+  const list = document.getElementById('recentList');
+  const term = document.getElementById('searchInput').value.trim().toLowerCase();
+  let entries = Object.entries(entriesData).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+  if (term) entries = entries.filter(([, d]) => (d.giverName || 'anonymous').toLowerCase().includes(term));
+  if (!entries.length) { list.innerHTML = `<div class="empty">${term ? 'No matching entries' : 'No gifts entered yet'}</div>`; return; }
+  list.innerHTML = entries.map(([id, d]) => {
+    const currencyOptions = Array.from(new Set([...CURRENCIES, d.currency].filter(Boolean)));
+    if (id === editingId) {
+      return `
+        <div class="entry">
+          <div class="editRow">
+            <input type="text" data-f="giverName" value="${escapeHtml(d.giverName || '')}" placeholder="Giver's name">
+            <div class="row">
+              <input type="number" data-f="amount" value="${d.amount || 0}" step="any">
+              <select data-f="currency" style="max-width:110px">${currencyOptions.map(c => `<option ${c === (d.currency || CURRENCY) ? 'selected' : ''}>${c}</option>`).join('')}</select>
+            </div>
+            <select data-f="method">${METHODS.map(m => `<option ${m === d.method ? 'selected' : ''}>${m}</option>`).join('')}</select>
+            <select data-f="category">${CATEGORIES.map(c => `<option ${c === d.category ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select>
+            <input type="text" data-f="note" value="${escapeHtml(d.note || '')}" placeholder="Note (optional)">
+            <div class="acts">
+              <button type="button" class="save" data-save="${id}">Save</button>
+              <button type="button" data-cancel="${id}">Cancel</button>
+            </div>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="entry">
+        <div class="row1">
+          <div>
+            <div class="who">${escapeHtml(d.giverName || 'Anonymous')}</div>
+            <div class="meta">${escapeHtml(d.method || '')} · ${escapeHtml(d.category || '')}${d.note ? ' · ' + escapeHtml(d.note) : ''} · ${timeAgo(d.timestamp)}</div>
+          </div>
+          <div class="amt">${fmt(d.amount || 0, d.currency)}</div>
+        </div>
+        <div class="acts">
+          <button type="button" data-edit="${id}">Edit</button>
+          <button type="button" class="del" data-del="${id}">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', renderRecent);
+
+document.getElementById('recentList').addEventListener('click', async e => {
+  const editBtn = e.target.closest('[data-edit]');
+  const cancelBtn = e.target.closest('[data-cancel]');
+  const saveBtn = e.target.closest('[data-save]');
+  const delBtn = e.target.closest('[data-del]');
+
+  if (editBtn) {
+    editingId = editBtn.dataset.edit;
+    renderRecent();
+  } else if (cancelBtn) {
+    editingId = null;
+    renderRecent();
+  } else if (saveBtn) {
+    const id = saveBtn.dataset.save;
+    const row = saveBtn.closest('.entry');
+    const giverName = row.querySelector('[data-f=giverName]').value.trim() || 'Anonymous';
+    const amount = parseFloat(row.querySelector('[data-f=amount]').value);
+    const currency = row.querySelector('[data-f=currency]').value;
+    const method = row.querySelector('[data-f=method]').value;
+    const category = row.querySelector('[data-f=category]').value;
+    const note = row.querySelector('[data-f=note]').value.trim();
+    if (!amount || amount <= 0) { toast('Enter a valid amount', true); return; }
+    try {
+      await update(ref(db, 'donations/' + id), { giverName, amount, currency, method, category, note });
+      editingId = null;
+      renderRecent();
+      toast('Entry updated');
+    } catch (err) {
+      toast('Failed to update: ' + err.message, true);
+    }
+  } else if (delBtn) {
+    const id = delBtn.dataset.del;
+    if (!confirm('Delete this entry? This cannot be undone.')) return;
+    try {
+      await remove(ref(db, 'donations/' + id));
+      toast('Entry deleted');
+    } catch (err) {
+      toast('Failed to delete: ' + err.message, true);
+    }
+  }
+});
+
+// --- Toast ---
+let toastTimer;
+function toast(msg, isErr){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// --- Submit ---
+const form = document.getElementById('form');
+const submitBtn = document.getElementById('submitBtn');
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const enteredBy = enteredByEl.value.trim();
+  const amount = parseFloat(document.getElementById('amount').value);
+  if (!enteredBy || !amount || amount <= 0) { toast('Please fill in your name and a valid amount', true); return; }
+
+  const currency = currencySelect.value === '__other__'
+    ? (customCurrencyInput.value.trim().toUpperCase() || CURRENCY)
+    : currencySelect.value;
+
+  submitBtn.disabled = true;
+  try {
+    await push(donationsRef, {
+      giverName: document.getElementById('giverName').value.trim() || 'Anonymous',
+      amount,
+      currency,
+      method: document.getElementById('method').value,
+      category: document.getElementById('category').value,
+      note: document.getElementById('note').value.trim(),
+      enteredBy,
+      timestamp: serverTimestamp()
+    });
+    localStorage.setItem('cg_enteredBy', enteredBy);
+    toast(`Added ${fmt(amount, currency)} — thank you!`);
+    document.getElementById('giverName').value = '';
+    document.getElementById('amount').value = '';
+    document.getElementById('note').value = '';
+    document.getElementById('amount').focus();
+  } catch (err) {
+    toast('Failed to save: ' + err.message, true);
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

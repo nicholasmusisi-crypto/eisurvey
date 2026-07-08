@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheerful Giving — Live Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAF9F6;--bg2:#F1EFE9;--bg3:#E4E2DA;
+  --t:#28271F;--t2:#6A6858;--t3:#A09E90;
+  --bd:rgba(40,39,31,.11);--bd2:rgba(40,39,31,.20);
+  --g:#1E3A5F;--gl:#DBEAFE;--gd:#0F2440;
+  --r:#D95640;--rl:#FAEAE6;
+  --a:#C67C15;--al:#FDF0D8;
+  --grn:#1E7145;
+  --rad:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
+  --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.17);
+  --gl:#0D2137;--gd:#60A5FA;
+  --rl:#4A1509;--r:#F09070;
+  --al:#3F2100;--a:#F0A030;
+  --grn:#2E9E62;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
+.top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+h1{font-size:22px;font-weight:700}
+.sub{color:var(--t2);font-size:13px}
+.heroRow{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.hero{flex:2;min-width:240px;background:var(--g);color:#fff;border-radius:var(--rad);padding:28px 26px;margin-bottom:0;text-align:center}
+.hero.mini{flex:1;min-width:180px;padding:20px 22px;background:var(--grn)}
+.hero.mini .total{font-size:clamp(24px,4vw,36px)}
+.hero .total{font-size:clamp(38px,7vw,64px);font-weight:800;line-height:1.1}
+.hero .label{font-size:13px;opacity:.8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:14px;margin-top:16px;overflow:hidden}
+.barInner{background:#fff;height:100%;border-radius:999px;transition:width .6s ease;width:0%}
+.goalRow{display:flex;justify-content:space-between;font-size:12px;opacity:.85;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:16px;text-align:center}
+.stat .n{font-size:26px;font-weight:800}
+.stat .l{font-size:12px;color:var(--t2);margin-top:2px}
+.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px}
+.panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
+.feed{max-height:420px;overflow-y:auto}
+.gift{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--bd)}
+.gift:last-child{border-bottom:none}
+.gift .who{font-weight:600;font-size:14px}
+.gift .meta{font-size:12px;color:var(--t2)}
+.gift .amt{font-weight:800;color:var(--g)}
+.gift.new{animation:pop .5s ease}
+@keyframes pop{from{background:var(--gl);transform:scale(1.01)}to{background:transparent;transform:scale(1)}}
+.goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
+.goalBtn:hover{color:var(--t)}
+.goalBtn.danger{color:var(--r);border-color:var(--r)}
+.topBtns{display:flex;gap:8px;flex-wrap:wrap}
+.empty{color:var(--t3);font-size:13px;text-align:center;padding:30px 0}
+.catRow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid var(--bd)}
+.catRow:last-child{border-bottom:none}
+.catRow .name{font-size:14px;font-weight:600}
+.catRow .cnt{font-size:12px;color:var(--t2);margin-left:6px}
+.catRow .amt{font-weight:800;color:var(--g)}
+.panel + .panel{margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>🎁 Cheerful Giving</h1>
+      <div class="sub">Live fundraiser dashboard</div>
+    </div>
+    <div class="topBtns">
+      <button class="goalBtn" id="adminBtn">🔒 Admin</button>
+      <button class="goalBtn" id="reportBtn" style="display:none">Generate report</button>
+      <button class="goalBtn" id="setGoalBtn" style="display:none">Set goal</button>
+      <button class="goalBtn danger" id="resetBtn" style="display:none">Reset data</button>
+    </div>
+  </div>
+
+  <div class="heroRow" id="heroRow">
+    <div class="hero">
+      <div class="label">Total raised</div>
+      <div class="total" id="total">UGX 0</div>
+      <div class="barOuter"><div class="barInner" id="bar"></div></div>
+      <div class="goalRow"><span id="pct">0%</span><span id="goalLabel">Goal: —</span></div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
+    <div class="stat"><div class="n" id="avg">—</div><div class="l">Average gift</div></div>
+    <div class="stat"><div class="n" id="largest">—</div><div class="l">Largest gift</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Recent gifts</h2>
+    <div class="feed" id="feed"><div class="empty">Waiting for the first gift…</div></div>
+  </div>
+
+  <div class="panel" id="categoryPanel" style="display:none">
+    <h2 id="categoryTitle">By category</h2>
+    <div id="categoryList"></div>
+  </div>
+
+  <div id="extraCategoryPanels"></div>
+</div>
+
+<script type="module">
+import { firebaseConfig, CURRENCY, ADMIN_PIN, MANAGE_PIN, CATEGORIES } from './firebase-config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const donationsRef = ref(db, 'donations');
+const goalRef = ref(db, 'config/goal');
+
+function fmt(n, currency){ return (currency || CURRENCY) + ' ' + Math.round(n).toLocaleString('en-US'); }
+
+function groupByCurrency(data){
+  const groups = {};
+  Object.values(data || {}).forEach(d => {
+    const cur = d.currency || CURRENCY;
+    (groups[cur] = groups[cur] || []).push(d);
+  });
+  return groups;
+}
+
+function categoryBreakdown(list){
+  const totals = {};
+  const counts = {};
+  list.forEach(d => {
+    const cat = d.category || 'Uncategorized';
+    totals[cat] = (totals[cat] || 0) + (Number(d.amount) || 0);
+    counts[cat] = (counts[cat] || 0) + 1;
+  });
+  const cats = Array.from(new Set([...CATEGORIES, ...Object.keys(totals)]))
+    .filter(c => totals[c] > 0)
+    .sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
+  return { totals, counts, cats };
+}
+
+let goal = 0;
+let lastCount = 0;
+let lastData = {};
+
+onValue(goalRef, snap => {
+  goal = Number(snap.val()) || 0;
+  document.getElementById('goalLabel').textContent = goal ? `Goal: ${fmt(goal)}` : 'Goal: not set';
+  renderTotals(lastData);
+});
+
+// --- Admin / Manage unlock ---
+const adminBtn = document.getElementById('adminBtn');
+const reportBtn = document.getElementById('reportBtn');
+const setGoalBtn = document.getElementById('setGoalBtn');
+const resetBtn = document.getElementById('resetBtn');
+const categoryPanel = document.getElementById('categoryPanel');
+let dashRole = sessionStorage.getItem('cg_dash_role') || null;
+
+function applyRole(){
+  const unlocked = dashRole === 'admin' || dashRole === 'manage';
+  if (dashRole === 'manage') {
+    adminBtn.textContent = '🔓 Manage';
+    setGoalBtn.style.display = '';
+    resetBtn.style.display = '';
+  } else if (dashRole === 'admin') {
+    adminBtn.textContent = '🔓 Admin';
+    setGoalBtn.style.display = 'none';
+    resetBtn.style.display = 'none';
+  } else {
+    adminBtn.textContent = '🔒 Admin';
+    setGoalBtn.style.display = 'none';
+    resetBtn.style.display = 'none';
+  }
+  categoryPanel.style.display = unlocked ? '' : 'none';
+  reportBtn.style.display = unlocked ? '' : 'none';
+  renderCategories(lastData);
+  renderExtraCategoryPanels(lastData);
+}
+applyRole();
+
+adminBtn.addEventListener('click', () => {
+  if (dashRole) return;
+  const val = prompt('Enter admin or manage PIN:');
+  if (val === null) return;
+  if (val === MANAGE_PIN) dashRole = 'manage';
+  else if (val === ADMIN_PIN) dashRole = 'admin';
+  else { alert('Incorrect PIN'); return; }
+  sessionStorage.setItem('cg_dash_role', dashRole);
+  applyRole();
+});
+
+document.getElementById('setGoalBtn').addEventListener('click', () => {
+  const val = prompt('Set fundraising goal amount (' + CURRENCY + '):', goal || '');
+  if (val === null) return;
+  const num = parseFloat(val);
+  if (!isNaN(num) && num >= 0) set(goalRef, num);
+});
+
+resetBtn.addEventListener('click', async () => {
+  if (!confirm('This will permanently delete ALL gift entries and the goal. Continue?')) return;
+  if (!confirm('Are you absolutely sure? This cannot be undone.')) return;
+  await remove(donationsRef);
+  await remove(goalRef);
+});
+
+reportBtn.addEventListener('click', generateReport);
+
+onValue(donationsRef, snap => {
+  lastData = snap.val() || {};
+  renderTotals(lastData);
+  renderExtraCurrencies(lastData);
+  renderFeed(lastData);
+  renderCategories(lastData);
+  renderExtraCategoryPanels(lastData);
+});
+
+function renderTotals(data){
+  const list = (Object.values(data || {})).filter(d => (d.currency || CURRENCY) === CURRENCY);
+  const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+  document.getElementById('total').textContent = fmt(total);
+  document.getElementById('count').textContent = list.length;
+  document.getElementById('avg').textContent = list.length ? fmt(total / list.length) : '—';
+  document.getElementById('largest').textContent = list.length ? fmt(Math.max(...list.map(d => Number(d.amount) || 0))) : '—';
+
+  const pct = goal > 0 ? Math.min(100, (total / goal) * 100) : 0;
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('pct').textContent = Math.round(pct) + '%';
+}
+
+function renderExtraCurrencies(data){
+  const groups = groupByCurrency(data);
+  const heroRow = document.getElementById('heroRow');
+  document.querySelectorAll('.hero.mini').forEach(el => el.remove());
+  Object.keys(groups).filter(c => c !== CURRENCY).sort().forEach(cur => {
+    const list = groups[cur];
+    const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+    if (!total) return;
+    const el = document.createElement('div');
+    el.className = 'hero mini';
+    el.innerHTML = `
+      <div class="label">${escapeHtml(cur)} raised</div>
+      <div class="total">${fmt(total, cur)}</div>
+      <div class="goalRow"><span>${list.length} gift${list.length === 1 ? '' : 's'}</span><span></span></div>
+    `;
+    heroRow.appendChild(el);
+  });
+}
+
+function timeAgo(ts){
+  if (!ts) return 'just now';
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  return Math.floor(s / 3600) + 'h ago';
+}
+
+function renderFeed(data){
+  const entries = Object.entries(data || {}).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+  const feed = document.getElementById('feed');
+  if (!entries.length) { feed.innerHTML = '<div class="empty">Waiting for the first gift…</div>'; return; }
+  feed.innerHTML = entries.slice(0, 30).map(([id, d], i) => `
+    <div class="gift${i === 0 && entries.length > lastCount ? ' new' : ''}">
+      <div>
+        <div class="who">${escapeHtml(d.giverName || 'Anonymous')}</div>
+        <div class="meta">${escapeHtml(d.method || '')}${d.note ? ' · ' + escapeHtml(d.note) : ''} · ${timeAgo(d.timestamp)}</div>
+      </div>
+      <div class="amt">${fmt(d.amount || 0, d.currency)}</div>
+    </div>
+  `).join('');
+  lastCount = entries.length;
+}
+
+function renderCategories(data){
+  if (dashRole !== 'admin' && dashRole !== 'manage') return;
+  const groups = groupByCurrency(data);
+  const hasExtra = Object.keys(groups).some(c => c !== CURRENCY && groups[c].reduce((s, d) => s + (Number(d.amount) || 0), 0) > 0);
+  document.getElementById('categoryTitle').textContent = hasExtra ? `By category (${CURRENCY})` : 'By category';
+
+  const { totals, counts, cats } = categoryBreakdown(groups[CURRENCY] || []);
+  const el = document.getElementById('categoryList');
+  if (!cats.length) { el.innerHTML = '<div class="empty">No gifts entered yet</div>'; return; }
+  el.innerHTML = cats.map(c => `
+    <div class="catRow">
+      <div><span class="name">${escapeHtml(c)}</span><span class="cnt">${counts[c]} gift${counts[c] === 1 ? '' : 's'}</span></div>
+      <div class="amt">${fmt(totals[c], CURRENCY)}</div>
+    </div>
+  `).join('');
+}
+
+function renderExtraCategoryPanels(data){
+  const container = document.getElementById('extraCategoryPanels');
+  if (dashRole !== 'admin' && dashRole !== 'manage') { container.innerHTML = ''; return; }
+  const groups = groupByCurrency(data);
+  container.innerHTML = Object.keys(groups).filter(c => c !== CURRENCY).sort().map(cur => {
+    const { totals, counts, cats } = categoryBreakdown(groups[cur]);
+    if (!cats.length) return '';
+    const rows = cats.map(c => `
+      <div class="catRow">
+        <div><span class="name">${escapeHtml(c)}</span><span class="cnt">${counts[c]} gift${counts[c] === 1 ? '' : 's'}</span></div>
+        <div class="amt">${fmt(totals[c], cur)}</div>
+      </div>
+    `).join('');
+    return `<div class="panel"><h2>By category (${escapeHtml(cur)})</h2><div>${rows}</div></div>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function generateReport(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const groups = groupByCurrency(lastData);
+  const currencies = Object.keys(groups).sort((a, b) => a === CURRENCY ? -1 : b === CURRENCY ? 1 : 0);
+  let y = 20;
+
+  doc.setFontSize(18);
+  doc.text('Cheerful Giving — Fundraiser Report', 14, y); y += 8;
+  doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text('Generated ' + new Date().toLocaleString(), 14, y); y += 14;
+  doc.setTextColor(20);
+
+  currencies.forEach(cur => {
+    const list = groups[cur];
+    const total = list.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+    if (!total) return;
+    if (y > 260) { doc.addPage(); y = 20; }
+
+    doc.setFontSize(14);
+    doc.text(`${cur} Contributions`, 14, y); y += 8;
+    doc.setFontSize(11);
+    doc.text(`Overall contribution: ${fmt(total, cur)}`, 14, y); y += 6;
+    doc.text(`Number of gifts: ${list.length}`, 14, y); y += 6;
+    doc.text(`Average gift: ${fmt(total / list.length, cur)}`, 14, y); y += 6;
+    doc.text(`Largest gift: ${fmt(Math.max(...list.map(d => Number(d.amount) || 0)), cur)}`, 14, y); y += 10;
+
+    const { totals, counts, cats } = categoryBreakdown(list);
+    doc.setFontSize(12);
+    doc.text('By category', 14, y); y += 7;
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    doc.text('Category', 14, y);
+    doc.text('Gifts', 110, y);
+    doc.text('Amount', 140, y);
+    doc.setTextColor(20);
+    y += 5;
+    cats.forEach(c => {
+      if (y > 275) { doc.addPage(); y = 20; }
+      const pct = ((totals[c] / total) * 100).toFixed(1);
+      doc.text(c, 14, y);
+      doc.text(String(counts[c]), 110, y);
+      doc.text(`${fmt(totals[c], cur)} (${pct}%)`, 140, y);
+      y += 6;
+    });
+    y += 10;
+  });
+
+  doc.save('cheerful-giving-report.pdf');
+}
+
+setInterval(() => renderFeed(lastData), 30000);
+</script>
+</body>
+</html>
