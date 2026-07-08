@@ -46,6 +46,14 @@ h1{font-size:22px;font-weight:700}
 .stat .l{font-size:13px;color:var(--t2);margin-top:4px}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px}
 .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
+.feed{max-height:420px;overflow-y:auto}
+.gift{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid var(--bd)}
+.gift:last-child{border-bottom:none}
+.gift .who{font-weight:600;font-size:14px}
+.gift .meta{font-size:12px;color:var(--t2)}
+.gift .amt{font-weight:800;color:var(--g)}
+.gift.new{animation:pop .5s ease}
+@keyframes pop{from{background:var(--gl);transform:scale(1.01)}to{background:transparent;transform:scale(1)}}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
@@ -86,6 +94,11 @@ h1{font-size:22px;font-weight:700}
   <div class="stats">
     <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
     <div class="stat"><div class="n" id="largest">—</div><div class="l">Largest gift</div></div>
+  </div>
+
+  <div class="panel" id="feedPanel" style="display:none">
+    <h2>Recent gifts</h2>
+    <div class="feed" id="feed"><div class="empty">Waiting for the first gift…</div></div>
   </div>
 
   <div class="panel" id="categoryPanel" style="display:none">
@@ -133,6 +146,7 @@ function categoryBreakdown(list){
 
 let goal = 0;
 let lastData = {};
+let lastCount = 0;
 
 onValue(goalRef, snap => {
   goal = Number(snap.val()) || 0;
@@ -146,6 +160,7 @@ const reportBtn = document.getElementById('reportBtn');
 const setGoalBtn = document.getElementById('setGoalBtn');
 const resetBtn = document.getElementById('resetBtn');
 const categoryPanel = document.getElementById('categoryPanel');
+const feedPanel = document.getElementById('feedPanel');
 let dashRole = sessionStorage.getItem('cg_dash_role') || null;
 
 function applyRole(){
@@ -164,9 +179,11 @@ function applyRole(){
     resetBtn.style.display = 'none';
   }
   categoryPanel.style.display = unlocked ? '' : 'none';
+  feedPanel.style.display = unlocked ? '' : 'none';
   reportBtn.style.display = unlocked ? '' : 'none';
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
+  renderFeed(lastData);
 }
 applyRole();
 
@@ -203,6 +220,7 @@ onValue(donationsRef, snap => {
   renderExtraCurrencies(lastData);
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
+  renderFeed(lastData);
 });
 
 function renderTotals(data){
@@ -235,6 +253,31 @@ function renderExtraCurrencies(data){
     `;
     heroRow.appendChild(el);
   });
+}
+
+function timeAgo(ts){
+  if (!ts) return 'just now';
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  return Math.floor(s / 3600) + 'h ago';
+}
+
+function renderFeed(data){
+  if (dashRole !== 'admin' && dashRole !== 'manage') return;
+  const entries = Object.entries(data || {}).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+  const feed = document.getElementById('feed');
+  if (!entries.length) { feed.innerHTML = '<div class="empty">Waiting for the first gift…</div>'; return; }
+  feed.innerHTML = entries.slice(0, 30).map(([id, d], i) => `
+    <div class="gift${i === 0 && entries.length > lastCount ? ' new' : ''}">
+      <div>
+        <div class="who">${escapeHtml(d.giverName || 'Anonymous')}</div>
+        <div class="meta">${escapeHtml(d.method || '')}${d.note ? ' · ' + escapeHtml(d.note) : ''} · ${timeAgo(d.timestamp)}</div>
+      </div>
+      <div class="amt">${fmt(d.amount || 0, d.currency)}</div>
+    </div>
+  `).join('');
+  lastCount = entries.length;
 }
 
 function renderCategories(data){
@@ -326,6 +369,8 @@ function generateReport(){
 
   doc.save('cheerful-giving-report.pdf');
 }
+
+setInterval(() => renderFeed(lastData), 30000);
 </script>
 </body>
 </html>
