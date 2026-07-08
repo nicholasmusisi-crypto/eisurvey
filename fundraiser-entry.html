@@ -98,9 +98,15 @@ a.dashlink{display:block;text-align:center;margin-top:16px;color:var(--g);font-s
       <label>Entered by (volunteer)</label>
       <input type="text" id="enteredBy" placeholder="Your name" required>
     </div>
-    <div class="field">
-      <label>Giver's name</label>
-      <input type="text" id="giverName" placeholder="Anonymous">
+    <div class="row">
+      <div class="field">
+        <label>Giver's name</label>
+        <input type="text" id="giverName" placeholder="Anonymous">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="category"></select>
+      </div>
     </div>
     <div class="row">
       <div class="field">
@@ -115,26 +121,6 @@ a.dashlink{display:block;text-align:center;margin-top:16px;color:var(--g);font-s
     <div class="field" id="customCurrencyField" style="display:none">
       <label>Currency code</label>
       <input type="text" id="customCurrency" placeholder="e.g. KES" maxlength="6" style="text-transform:uppercase">
-    </div>
-    <div class="row">
-      <div class="field">
-        <label>Method</label>
-        <select id="method">
-          <option>Cash</option>
-          <option>Mobile Money</option>
-          <option>Bank Transfer</option>
-          <option>Card</option>
-          <option>Pledge</option>
-        </select>
-      </div>
-    </div>
-    <div class="field">
-      <label>Category</label>
-      <select id="category"></select>
-    </div>
-    <div class="field">
-      <label>Note (optional)</label>
-      <input type="text" id="note" placeholder="e.g. building fund">
     </div>
     <button type="submit" class="submit" id="submitBtn">Add Gift</button>
   </form>
@@ -206,7 +192,6 @@ currencySelect.addEventListener('change', () => {
 });
 
 // --- Live running total + recent entries ---
-const METHODS = ['Cash', 'Mobile Money', 'Bank Transfer', 'Card', 'Pledge'];
 let entriesData = {};
 let editingId = null;
 
@@ -272,13 +257,11 @@ function renderRecent(){
         <div class="entry">
           <div class="editRow">
             <input type="text" data-f="giverName" value="${escapeHtml(d.giverName || '')}" placeholder="Giver's name">
+            <select data-f="category">${CATEGORIES.map(c => `<option ${c === d.category ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select>
             <div class="row">
               <input type="text" data-f="amount" inputmode="decimal" value="${(d.amount || 0).toLocaleString('en-US')}">
               <select data-f="currency" style="max-width:110px">${currencyOptions.map(c => `<option ${c === (d.currency || CURRENCY) ? 'selected' : ''}>${c}</option>`).join('')}</select>
             </div>
-            <select data-f="method">${METHODS.map(m => `<option ${m === d.method ? 'selected' : ''}>${m}</option>`).join('')}</select>
-            <select data-f="category">${CATEGORIES.map(c => `<option ${c === d.category ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select>
-            <input type="text" data-f="note" value="${escapeHtml(d.note || '')}" placeholder="Note (optional)">
             <div class="acts">
               <button type="button" class="save" data-save="${id}">Save</button>
               <button type="button" data-cancel="${id}">Cancel</button>
@@ -286,12 +269,14 @@ function renderRecent(){
           </div>
         </div>`;
     }
+    const metaParts = [d.method, d.category, d.note].filter(Boolean).map(escapeHtml);
+    metaParts.push(timeAgo(d.timestamp));
     return `
       <div class="entry">
         <div class="row1">
           <div>
             <div class="who">${escapeHtml(d.giverName || 'Anonymous')}</div>
-            <div class="meta">${escapeHtml(d.method || '')} · ${escapeHtml(d.category || '')}${d.note ? ' · ' + escapeHtml(d.note) : ''} · ${timeAgo(d.timestamp)}</div>
+            <div class="meta">${metaParts.join(' · ')}</div>
           </div>
           <div class="amt">${fmt(d.amount || 0, d.currency)}</div>
         </div>
@@ -329,12 +314,10 @@ document.getElementById('recentList').addEventListener('click', async e => {
     const giverName = row.querySelector('[data-f=giverName]').value.trim() || 'Anonymous';
     const amount = parseAmount(row.querySelector('[data-f=amount]'));
     const currency = row.querySelector('[data-f=currency]').value;
-    const method = row.querySelector('[data-f=method]').value;
     const category = row.querySelector('[data-f=category]').value;
-    const note = row.querySelector('[data-f=note]').value.trim();
     if (!amount || amount <= 0) { toast('Enter a valid amount', true); return; }
     try {
-      await update(ref(db, 'donations/' + id), { giverName, amount, currency, method, category, note });
+      await update(ref(db, 'donations/' + id), { giverName, amount, currency, category });
       editingId = null;
       renderRecent();
       toast('Entry updated');
@@ -382,9 +365,7 @@ form.addEventListener('submit', async e => {
       giverName: document.getElementById('giverName').value.trim() || 'Anonymous',
       amount,
       currency,
-      method: document.getElementById('method').value,
       category: document.getElementById('category').value,
-      note: document.getElementById('note').value.trim(),
       enteredBy,
       timestamp: serverTimestamp()
     });
@@ -392,7 +373,6 @@ form.addEventListener('submit', async e => {
     toast(`Added ${fmt(amount, currency)} — thank you!`);
     document.getElementById('giverName').value = '';
     document.getElementById('amount').value = '';
-    document.getElementById('note').value = '';
     document.getElementById('amount').focus();
   } catch (err) {
     toast('Failed to save: ' + err.message, true);
