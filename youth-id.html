@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Youth ID — Experience Educate</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAF9F6;--bg2:#F1EFE9;--bg3:#E4E2DA;
+  --t:#28271F;--t2:#6A6858;--t3:#A09E90;
+  --bd:rgba(40,39,31,.11);--bd2:rgba(40,39,31,.20);
+  --g:#1F8A5F;--gl:#DCF3E8;--gd:#0F5C3E;
+  --r:#D95640;--rl:#FAEAE6;
+  --a:#C67C15;--al:#FDF0D8;
+  --rad:14px;--rs:9px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
+  --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.17);
+  --gl:#0C2A1F;--gd:#57D69B;
+  --rl:#4A1509;--r:#F09070;
+  --al:#3F2100;--a:#F0A030;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
+.screen{display:none;min-height:100vh}
+.screen.on{display:block}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:2px}
+.sub{text-align:center;color:var(--t2);font-size:13px;margin-bottom:22px}
+.card{background:var(--bg);border-radius:var(--rad);padding:18px;margin-bottom:14px;border:.5px solid var(--bd)}
+label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin:0 0 6px;text-transform:uppercase;letter-spacing:.03em}
+input[type=text],input[type=number],input[type=tel],select{
+  width:100%;padding:12px 13px;border-radius:var(--rs);border:.5px solid var(--bd2);
+  background:var(--bg2);color:var(--t);font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none;margin-bottom:14px
+}
+.field:last-child input,.field:last-child select{margin-bottom:0}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+button{font-family:inherit;cursor:pointer}
+button.submit{width:100%;padding:15px;border:none;border-radius:var(--rs);background:var(--g);color:#fff;font-size:16px;font-weight:700;margin-top:4px}
+button.submit:active{opacity:.85}
+button.submit:disabled{opacity:.5;cursor:default}
+button.secondary{width:100%;padding:13px;border:.5px solid var(--bd2);border-radius:var(--rs);background:none;color:var(--t);font-size:14px;font-weight:600;margin-top:10px}
+button.secondary:active{background:var(--bg3)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:.5px solid var(--bd)}
+.topbar h2{font-size:15px;font-weight:700}
+.back{color:var(--g);font-size:14px;font-weight:600;cursor:pointer;background:none;border:none;padding:4px 0}
+
+/* ─ Home ─ */
+#scr-home .wrap{padding-top:60px}
+.hero{text-align:center;margin-bottom:36px}
+.hero .emoji{font-size:44px;margin-bottom:8px}
+.hero h1{font-size:24px}
+.role-card{background:var(--bg);border:.5px solid var(--bd);border-radius:16px;padding:18px 20px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;gap:14px}
+.role-card:active{background:var(--bg3)}
+.role-card .ico{width:46px;height:46px;border-radius:50%;background:var(--gl);color:var(--gd);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.role-card h3{font-size:15px;font-weight:700}
+.role-card p{font-size:12px;color:var(--t2);margin-top:2px}
+.pin-wrap{display:none;background:var(--bg);border:.5px solid var(--bd);border-radius:16px;padding:20px;margin-top:8px}
+.pin-wrap h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.pin-input-row{display:flex;gap:8px}
+.pin-input-row input{flex:1;margin-bottom:0;text-align:center;letter-spacing:4px}
+.pin-input-row button{padding:0 20px;border:none;border-radius:var(--rs);background:var(--g);color:#fff;font-weight:700;font-size:14px}
+.pin-wrap .err{color:var(--r);font-size:13px;margin-top:8px;display:none}
+
+/* ─ Photo capture ─ */
+.photo-box{width:140px;height:170px;margin:0 auto 18px;border-radius:12px;border:2px dashed var(--bd2);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;overflow:hidden;position:relative}
+.photo-box:active{background:var(--bg3)}
+.photo-box img{width:100%;height:100%;object-fit:cover}
+#photoPlaceholder{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--t2);font-size:12px;text-align:center;padding:0 10px}
+#photoPlaceholder .ic{font-size:30px}
+
+/* ─ ID card ─ */
+.card-stage{display:flex;justify-content:center;padding:28px 16px}
+.idcard{width:340px;max-width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.08)}
+.idcard-hdr{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.idcard-hdr .org{font-size:13px;font-weight:800;letter-spacing:.02em}
+.idcard-hdr .tag{font-size:9.5px;opacity:.85;text-transform:uppercase;letter-spacing:.08em}
+.idcard-body{display:flex;gap:14px;padding:16px}
+.idcard-photo{width:92px;height:114px;border-radius:8px;object-fit:cover;background:#eee;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}
+.idcard-info{flex:1;min-width:0}
+.idcard-info .name{font-size:16px;font-weight:800;color:#1a1a1a;line-height:1.2;margin-bottom:6px;word-break:break-word}
+.idcard-info .row{font-size:11.5px;color:#555;margin-bottom:3px}
+.idcard-info .row b{color:#222;font-weight:600}
+.idcard-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px dashed rgba(0,0,0,.15);background:#fafafa}
+.idcard-id{font-family:'SF Mono',Consolas,monospace;font-weight:800;font-size:13px;color:var(--gd)}
+.idcard-qr{width:58px;height:58px;display:block}
+.card-actions{max-width:340px;margin:0 auto;padding:0 16px}
+
+/* ─ Admin list ─ */
+#adminSearch{margin-bottom:6px}
+.admin-count{font-size:12px;color:var(--t2);margin-bottom:12px}
+.admin-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--bd);cursor:pointer}
+.admin-row:last-child{border-bottom:none}
+.admin-row:active{background:var(--bg3)}
+.admin-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--bg3);flex-shrink:0}
+.admin-info .who{font-size:14px;font-weight:600}
+.admin-info .meta{font-size:12px;color:var(--t2);margin-top:1px}
+.empty{color:var(--t3);font-size:13px;text-align:center;padding:20px 0}
+
+/* ─ Verify screen ─ */
+#scr-verify.on{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;min-height:100vh}
+#scr-verify{background:var(--gd);color:#fff}
+.verify-photo{width:170px;height:210px;object-fit:cover;border-radius:14px;border:4px solid #fff;box-shadow:0 10px 30px rgba(0,0,0,.35);margin-bottom:18px}
+.verify-name{font-size:26px;font-weight:800}
+.verify-meta{font-size:14px;opacity:.85;margin-top:4px}
+.verify-id{font-family:'SF Mono',Consolas,monospace;font-size:13px;opacity:.75;margin-top:6px}
+.verify-badge{margin-top:20px;padding:11px 24px;border-radius:999px;font-weight:800;font-size:14px}
+.verify-badge.ok{background:#22C55E;color:#04310F}
+.verify-badge.bad{background:#EF4444;color:#3D0A0A}
+.verify-loading{font-size:15px;opacity:.85}
+
+/* ─ Toast ─ */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--g);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.2);z-index:99}
+.toast.err{background:var(--r)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─ Print ─ */
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:fixed;top:24px;left:24px}
+  .no-print{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ─ Home ─ -->
+<div class="screen on" id="scr-home">
+  <div class="wrap">
+    <div class="hero">
+      <div class="emoji">🪪</div>
+      <h1>Youth ID</h1>
+      <p class="sub">Recruitment &amp; site verification</p>
+    </div>
+    <div class="role-card" id="roleRegister">
+      <div class="ico">📷</div>
+      <div><h3>Register Youth</h3><p>Capture photo &amp; details, generate ID</p></div>
+    </div>
+    <div class="role-card" id="roleAdmin">
+      <div class="ico">🔍</div>
+      <div><h3>Admin / Search</h3><p>Browse &amp; reprint registered youth</p></div>
+    </div>
+    <div class="pin-wrap" id="pinWrap">
+      <h3 id="pinWrapTitle">Enter PIN</h3>
+      <div class="pin-input-row">
+        <input type="text" inputmode="numeric" id="pinInput" placeholder="••••">
+        <button id="pinBtn">Unlock</button>
+      </div>
+      <p class="err" id="pinErr">Incorrect PIN, try again.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─ Register ─ -->
+<div class="screen" id="scr-register">
+  <div class="topbar"><button class="back" data-home>← Back</button><h2>Register Youth</h2><span style="width:44px"></span></div>
+  <div class="wrap">
+    <form class="card" id="registerForm">
+      <div class="photo-box" id="photoBox">
+        <div id="photoPlaceholder"><span class="ic">📷</span><span>Tap to take/upload photo</span></div>
+        <img id="photoPreview" style="display:none">
+      </div>
+      <input type="file" accept="image/*" capture="environment" id="photoInput" style="display:none">
+
+      <div class="field">
+        <label>Registered by</label>
+        <input type="text" id="registeredBy" placeholder="Your name" required>
+      </div>
+      <div class="field">
+        <label>Youth's full name</label>
+        <input type="text" id="youthName" placeholder="Full name" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Gender</label>
+          <select id="gender">
+            <option value="">Select…</option>
+            <option>Female</option>
+            <option>Male</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Age</label>
+          <input type="number" id="age" placeholder="e.g. 22" min="0" max="120">
+        </div>
+      </div>
+      <div class="field">
+        <label>District</label>
+        <select id="district"></select>
+      </div>
+      <div class="field" id="customDistrictField" style="display:none">
+        <label>District name</label>
+        <input type="text" id="customDistrict" placeholder="Enter district">
+      </div>
+      <div class="field">
+        <label>Address / Parish / Village</label>
+        <input type="text" id="address" placeholder="e.g. Kyengera, Nsangi Parish">
+      </div>
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" id="phone" placeholder="e.g. 07XXXXXXXX">
+      </div>
+      <button type="submit" class="submit" id="registerBtn">Register &amp; Generate ID</button>
+    </form>
+  </div>
+</div>
+
+<!-- ─ ID card ─ -->
+<div class="screen" id="scr-card">
+  <div class="topbar"><button class="back" id="cardBackBtn">← Back</button><h2>Youth ID</h2><span style="width:44px"></span></div>
+  <div class="card-stage">
+    <div id="printArea">
+      <div class="idcard">
+        <div class="idcard-hdr">
+          <span class="org" id="cardOrg">Experience Educate</span>
+          <span class="tag">Youth ID</span>
+        </div>
+        <div class="idcard-body">
+          <img class="idcard-photo" id="cardPhoto">
+          <div class="idcard-info">
+            <div class="name" id="cardName"></div>
+            <div class="row" id="cardMetaRow"></div>
+            <div class="row"><b>District:</b> <span id="cardDistrict"></span></div>
+            <div class="row"><b>Contact:</b> <span id="cardPhoneRow"></span></div>
+          </div>
+        </div>
+        <div class="idcard-footer">
+          <span class="idcard-id" id="cardId"></span>
+          <img class="idcard-qr" id="cardQr">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-actions no-print">
+    <button class="submit" id="printBtn">🖨️ Print ID Card</button>
+    <button class="secondary" id="registerAgainBtn">Register Another</button>
+  </div>
+</div>
+
+<!-- ─ Admin ─ -->
+<div class="screen" id="scr-admin">
+  <div class="topbar"><button class="back" data-home>← Back</button><h2>Admin / Search</h2><span style="width:44px"></span></div>
+  <div class="wrap">
+    <div class="card">
+      <input type="text" id="adminSearch" placeholder="Search by name, ID or district…">
+      <div class="admin-count" id="adminCount">Loading…</div>
+      <div id="adminList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─ Verify (QR scan target) ─ -->
+<div class="screen" id="scr-verify">
+  <div class="verify-loading">Checking ID…</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { firebaseConfig, ORG_NAME, ID_PREFIX, CAPTURE_PIN, ADMIN_PIN, DISTRICTS } from './youth-id-config.js';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getDatabase, ref, set, get, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+import { getStorage, ref as sref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import QRCode from "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm";
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const storage = getStorage(app);
+
+document.getElementById('cardOrg').textContent = ORG_NAME;
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let toastTimer;
+function toast(msg, isErr){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0, 0);
+}
+
+document.querySelectorAll('[data-home]').forEach(btn => btn.addEventListener('click', () => showScreen('scr-home')));
+
+// --- Home / PIN gate ---
+let pendingRole = null;
+document.getElementById('roleRegister').addEventListener('click', () => openPin('register'));
+document.getElementById('roleAdmin').addEventListener('click', () => openPin('admin'));
+
+function openPin(role){
+  pendingRole = role;
+  document.getElementById('pinWrapTitle').textContent = role === 'register' ? 'Enter Registration PIN' : 'Enter Admin PIN';
+  const wrap = document.getElementById('pinWrap');
+  wrap.style.display = 'block';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinErr').style.display = 'none';
+  document.getElementById('pinInput').focus();
+}
+
+document.getElementById('pinBtn').addEventListener('click', checkPin);
+document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+
+function checkPin(){
+  const val = document.getElementById('pinInput').value.trim();
+  const expected = pendingRole === 'register' ? CAPTURE_PIN : ADMIN_PIN;
+  if (val === expected) {
+    document.getElementById('pinWrap').style.display = 'none';
+    if (pendingRole === 'register') { resetRegisterForm(); showScreen('scr-register'); }
+    else { showScreen('scr-admin'); loadAdminList(); }
+  } else {
+    document.getElementById('pinErr').style.display = 'block';
+  }
+}
+
+// --- District select ---
+const districtSelect = document.getElementById('district');
+const customDistrictField = document.getElementById('customDistrictField');
+const customDistrictInput = document.getElementById('customDistrict');
+districtSelect.innerHTML = DISTRICTS.map(d => `<option>${escapeHtml(d)}</option>`).join('') + '<option value="__other__">Other…</option>';
+districtSelect.addEventListener('change', () => {
+  customDistrictField.style.display = districtSelect.value === '__other__' ? 'block' : 'none';
+});
+
+// --- Photo capture + compression ---
+let photoBlob = null, photoDataUrl = null;
+document.getElementById('photoBox').addEventListener('click', () => document.getElementById('photoInput').click());
+document.getElementById('photoInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const { blob, dataUrl } = await fileToCompressedBlob(file);
+    photoBlob = blob; photoDataUrl = dataUrl;
+    const img = document.getElementById('photoPreview');
+    img.src = dataUrl; img.style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+  } catch (err) {
+    toast('Could not read that photo, try again', true);
+  }
+});
+
+function fileToCompressedBlob(file, maxDim = 640, quality = 0.75){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim) { height = height * maxDim / width; width = maxDim; }
+        else if (height > maxDim) { width = width * maxDim / height; height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => resolve({ blob, dataUrl: canvas.toDataURL('image/jpeg', quality) }), 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// --- Registered-by persistence ---
+const registeredByEl = document.getElementById('registeredBy');
+registeredByEl.value = localStorage.getItem('yid_registeredBy') || '';
+
+function resetRegisterForm(){
+  document.getElementById('registerForm').reset();
+  registeredByEl.value = localStorage.getItem('yid_registeredBy') || '';
+  photoBlob = null; photoDataUrl = null;
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoPlaceholder').style.display = 'flex';
+  customDistrictField.style.display = 'none';
+}
+
+// --- Unique ID generation ---
+async function nextId(){
+  const result = await runTransaction(ref(db, 'meta/counter'), cur => (cur || 0) + 1);
+  const n = result.snapshot.val();
+  const yy = String(new Date().getFullYear()).slice(-2);
+  return `${ID_PREFIX}${yy}-${String(n).padStart(5, '0')}`;
+}
+
+// --- Register submit ---
+const registerBtn = document.getElementById('registerBtn');
+document.getElementById('registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!photoBlob) { toast("Please add the youth's photo", true); return; }
+  const registeredBy = registeredByEl.value.trim();
+  const name = document.getElementById('youthName').value.trim();
+  if (!registeredBy || !name) { toast('Please fill in your name and the youth\'s name', true); return; }
+  const gender = document.getElementById('gender').value;
+  const age = document.getElementById('age').value;
+  const district = districtSelect.value === '__other__' ? customDistrictInput.value.trim() : districtSelect.value;
+  const address = document.getElementById('address').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+
+  registerBtn.disabled = true; registerBtn.textContent = 'Registering…';
+  try {
+    const id = await nextId();
+    const photoRef = sref(storage, `youth_photos/${id}.jpg`);
+    await uploadBytes(photoRef, photoBlob, { contentType: 'image/jpeg' });
+    const photoURL = await getDownloadURL(photoRef);
+    const record = { name, gender, age: age ? Number(age) : null, district, address, phone, photoURL, registeredBy, createdAt: Date.now() };
+    await set(ref(db, 'youth/' + id), record);
+    localStorage.setItem('yid_registeredBy', registeredBy);
+    toast('Registered — ID generated');
+    showCard({ ...record, id }, { mode: 'fresh' });
+  } catch (err) {
+    toast('Failed to register: ' + err.message, true);
+  } finally {
+    registerBtn.disabled = false; registerBtn.textContent = 'Register & Generate ID';
+  }
+});
+
+// --- ID card rendering ---
+let cardReturnTo = 'scr-home';
+function showCard(d, opts = {}){
+  document.getElementById('cardPhoto').src = d.photoURL;
+  document.getElementById('cardName').textContent = d.name;
+  document.getElementById('cardDistrict').textContent = d.district || '—';
+  document.getElementById('cardPhoneRow').textContent = d.phone || '—';
+  document.getElementById('cardId').textContent = d.id;
+  document.getElementById('cardMetaRow').innerHTML = `<b>${[d.gender, d.age ? d.age + ' yrs' : null].filter(Boolean).join(' · ') || '—'}</b>`;
+
+  const verifyUrl = `${location.origin}${location.pathname}?verify=${encodeURIComponent(d.id)}`;
+  QRCode.toDataURL(verifyUrl, { width: 160, margin: 1, color: { dark: '#0F5C3E', light: '#FFFFFF' } }, (err, url) => {
+    if (!err) document.getElementById('cardQr').src = url;
+  });
+
+  document.getElementById('registerAgainBtn').style.display = opts.mode === 'fresh' ? 'block' : 'none';
+  cardReturnTo = opts.returnTo || 'scr-home';
+  showScreen('scr-card');
+}
+
+document.getElementById('cardBackBtn').addEventListener('click', () => showScreen(cardReturnTo));
+document.getElementById('registerAgainBtn').addEventListener('click', () => { resetRegisterForm(); showScreen('scr-register'); });
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+// --- Admin list ---
+let allYouth = [];
+let adminLoaded = false;
+function loadAdminList(){
+  if (adminLoaded) return;
+  adminLoaded = true;
+  onValue(ref(db, 'youth'), snap => {
+    const val = snap.val() || {};
+    allYouth = Object.entries(val).map(([id, d]) => ({ id, ...d })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    renderAdminList();
+  });
+}
+
+function renderAdminList(){
+  const term = document.getElementById('adminSearch').value.trim().toLowerCase();
+  let list = allYouth;
+  if (term) list = list.filter(d => (d.name || '').toLowerCase().includes(term) || d.id.toLowerCase().includes(term) || (d.district || '').toLowerCase().includes(term));
+  document.getElementById('adminCount').textContent = `${allYouth.length} registered${term ? ` · ${list.length} matching` : ''}`;
+  const container = document.getElementById('adminList');
+  if (!list.length) { container.innerHTML = `<div class="empty">${allYouth.length ? 'No matches' : 'No youth registered yet'}</div>`; return; }
+  container.innerHTML = list.map(d => `
+    <div class="admin-row" data-id="${escapeHtml(d.id)}">
+      <img class="admin-thumb" src="${d.photoURL || ''}">
+      <div class="admin-info">
+        <div class="who">${escapeHtml(d.name || '—')}</div>
+        <div class="meta">${escapeHtml(d.id)} · ${escapeHtml(d.district || '—')}</div>
+      </div>
+    </div>`).join('');
+}
+document.getElementById('adminSearch').addEventListener('input', renderAdminList);
+document.getElementById('adminList').addEventListener('click', e => {
+  const row = e.target.closest('.admin-row');
+  if (!row) return;
+  const d = allYouth.find(x => x.id === row.dataset.id);
+  if (d) showCard(d, { mode: 'reprint', returnTo: 'scr-admin' });
+});
+
+// --- Verify (QR scan target) ---
+const params = new URLSearchParams(location.search);
+const verifyId = params.get('verify');
+if (verifyId) {
+  runVerify(verifyId);
+} else {
+  showScreen('scr-home');
+}
+
+async function runVerify(id){
+  showScreen('scr-verify');
+  try {
+    const snap = await get(ref(db, 'youth/' + id));
+    renderVerify(snap.exists() ? snap.val() : null, id);
+  } catch (err) {
+    renderVerify(null, id);
+  }
+}
+
+function renderVerify(d, id){
+  const wrap = document.getElementById('scr-verify');
+  if (d) {
+    wrap.innerHTML = `
+      <img class="verify-photo" src="${d.photoURL}">
+      <div class="verify-name">${escapeHtml(d.name || '—')}</div>
+      <div class="verify-meta">${[d.district, d.gender].filter(Boolean).map(escapeHtml).join(' · ') || ''}</div>
+      <div class="verify-id">${escapeHtml(id)}</div>
+      <div class="verify-badge ok">✓ Registered — ${escapeHtml(ORG_NAME)}</div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="verify-badge bad">✗ ID Not Found</div>
+      <div class="verify-meta" style="margin-top:12px">${escapeHtml(id)} does not match any registered youth.</div>`;
+  }
+}
+</script>
+</body>
+</html>
