@@ -114,9 +114,37 @@ h1{font-size:22px;font-weight:700}
   85%{opacity:1}
   100%{transform:translateY(-110vh) translateX(var(--drift,20px)) rotate(var(--spin,8deg));opacity:0}
 }
+.launcher{
+  position:fixed;inset:0;z-index:300;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .6s ease;
+}
+.launcher.hide{opacity:0;pointer-events:none}
+.launcherInner{text-align:center;padding:40px}
+.launcherEmoji{font-size:64px;margin-bottom:18px}
+.launcherTitle{font-size:clamp(24px,4.5vw,40px);font-weight:800;margin-bottom:8px;color:var(--t)}
+.launcherSub{font-size:15px;color:var(--t2);margin-bottom:40px}
+.launchBtn{
+  background:var(--g);color:#fff;border:none;padding:18px 44px;border-radius:999px;
+  font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(15,36,64,.3);
+  transition:transform .2s ease
+}
+.launchBtn:hover{transform:scale(1.05)}
+.countdown{font-size:clamp(90px,22vw,200px);font-weight:800;color:var(--g);line-height:1}
+.countdown.pulse{animation:countdownPulse .5s ease}
+@keyframes countdownPulse{0%{transform:scale(.4);opacity:0}40%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
+<div class="launcher" id="launcher">
+  <div class="launcherInner">
+    <div class="launcherEmoji">🎁</div>
+    <div class="launcherTitle">Welcome to the Cheerful Giving Event</div>
+    <div class="launcherSub">Live fundraiser dashboard</div>
+    <button class="launchBtn" id="launchBtn">Launch Dashboard</button>
+    <div class="countdown" id="countdown" style="display:none"></div>
+  </div>
+</div>
 <div class="celebrateBanner" id="celebrateBanner"></div>
 <div class="giftPing" id="giftPing"></div>
 <div class="wrap">
@@ -285,6 +313,39 @@ fullscreenBtn.addEventListener('click', () => {
 });
 document.addEventListener('fullscreenchange', updateFullscreenBtn);
 document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
+
+// --- Launcher screen (shown once per browser session) ---
+const launcher = document.getElementById('launcher');
+if (sessionStorage.getItem('cg_launched') === '1') {
+  launcher.style.display = 'none';
+} else {
+  document.getElementById('launchBtn').addEventListener('click', () => {
+    const launchBtn = document.getElementById('launchBtn');
+    const countdownEl = document.getElementById('countdown');
+    launchBtn.style.display = 'none';
+    countdownEl.style.display = 'block';
+    let n = 3;
+    countdownEl.textContent = n;
+    countdownEl.classList.add('pulse');
+    const timer = setInterval(() => {
+      n--;
+      if (n <= 0) {
+        clearInterval(timer);
+        sessionStorage.setItem('cg_launched', '1');
+        launcher.classList.add('hide');
+        setTimeout(() => { launcher.style.display = 'none'; }, 650);
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 120, spread: 100, origin: { y: 0.5 } });
+        }
+        return;
+      }
+      countdownEl.textContent = n;
+      countdownEl.classList.remove('pulse');
+      void countdownEl.offsetWidth;
+      countdownEl.classList.add('pulse');
+    }, 1000);
+  });
+}
 
 onValue(goalRef, snap => {
   goal = Number(snap.val()) || 0;
