@@ -28,8 +28,14 @@ body::before{
   background-image:url('currency-bg.jpg');
   background-size:cover;background-position:center;background-attachment:fixed;
   opacity:.55;filter:saturate(.85) brightness(1.05) sepia(.1);
+  transform:scale(1);
+  transition:opacity .7s ease,filter .7s ease,transform .5s ease;
   pointer-events:none
 }
+/* Launcher screen: show the currency photo at full strength, no dimming */
+body.launching::before{opacity:1;filter:none}
+/* Reveal moment: brief forward push before settling into the dashboard's dimmer look */
+body.revealPulse::before{transform:scale(1.1)}
 @media(prefers-color-scheme:dark){:root{
   --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
   --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
@@ -319,6 +325,7 @@ const launcher = document.getElementById('launcher');
 if (sessionStorage.getItem('cg_launched') === '1') {
   launcher.style.display = 'none';
 } else {
+  document.body.classList.add('launching');
   document.getElementById('launchBtn').addEventListener('click', () => {
     const launchBtn = document.getElementById('launchBtn');
     const countdownEl = document.getElementById('countdown');
@@ -334,6 +341,13 @@ if (sessionStorage.getItem('cg_launched') === '1') {
         sessionStorage.setItem('cg_launched', '1');
         launcher.classList.add('hide');
         setTimeout(() => { launcher.style.display = 'none'; }, 650);
+        // Push the currency background forward, then settle it back into
+        // the dashboard's normal (dimmer) look as the launcher fades away.
+        document.body.classList.add('revealPulse');
+        setTimeout(() => {
+          document.body.classList.remove('revealPulse');
+          document.body.classList.remove('launching');
+        }, 300);
         if (typeof confetti === 'function') {
           confetti({ particleCount: 120, spread: 100, origin: { y: 0.5 } });
         }
