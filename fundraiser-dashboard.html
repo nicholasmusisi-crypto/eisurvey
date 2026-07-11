@@ -96,7 +96,16 @@ h1{font-size:22px;font-weight:700}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
 .topBtns{display:flex;gap:8px;flex-wrap:wrap}
 .empty{color:var(--t3);font-size:13px;text-align:center;padding:30px 0}
+.catGroup{margin-bottom:6px}
+.catGroup:last-child{margin-bottom:0}
+.catGroupHead{
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--bg2);border-radius:8px;padding:9px 12px;margin:10px 0 2px
+}
+.catGroupHead .gname{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.catGroupHead .gamt{font-weight:800;color:var(--g);white-space:nowrap}
 .catRow{padding:9px 0;border-bottom:.5px solid var(--bd)}
+.catRow.catSub{margin-left:12px}
 .catRow:last-child{border-bottom:none}
 .catTop{display:flex;justify-content:space-between;align-items:center}
 .catRow .name{font-size:14px;font-weight:600}
@@ -230,7 +239,7 @@ h1{font-size:22px;font-weight:700}
 </div>
 
 <script type="module">
-import { firebaseConfig, CURRENCY, ADMIN_PIN, MANAGE_PIN, CATEGORIES, CATEGORY_TARGETS, PREVIOUS_YEAR_TOTAL } from './firebase-config.js';
+import { firebaseConfig, CURRENCY, ADMIN_PIN, MANAGE_PIN, CATEGORY_GROUPS, CATEGORY_TARGETS, PREVIOUS_YEAR_TOTAL } from './firebase-config.js?v=2';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
@@ -250,18 +259,40 @@ function groupByCurrency(data){
   return groups;
 }
 
-function categoryBreakdown(list){
-  const totals = {};
-  const counts = {};
+function groupOfItem(item){
+  const g = CATEGORY_GROUPS.find(g => g.items.includes(item));
+  return g ? g.name : null;
+}
+
+// Groups the gifts by category group -> sub-category, preserving the event's
+// giving order from CATEGORY_GROUPS; anything unrecognized lands in "Other".
+function groupedBreakdown(list){
+  const acc = {}; // groupName -> { itemName -> {total, count} }
   list.forEach(d => {
-    const cat = d.category || 'Uncategorized';
-    totals[cat] = (totals[cat] || 0) + (Number(d.amount) || 0);
-    counts[cat] = (counts[cat] || 0) + 1;
+    const item = d.category || 'Uncategorized';
+    const group = d.categoryGroup || groupOfItem(item) || 'Other';
+    acc[group] = acc[group] || {};
+    acc[group][item] = acc[group][item] || { total: 0, count: 0 };
+    acc[group][item].total += Number(d.amount) || 0;
+    acc[group][item].count += 1;
   });
-  const cats = Array.from(new Set([...CATEGORIES, ...Object.keys(totals)]))
-    .filter(c => totals[c] > 0)
-    .sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
-  return { totals, counts, cats };
+
+  const orderedGroupNames = [...CATEGORY_GROUPS.map(g => g.name), ...Object.keys(acc).filter(n => !CATEGORY_GROUPS.some(g => g.name === n))];
+  return orderedGroupNames.map(name => {
+    const itemsAcc = acc[name];
+    if (!itemsAcc) return null;
+    const configItems = (CATEGORY_GROUPS.find(g => g.name === name) || { items: [] }).items;
+    const orderedItems = [...configItems, ...Object.keys(itemsAcc).filter(i => !configItems.includes(i))]
+      .filter(i => itemsAcc[i] && itemsAcc[i].total > 0)
+      .map(i => ({ name: i, total: itemsAcc[i].total, count: itemsAcc[i].count }));
+    if (!orderedItems.length) return null;
+    return {
+      name,
+      items: orderedItems,
+      subtotal: orderedItems.reduce((s, i) => s + i.total, 0),
+      count: orderedItems.reduce((s, i) => s + i.count, 0)
+    };
+  }).filter(Boolean);
 }
 
 let goal = 0;
@@ -623,22 +654,36 @@ function renderCategories(data){
   const hasExtra = Object.keys(groups).some(c => c !== CURRENCY && groups[c].reduce((s, d) => s + (Number(d.amount) || 0), 0) > 0);
   document.getElementById('categoryTitle').textContent = hasExtra ? `By category (${CURRENCY})` : 'By category';
 
-  const { totals, counts, cats } = categoryBreakdown(groups[CURRENCY] || []);
   const el = document.getElementById('categoryList');
-  if (!cats.length) { el.innerHTML = '<div class="empty">No gifts entered yet</div>'; return; }
-  el.innerHTML = cats.map(c => {
-    const target = CATEGORY_TARGETS[c];
-    const pct = target ? Math.min(100, (totals[c] / target) * 100) : null;
+  el.innerHTML = groupedCategoryHtml(groups[CURRENCY] || [], CURRENCY, true) || '<div class="empty">No gifts entered yet</div>';
+}
+
+function groupedCategoryHtml(list, cur, withTargets){
+  const grouped = groupedBreakdown(list);
+  if (!grouped.length) return '';
+  return grouped.map(g => {
+    const itemRows = g.items.map(i => {
+      const target = withTargets ? CATEGORY_TARGETS[i.name] : null;
+      const pct = target ? Math.min(100, (i.total / target) * 100) : null;
+      return `
+      <div class="catRow catSub">
+        <div class="catTop">
+          <div><span class="name">${escapeHtml(i.name)}</span><span class="cnt">${i.count} gift${i.count === 1 ? '' : 's'}</span></div>
+          <div class="amt">${fmt(i.total, cur)}</div>
+        </div>
+        ${target ? `
+          <div class="catBarOuter"><div class="catBarInner" style="width:${pct}%"></div></div>
+          <div class="catBarLabel">${Math.round(pct)}% of ${fmt(target, cur)} target</div>
+        ` : ''}
+      </div>`;
+    }).join('');
     return `
-    <div class="catRow">
-      <div class="catTop">
-        <div><span class="name">${escapeHtml(c)}</span><span class="cnt">${counts[c]} gift${counts[c] === 1 ? '' : 's'}</span></div>
-        <div class="amt">${fmt(totals[c], CURRENCY)}</div>
+    <div class="catGroup">
+      <div class="catGroupHead">
+        <div><span class="gname">${escapeHtml(g.name)}</span><span class="cnt">${g.count} gift${g.count === 1 ? '' : 's'}</span></div>
+        <div class="gamt">${fmt(g.subtotal, cur)}</div>
       </div>
-      ${target ? `
-        <div class="catBarOuter"><div class="catBarInner" style="width:${pct}%"></div></div>
-        <div class="catBarLabel">${Math.round(pct)}% of ${fmt(target, CURRENCY)} target</div>
-      ` : ''}
+      ${itemRows}
     </div>`;
   }).join('');
 }
@@ -648,15 +693,9 @@ function renderExtraCategoryPanels(data){
   if (dashRole !== 'admin' && dashRole !== 'manage') { container.innerHTML = ''; return; }
   const groups = groupByCurrency(data);
   container.innerHTML = Object.keys(groups).filter(c => c !== CURRENCY).sort().map(cur => {
-    const { totals, counts, cats } = categoryBreakdown(groups[cur]);
-    if (!cats.length) return '';
-    const rows = cats.map(c => `
-      <div class="catRow">
-        <div><span class="name">${escapeHtml(c)}</span><span class="cnt">${counts[c]} gift${counts[c] === 1 ? '' : 's'}</span></div>
-        <div class="amt">${fmt(totals[c], cur)}</div>
-      </div>
-    `).join('');
-    return `<div class="panel"><h2>By category (${escapeHtml(cur)})</h2><div>${rows}</div></div>`;
+    const html = groupedCategoryHtml(groups[cur], cur, false);
+    if (!html) return '';
+    return `<div class="panel"><h2>By category (${escapeHtml(cur)})</h2><div>${html}</div></div>`;
   }).join('');
 }
 
@@ -692,30 +731,40 @@ function generateReport(){
     doc.text(`Average gift: ${fmt(total / list.length, cur)}`, 14, y); y += 6;
     doc.text(`Largest gift: ${fmt(Math.max(...list.map(d => Number(d.amount) || 0)), cur)}`, 14, y); y += 10;
 
-    const { totals, counts, cats } = categoryBreakdown(list);
+    const grouped = groupedBreakdown(list);
     doc.setFontSize(12);
     doc.text('By category', 14, y); y += 7;
     doc.setFontSize(10);
     doc.setTextColor(120);
-    doc.text('Category', 14, y);
+    doc.text('Category / Sub-category', 14, y);
     doc.text('Gifts', 100, y);
     doc.text('Amount', 125, y);
     doc.text(cur === CURRENCY ? 'Progress' : '% of total', 165, y);
     doc.setTextColor(20);
     y += 5;
-    cats.forEach(c => {
-      if (y > 275) { doc.addPage(); y = 20; }
-      const target = cur === CURRENCY ? CATEGORY_TARGETS[c] : null;
-      const rightCol = target
-        ? `${Math.round((totals[c] / target) * 100)}% of ${fmt(target, cur)}`
-        : `${((totals[c] / total) * 100).toFixed(1)}%`;
-      doc.text(c, 14, y);
-      doc.text(String(counts[c]), 100, y);
-      doc.text(fmt(totals[c], cur), 125, y);
-      doc.text(rightCol, 165, y);
+    grouped.forEach(g => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFont(undefined, 'bold');
+      doc.text(g.name.toUpperCase(), 14, y);
+      doc.text(String(g.count), 100, y);
+      doc.text(fmt(g.subtotal, cur), 125, y);
+      doc.setFont(undefined, 'normal');
       y += 6;
+      g.items.forEach(i => {
+        if (y > 275) { doc.addPage(); y = 20; }
+        const target = cur === CURRENCY ? CATEGORY_TARGETS[i.name] : null;
+        const rightCol = target
+          ? `${Math.round((i.total / target) * 100)}% of ${fmt(target, cur)}`
+          : `${((i.total / total) * 100).toFixed(1)}%`;
+        doc.text('  ' + i.name, 14, y);
+        doc.text(String(i.count), 100, y);
+        doc.text(fmt(i.total, cur), 125, y);
+        doc.text(rightCol, 165, y);
+        y += 6;
+      });
+      y += 2;
     });
-    y += 10;
+    y += 8;
   });
 
   doc.save('cheerful-giving-report.pdf');

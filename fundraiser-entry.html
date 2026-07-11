@@ -107,13 +107,17 @@ a.dashlink{display:block;text-align:center;margin-top:16px;color:var(--g);font-s
       <label>Entered by (volunteer)</label>
       <input type="text" id="enteredBy" placeholder="Your name" required>
     </div>
+    <div class="field">
+      <label>Giver's name</label>
+      <input type="text" id="giverName" placeholder="Anonymous">
+    </div>
     <div class="row">
       <div class="field">
-        <label>Giver's name</label>
-        <input type="text" id="giverName" placeholder="Anonymous">
+        <label>Category</label>
+        <select id="categoryGroup"></select>
       </div>
       <div class="field">
-        <label>Category</label>
+        <label>Sub-category</label>
         <select id="category"></select>
       </div>
     </div>
@@ -146,7 +150,7 @@ a.dashlink{display:block;text-align:center;margin-top:16px;color:var(--g);font-s
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { firebaseConfig, CURRENCY, CURRENCIES, ENTRY_PIN, MANAGE_PIN, CATEGORIES } from './firebase-config.js';
+import { firebaseConfig, CURRENCY, CURRENCIES, ENTRY_PIN, MANAGE_PIN, CATEGORY_GROUPS } from './firebase-config.js?v=2';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
@@ -188,8 +192,25 @@ const enteredByEl = document.getElementById('enteredBy');
 enteredByEl.value = localStorage.getItem('cg_enteredBy') || '';
 
 // --- Category options ---
+const groupSelect = document.getElementById('categoryGroup');
 const categorySelect = document.getElementById('category');
-categorySelect.innerHTML = CATEGORIES.map(c => `<option>${escapeHtml(c)}</option>`).join('');
+groupSelect.innerHTML = CATEGORY_GROUPS.map(g => `<option>${escapeHtml(g.name)}</option>`).join('');
+
+function subCategoryOptions(groupName, selected){
+  const group = CATEGORY_GROUPS.find(g => g.name === groupName) || CATEGORY_GROUPS[0];
+  return group.items.map(i => `<option ${i === selected ? 'selected' : ''}>${escapeHtml(i)}</option>`).join('');
+}
+
+function fillSubCategories(){
+  categorySelect.innerHTML = subCategoryOptions(groupSelect.value);
+}
+fillSubCategories();
+groupSelect.addEventListener('change', fillSubCategories);
+
+function groupOfItem(item){
+  const g = CATEGORY_GROUPS.find(g => g.items.includes(item));
+  return g ? g.name : '';
+}
 
 // --- Currency options ---
 const currencySelect = document.getElementById('currency');
@@ -262,11 +283,15 @@ function renderRecent(){
   list.innerHTML = entries.map(([id, d]) => {
     const currencyOptions = Array.from(new Set([...CURRENCIES, d.currency].filter(Boolean)));
     if (id === editingId) {
+      const editGroup = d.categoryGroup || groupOfItem(d.category) || CATEGORY_GROUPS[0].name;
       return `
         <div class="entry">
           <div class="editRow">
             <input type="text" data-f="giverName" value="${escapeHtml(d.giverName || '')}" placeholder="Giver's name">
-            <select data-f="category">${CATEGORIES.map(c => `<option ${c === d.category ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select>
+            <div class="row">
+              <select data-f="categoryGroup">${CATEGORY_GROUPS.map(g => `<option ${g.name === editGroup ? 'selected' : ''}>${escapeHtml(g.name)}</option>`).join('')}</select>
+              <select data-f="category">${subCategoryOptions(editGroup, d.category)}</select>
+            </div>
             <div class="row">
               <input type="text" data-f="amount" inputmode="decimal" value="${(d.amount || 0).toLocaleString('en-US')}">
               <select data-f="currency" style="max-width:110px">${currencyOptions.map(c => `<option ${c === (d.currency || CURRENCY) ? 'selected' : ''}>${c}</option>`).join('')}</select>
@@ -278,7 +303,7 @@ function renderRecent(){
           </div>
         </div>`;
     }
-    const metaParts = [d.method, d.category, d.note].filter(Boolean).map(escapeHtml);
+    const metaParts = [d.categoryGroup || groupOfItem(d.category), d.category, d.method, d.note].filter(Boolean).map(escapeHtml);
     metaParts.push(timeAgo(d.timestamp));
     return `
       <div class="entry">
@@ -305,6 +330,13 @@ document.getElementById('recentList').addEventListener('input', e => {
   if (e.target.matches('[data-f=amount]')) formatAmountEl(e.target);
 });
 
+document.getElementById('recentList').addEventListener('change', e => {
+  if (e.target.matches('[data-f=categoryGroup]')) {
+    const row = e.target.closest('.editRow');
+    row.querySelector('[data-f=category]').innerHTML = subCategoryOptions(e.target.value);
+  }
+});
+
 document.getElementById('recentList').addEventListener('click', async e => {
   const editBtn = e.target.closest('[data-edit]');
   const cancelBtn = e.target.closest('[data-cancel]');
@@ -323,10 +355,11 @@ document.getElementById('recentList').addEventListener('click', async e => {
     const giverName = row.querySelector('[data-f=giverName]').value.trim() || 'Anonymous';
     const amount = parseAmount(row.querySelector('[data-f=amount]'));
     const currency = row.querySelector('[data-f=currency]').value;
+    const categoryGroup = row.querySelector('[data-f=categoryGroup]').value;
     const category = row.querySelector('[data-f=category]').value;
     if (!amount || amount <= 0) { toast('Enter a valid amount', true); return; }
     try {
-      await update(ref(db, 'donations/' + id), { giverName, amount, currency, category });
+      await update(ref(db, 'donations/' + id), { giverName, amount, currency, categoryGroup, category });
       editingId = null;
       renderRecent();
       toast('Entry updated');
@@ -374,6 +407,7 @@ form.addEventListener('submit', async e => {
       giverName: document.getElementById('giverName').value.trim() || 'Anonymous',
       amount,
       currency,
+      categoryGroup: groupSelect.value,
       category: document.getElementById('category').value,
       enteredBy,
       timestamp: serverTimestamp()

@@ -36,30 +36,24 @@
 const FIREBASE_URL = 'https://cheerful-giving-default-rtdb.firebaseio.com';
 const CURRENCY = 'UGX';
 
-const CATEGORY_TARGETS = {
-  'Bishop & Pr Diana': 10000000,
-  'Mengo Pastors': 24000000,
-  'Location Pastors': 18000000,
-  'Location churches': 15000000,
-  'Mengo MFs': 52000000,
-  'Generations': 2000000,
-  "Children's church": 2500000,
-  'Diaspora': 2000000,
-  'Biz Category': 5000000,
-  'Older Sons of the Ministry': 10000000,
-  'Younger Sons of the Ministry': 2500000,
-  "Bishop's Friends": 5000000,
-  'Couples wedded at church (non members)': 1000000,
-  'Makerere Treasury': 1000000,
-  'Mengo Treasury': 5000000,
-  'Kyambogo Treasury': 500000,
-  'Church Planting Treasury': 2000000,
-  'Harpazol': 2000000,
-  'Light House Treasury': 2000000,
-  'Soul Seed': 2500000,
-  'Home Comers': 2500000
-  // "Praying wives" intentionally has no target, same as the website.
-};
+// Category groups from the "ORDER OF THE GIVING" sheet, kept in event order.
+// Must be kept in sync with firebase-config.js on the website.
+const CATEGORY_GROUPS = [
+  { name: 'Leadership', items: ['Bishop and Pastor Diana', 'Mengo Pastors', 'Pastors of the Church Plants', "Children's Church"] },
+  { name: 'Mengo Church', items: ["Pr Jacque's Missional Family", "Pr Erinah's Missional Family", "Pr William's Missional Family", 'Pr Dennis/Martin/David Missional Family', "Pr Ivy's Missional Family", "Pr Bonny's Missional Family", 'Generations'] },
+  { name: 'Location Churches', items: ['Nations Church Makerere', 'Nations Church Kyambogo', 'Streams of Life Matugga', 'Streams of Life Nakawuka', 'Streams of Life Bulenga', 'Streams of Life Nakaseke', 'Streams of Life Masindi, Isagara', 'Streams of Life Kitagobwa', 'Streams of Life Matendo', 'Streams of Life Kyengera'] },
+  { name: 'Guests – Partners', items: ['Older Sons of the Ministry', 'Younger Sons of the Ministry', 'Friends to Bishop & the Ministry', 'Praying Wives', 'Soul Seed', 'CAPRO', 'Diaspora', 'Business Community'] },
+  { name: 'Arms of the Ministry', items: ['Mengo Treasury', 'Makerere Treasury', 'Kyambogo Treasury', 'Light House Treasury', 'Church Planting Treasury', 'Soul Winning Treasury'] },
+  { name: 'Nyongeza for Yesu', items: ['Daughters of Valor', 'Men Connect', 'Great Woman', 'Worship Team', 'Harpazol / Soul Winners', 'Others Who Are Interested to Sow'] }
+];
+
+// Per-sub-category targets (UGX). Awaiting the new targets list.
+const CATEGORY_TARGETS = {};
+
+function groupOfItem_(item){
+  const g = CATEGORY_GROUPS.find(g => g.items.indexOf(item) !== -1);
+  return g ? g.name : '';
+}
 
 function fmt_(n){ return Math.round(n).toLocaleString('en-US'); }
 
@@ -78,7 +72,7 @@ function syncDonations(){
 function writeDonationsTab_(ss, list){
   const sheet = ss.getSheetByName('Donations') || ss.insertSheet('Donations');
   sheet.clear();
-  const headers = ['Timestamp', 'Giver Name', 'Amount', 'Currency', 'Method', 'Category', 'Note', 'Entered By'];
+  const headers = ['Timestamp', 'Giver Name', 'Amount', 'Currency', 'Category', 'Sub-category', 'Entered By'];
   sheet.appendRow(headers);
 
   const rows = list.slice()
@@ -88,9 +82,8 @@ function writeDonationsTab_(ss, list){
       d.giverName || 'Anonymous',
       d.amount || 0,
       d.currency || CURRENCY,
-      d.method || '',
+      d.categoryGroup || groupOfItem_(d.category) || '',
       d.category || '',
-      d.note || '',
       d.enteredBy || ''
     ]);
   if (rows.length) {
@@ -156,27 +149,45 @@ function writeDashboardTab_(ss, list, goal){
 
   dash.getRange(row, 1).setValue('By category (' + CURRENCY + ')').setFontWeight('bold').setFontSize(13);
   row++;
-  dash.getRange(row, 1, 1, 4).setValues([['Category', 'Gifts', 'Amount', '% of target']]).setFontWeight('bold');
+  dash.getRange(row, 1, 1, 4).setValues([['Category / Sub-category', 'Gifts', 'Amount', '% of target']]).setFontWeight('bold');
   row++;
 
-  const totals = {}, counts = {};
+  // Accumulate group -> sub-category totals, then write in event order.
+  const acc = {};
   primaryList.forEach(d => {
-    const cat = d.category || 'Uncategorized';
-    totals[cat] = (totals[cat] || 0) + (Number(d.amount) || 0);
-    counts[cat] = (counts[cat] || 0) + 1;
+    const item = d.category || 'Uncategorized';
+    const group = d.categoryGroup || groupOfItem_(item) || 'Other';
+    acc[group] = acc[group] || {};
+    acc[group][item] = acc[group][item] || { total: 0, count: 0 };
+    acc[group][item].total += Number(d.amount) || 0;
+    acc[group][item].count += 1;
   });
-  const cats = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
-  cats.forEach(c => {
-    const target = CATEGORY_TARGETS[c];
-    dash.getRange(row, 1).setValue(c);
-    dash.getRange(row, 2).setValue(counts[c]);
-    dash.getRange(row, 3).setValue(CURRENCY + ' ' + fmt_(totals[c]));
-    if (target) {
-      dash.getRange(row, 4).setValue(Math.min(1, totals[c] / target)).setNumberFormat('0.0%');
-    } else {
-      dash.getRange(row, 4).setValue('—');
-    }
+  const groupNames = CATEGORY_GROUPS.map(g => g.name).concat(Object.keys(acc).filter(n => !CATEGORY_GROUPS.some(g => g.name === n)));
+  groupNames.forEach(name => {
+    const itemsAcc = acc[name];
+    if (!itemsAcc) return;
+    const configItems = (CATEGORY_GROUPS.find(g => g.name === name) || { items: [] }).items;
+    const items = configItems.concat(Object.keys(itemsAcc).filter(i => configItems.indexOf(i) === -1))
+      .filter(i => itemsAcc[i] && itemsAcc[i].total > 0);
+    if (!items.length) return;
+    const subtotal = items.reduce((s, i) => s + itemsAcc[i].total, 0);
+    const count = items.reduce((s, i) => s + itemsAcc[i].count, 0);
+    dash.getRange(row, 1).setValue(name.toUpperCase()).setFontWeight('bold');
+    dash.getRange(row, 2).setValue(count).setFontWeight('bold');
+    dash.getRange(row, 3).setValue(CURRENCY + ' ' + fmt_(subtotal)).setFontWeight('bold');
     row++;
+    items.forEach(i => {
+      const target = CATEGORY_TARGETS[i];
+      dash.getRange(row, 1).setValue('    ' + i);
+      dash.getRange(row, 2).setValue(itemsAcc[i].count);
+      dash.getRange(row, 3).setValue(CURRENCY + ' ' + fmt_(itemsAcc[i].total));
+      if (target) {
+        dash.getRange(row, 4).setValue(Math.min(1, itemsAcc[i].total / target)).setNumberFormat('0.0%');
+      } else {
+        dash.getRange(row, 4).setValue('—');
+      }
+      row++;
+    });
   });
 
   dash.getRange(row, 1).setValue('Last synced: ' + new Date().toLocaleString()).setFontColor('#888888').setFontSize(9);
