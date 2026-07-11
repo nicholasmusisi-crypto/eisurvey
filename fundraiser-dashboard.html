@@ -80,6 +80,15 @@ h1{font-size:22px;font-weight:700}
 .stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:22px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .stat .n{font-size:34px;font-weight:800;white-space:nowrap}
 .stat .l{font-size:13px;color:var(--t2);margin-top:4px}
+.giveRow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--bd)}
+.giveRow:last-child{border-bottom:none}
+.giveBadge{
+  flex-shrink:0;width:86px;text-align:center;font-size:11px;font-weight:800;color:#fff;
+  padding:7px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
+}
+.giveRow .giveName{font-size:13px;font-weight:700}
+.giveRow .giveDetail{font-size:13px;color:var(--t2);word-break:break-all}
+.giveRow .giveDetail b{color:var(--t);font-weight:700}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
@@ -179,7 +188,37 @@ h1{font-size:22px;font-weight:700}
 
   <div class="stats">
     <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
-    <div class="stat"><div class="n" id="largest">—</div><div class="l">Largest gift</div></div>
+    <div class="panel">
+      <h2>Ways to Give</h2>
+      <div class="giveRow">
+        <div class="giveBadge" style="background:#E30613">absa</div>
+        <div>
+          <div class="giveName">ABSA Bank</div>
+          <div class="giveDetail">Streams of Life Church · A/C <b>6003961395</b></div>
+        </div>
+      </div>
+      <div class="giveRow">
+        <div class="giveBadge" style="background:#FFCC00;color:#28271F">MTN MoMo</div>
+        <div>
+          <div class="giveName">MTN Mobile Money</div>
+          <div class="giveDetail">Merchant Code <b>*165*3*628906#</b></div>
+        </div>
+      </div>
+      <div class="giveRow">
+        <div class="giveBadge" style="background:#FF0000">airtel</div>
+        <div>
+          <div class="giveName">Airtel Money</div>
+          <div class="giveDetail">Merchant Code <b>*185*5*10*1260208#</b></div>
+        </div>
+      </div>
+      <div class="giveRow">
+        <div class="giveBadge" style="background:#003087">PayPal</div>
+        <div>
+          <div class="giveName">PayPal</div>
+          <div class="giveDetail"><b>https://streamsoflife.co.ug</b></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="panel" id="categoryPanel" style="display:none">
@@ -287,7 +326,7 @@ function pulse(el){
 }
 
 function refitAllNumbers(){
-  const els = [document.getElementById('total'), document.getElementById('count'), document.getElementById('largest'), ...document.querySelectorAll('.hero.mini .total')];
+  const els = [document.getElementById('total'), document.getElementById('count'), ...document.querySelectorAll('.hero.mini .total')];
   els.forEach(el => { if (el) fitText(el, el.textContent, MIN_NUMBER_SIZE); });
 }
 let resizeTimer;
@@ -448,13 +487,6 @@ function renderTotals(data){
   if (total > prevTotal && !isFirstDonationsRender) pulse(document.querySelector('.hero:not(.mini)'));
 
   animateNumber(document.getElementById('count'), allList.length, v => Math.round(v).toLocaleString('en-US'));
-
-  const largestEl = document.getElementById('largest');
-  if (list.length) {
-    animateNumber(largestEl, Math.max(...list.map(d => Number(d.amount) || 0)), v => fmt(v));
-  } else {
-    largestEl.textContent = '—';
-  }
 
   const pct = goal > 0 ? Math.min(100, (total / goal) * 100) : 0;
   document.getElementById('bar').style.width = pct + '%';
