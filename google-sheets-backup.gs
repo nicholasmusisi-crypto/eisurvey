@@ -41,7 +41,7 @@ const CURRENCY = 'UGX';
 const CATEGORY_GROUPS = [
   { name: 'Leadership', items: ['Bishop and Pastor Diana', 'Mengo Pastors', 'Pastors of the Church Plants', "Children's Church"] },
   { name: 'Mengo Church', items: ["Pr Jacque's Missional Family", "Pr Erinah's Missional Family", "Pr William's Missional Family", 'Pr Dennis/Martin/David Missional Family', "Pr Ivy's Missional Family", "Pr Bonny's Missional Family", 'Generations'] },
-  { name: 'Location Churches', items: ['Nations Church Makerere', 'Nations Church Kyambogo', 'Streams of Life Matugga', 'Streams of Life Nakawuka', 'Streams of Life Bulenga', 'Streams of Life Nakaseke', 'Streams of Life Masindi, Isagara', 'Streams of Life Kitagobwa', 'Streams of Life Matendo', 'Streams of Life Kyengera'] },
+  { name: 'Location Churches', items: ['Nations Church Makerere', 'Nations Church Kyambogo', 'Streams of Life Matugga', 'Streams of Life Nakawuka', 'Streams of Life Bulenga', 'Streams of Life Nakaseke', 'Streams of Life Masindi, Isagara', 'Streams of Life Kitagobwa', 'Streams of Life Matendo', 'Streams of Life Kyengera', 'Streams of Life Church Makindye', 'Streams of Life Church Mukono', 'Streams of Life Church Kabembe'] },
   { name: 'Guests – Partners', items: ['Older Sons of the Ministry', 'Younger Sons of the Ministry', 'Friends to Bishop & the Ministry', 'Praying Wives', 'Soul Seed', 'CAPRO', 'Diaspora', 'Business Community'] },
   { name: 'Arms of the Ministry', items: ['Mengo Treasury', 'Makerere Treasury', 'Kyambogo Treasury', 'Light House Treasury', 'Church Planting Treasury', 'Soul Winning Treasury'] },
   { name: 'Nyongeza for Yesu', items: ['Daughters of Valor', 'Men Connect', 'Great Woman', 'Worship Team', 'Harpazol / Soul Winners', 'Others Who Are Interested to Sow'] }

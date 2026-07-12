@@ -67,7 +67,10 @@ export const CATEGORY_GROUPS = [
       "Streams of Life Masindi, Isagara",
       "Streams of Life Kitagobwa",
       "Streams of Life Matendo",
-      "Streams of Life Kyengera"
+      "Streams of Life Kyengera",
+      "Streams of Life Church Makindye",
+      "Streams of Life Church Mukono",
+      "Streams of Life Church Kabembe"
     ]
   },
   {
@@ -113,7 +116,8 @@ export const CATEGORIES = CATEGORY_GROUPS.flatMap(g => g.items);
 // Per-sub-category targets, in the primary currency (UGX), from the
 // "ORDER OF THE GIVING" targets sheet. A sub-category listed here gets a
 // progress bar on the dashboard/report; anything absent (e.g. "Others Who
-// Are Interested to Sow", which has no target in the sheet) just shows its
+// Are Interested to Sow", or the 3 new Location Churches added without a
+// target: Makindye, Mukono, Kabembe) just shows its
 // running total.
 export const CATEGORY_TARGETS = {
   "Bishop and Pastor Diana": 15000000,
