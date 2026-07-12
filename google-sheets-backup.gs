@@ -47,8 +47,50 @@ const CATEGORY_GROUPS = [
   { name: 'Nyongeza for Yesu', items: ['Daughters of Valor', 'Men Connect', 'Great Woman', 'Worship Team', 'Harpazol / Soul Winners', 'Others Who Are Interested to Sow'] }
 ];
 
-// Per-sub-category targets (UGX). Awaiting the new targets list.
-const CATEGORY_TARGETS = {};
+// Per-sub-category targets (UGX). Keep in sync with firebase-config.js.
+const CATEGORY_TARGETS = {
+  'Bishop and Pastor Diana': 15000000,
+  'Mengo Pastors': 24000000,
+  'Pastors of the Church Plants': 20000000,
+  "Children's Church": 2500000,
+  "Pr Jacque's Missional Family": 2000000,
+  "Pr Erinah's Missional Family": 8000000,
+  "Pr William's Missional Family": 6000000,
+  'Pr Dennis/Martin/David Missional Family': 6000000,
+  "Pr Ivy's Missional Family": 10000000,
+  "Pr Bonny's Missional Family": 20000000,
+  'Generations': 2000000,
+  'Nations Church Makerere': 10000000,
+  'Nations Church Kyambogo': 1000000,
+  'Streams of Life Matugga': 3000000,
+  'Streams of Life Nakawuka': 500000,
+  'Streams of Life Bulenga': 1000000,
+  'Streams of Life Nakaseke': 1000000,
+  'Streams of Life Masindi, Isagara': 500000,
+  'Streams of Life Kitagobwa': 300000,
+  'Streams of Life Matendo': 1000000,
+  'Streams of Life Kyengera': 1000000,
+  'Older Sons of the Ministry': 10000000,
+  'Younger Sons of the Ministry': 5000000,
+  'Friends to Bishop & the Ministry': 20000000,
+  'Praying Wives': 15000000,
+  'Soul Seed': 1000000,
+  'CAPRO': 500000,
+  'Diaspora': 2000000,
+  'Business Community': 5000000,
+  'Mengo Treasury': 5000000,
+  'Makerere Treasury': 1000000,
+  'Kyambogo Treasury': 500000,
+  'Light House Treasury': 2000000,
+  'Church Planting Treasury': 2000000,
+  'Soul Winning Treasury': 2000000,
+  'Daughters of Valor': 500000,
+  'Men Connect': 1000000,
+  'Great Woman': 1000000,
+  'Worship Team': 500000,
+  'Harpazol / Soul Winners': 500000
+  // "Others Who Are Interested to Sow" intentionally has no target.
+};
 
 function groupOfItem_(item){
   const g = CATEGORY_GROUPS.find(g => g.items.indexOf(item) !== -1);

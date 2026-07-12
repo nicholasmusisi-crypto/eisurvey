@@ -110,7 +110,51 @@ export const CATEGORY_GROUPS = [
 // Flat list of all sub-categories, derived in event order.
 export const CATEGORIES = CATEGORY_GROUPS.flatMap(g => g.items);
 
-// Per-sub-category targets, in the primary currency (UGX). Awaiting the new
-// targets list — a sub-category listed here gets a progress bar on the
-// dashboard; anything absent just shows its running total.
-export const CATEGORY_TARGETS = {};
+// Per-sub-category targets, in the primary currency (UGX), from the
+// "ORDER OF THE GIVING" targets sheet. A sub-category listed here gets a
+// progress bar on the dashboard/report; anything absent (e.g. "Others Who
+// Are Interested to Sow", which has no target in the sheet) just shows its
+// running total.
+export const CATEGORY_TARGETS = {
+  "Bishop and Pastor Diana": 15000000,
+  "Mengo Pastors": 24000000,
+  "Pastors of the Church Plants": 20000000,
+  "Children's Church": 2500000,
+  "Pr Jacque's Missional Family": 2000000,
+  "Pr Erinah's Missional Family": 8000000,
+  "Pr William's Missional Family": 6000000,
+  "Pr Dennis/Martin/David Missional Family": 6000000,
+  "Pr Ivy's Missional Family": 10000000,
+  "Pr Bonny's Missional Family": 20000000,
+  "Generations": 2000000,
+  "Nations Church Makerere": 10000000,
+  "Nations Church Kyambogo": 1000000,
+  "Streams of Life Matugga": 3000000,
+  "Streams of Life Nakawuka": 500000,
+  "Streams of Life Bulenga": 1000000,
+  "Streams of Life Nakaseke": 1000000,
+  "Streams of Life Masindi, Isagara": 500000,
+  "Streams of Life Kitagobwa": 300000,
+  "Streams of Life Matendo": 1000000,
+  "Streams of Life Kyengera": 1000000,
+  "Older Sons of the Ministry": 10000000,
+  "Younger Sons of the Ministry": 5000000,
+  "Friends to Bishop & the Ministry": 20000000,
+  "Praying Wives": 15000000,
+  "Soul Seed": 1000000,
+  "CAPRO": 500000,
+  "Diaspora": 2000000,
+  "Business Community": 5000000,
+  "Mengo Treasury": 5000000,
+  "Makerere Treasury": 1000000,
+  "Kyambogo Treasury": 500000,
+  "Light House Treasury": 2000000,
+  "Church Planting Treasury": 2000000,
+  "Soul Winning Treasury": 2000000,
+  "Daughters of Valor": 500000,
+  "Men Connect": 1000000,
+  "Great Woman": 1000000,
+  "Worship Team": 500000,
+  "Harpazol / Soul Winners": 500000
+  // "Others Who Are Interested to Sow" intentionally has no target.
+};
