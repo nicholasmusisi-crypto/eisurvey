@@ -100,15 +100,15 @@ h1{font-size:20px;font-weight:700}
 .currencyChip .ccAmt{font-weight:800;font-size:clamp(24px,4vh,36px);white-space:nowrap}
 .currencyChip .ccCount{font-size:14px;opacity:.85}
 .currencyChip.pulse{animation:heroPulse .7s ease}
-.giveRow{display:flex;align-items:center;gap:10px;padding:clamp(3px,0.8vh,6px) 0;border-bottom:.5px solid var(--bd)}
+.giveRow{display:flex;align-items:center;gap:14px;padding:clamp(1px,0.4vh,4px) 0;border-bottom:.5px solid var(--bd)}
 .giveRow:last-child{border-bottom:none}
 .giveBadge{
-  flex-shrink:0;width:92px;text-align:center;font-size:13px;font-weight:800;color:#fff;
-  padding:7px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
+  flex-shrink:0;min-width:60px;text-align:center;font-size:clamp(14px,2vh,22px);font-weight:800;color:#fff;
+  padding:6px 12px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
 }
 .giveText{text-align:left;overflow-wrap:break-word;min-width:0}
-.giveRow .giveName{font-size:17px;font-weight:700}
-.giveRow .giveDetail{font-size:16px;color:var(--t2)}
+.giveRow .giveName{font-size:clamp(18px,2.6vh,28px);font-weight:700;line-height:1.1}
+.giveRow .giveDetail{font-size:clamp(17px,2.4vh,26px);color:var(--t2);line-height:1.1}
 .giveRow .giveDetail b{color:var(--t);font-weight:700}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:clamp(8px,1.8vh,14px) 18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .panel h2{font-size:16px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:clamp(4px,1vh,8px)}
@@ -116,7 +116,15 @@ h1{font-size:20px;font-weight:700}
    rule above) so this is the only flex item in .midBand and naturally spans
    the full row. Once a chip appears, equal flex-grow with .heroRow gives a
    50/50 split -> each half the hero's width. */
-.givePanel{flex:1 1 0;min-width:280px;transition:flex-grow .4s ease,flex-basis .4s ease}
+.givePanel{
+  flex:1 1 0;min-width:280px;transition:flex-grow .4s ease,flex-basis .4s ease;
+  background:var(--g);color:#fff;border:none;box-shadow:0 10px 30px rgba(15,36,64,.25);
+  padding:clamp(4px,0.8vh,8px) 28px
+}
+.givePanel h2{color:rgba(255,255,255,.85);font-size:clamp(16px,2.4vh,26px);margin-bottom:clamp(2px,0.4vh,4px)}
+.givePanel .giveRow{border-bottom-color:rgba(255,255,255,.18)}
+.givePanel .giveRow .giveDetail{color:rgba(255,255,255,.85)}
+.givePanel .giveRow .giveDetail b{color:#fff}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
