@@ -72,8 +72,9 @@ h1{font-size:20px;font-weight:700}
 }
 .giftPing.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .midBand{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-bottom:auto}
-.heroRow{display:flex;flex-direction:column;gap:clamp(4px,1vh,8px);flex:0 0 260px}
-.heroRow:empty{display:none}
+/* Unwraps into midBand: each currency chip becomes a direct flex sibling of
+   .givePanel, so the 3:1 flex-grow ratio below holds for any chip count. */
+.heroRow{display:contents}
 .hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:clamp(16px,4.5vh,48px) 36px;margin-top:auto;margin-bottom:clamp(10px,1.5vh,16px);text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
 .hero .total{font-size:clamp(42px,9vh,92px);font-weight:800;line-height:1.1;white-space:nowrap}
 .hero .label{font-size:15px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:600}
@@ -87,7 +88,11 @@ h1{font-size:20px;font-weight:700}
    the narrower Ways to Give panel, but still secondary to the hero */
 .currencyChip{
   background:var(--grn);color:#fff;border-radius:12px;padding:clamp(6px,1.8vh,14px) 18px;
-  box-shadow:0 6px 16px rgba(15,54,34,.2);display:flex;flex-direction:column;justify-content:center;gap:2px;flex:1
+  box-shadow:0 6px 16px rgba(15,54,34,.2);display:flex;flex-direction:column;justify-content:center;gap:2px;
+  /* One "unit" of width — givePanel below is flex-grow:3, so it stays ~3x
+     a single chip's width regardless of how many chips are present. */
+  flex:1 1 0;min-width:130px;
+  transition:flex-grow .4s ease,flex-basis .4s ease
 }
 .currencyChip .ccLabel{font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
 .currencyChip .ccAmt{font-weight:800;font-size:clamp(20px,3.4vh,30px);white-space:nowrap}
@@ -105,7 +110,13 @@ h1{font-size:20px;font-weight:700}
 .giveRow .giveDetail b{color:var(--t);font-weight:700}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:clamp(8px,1.8vh,14px) 18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:clamp(4px,1vh,8px)}
-.givePanel{flex:0 1 360px;min-width:260px}
+/* ~3 units wide — with no currency chips present this is the only flex item
+   in .midBand, so it naturally spans the full row (spacious, full-width
+   beneath the hero). Each chip added shares the ratio at ~1:3. (Grow value
+   is 3.3, not 3 — real content/padding on these boxes makes the flex
+   algorithm's min-content floor skew a plain 1:3 down to ~1:2.7 in practice;
+   this is a measured correction to land close to the intended 3x visually.) */
+.givePanel{flex:3.3 1 0;min-width:280px;transition:flex-grow .4s ease,flex-basis .4s ease}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
@@ -137,8 +148,8 @@ h1{font-size:20px;font-weight:700}
 .wrap.adminView .midBand{margin-bottom:0}
 @media(max-width:480px){
   .hero{padding:20px 16px}
-  .heroRow{flex-direction:row;flex-wrap:wrap;flex-basis:100%}
-  .currencyChip{flex:1;min-width:140px}
+  /* Too narrow for the 3:1 ratio to read well — stack everything full-width */
+  .currencyChip,.givePanel{flex:1 1 100%}
 }
 .celebrateBanner{
   position:fixed;top:24px;left:50%;z-index:100;
