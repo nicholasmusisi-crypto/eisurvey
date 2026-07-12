@@ -72,9 +72,13 @@ h1{font-size:20px;font-weight:700}
 }
 .giftPing.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .midBand{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-bottom:auto}
-/* Unwraps into midBand: each currency chip becomes a direct flex sibling of
-   .givePanel, so the 3:1 flex-grow ratio below holds for any chip count. */
-.heroRow{display:contents}
+/* Currency chips container: when empty it's removed from layout entirely, so
+   .givePanel (the only flex item left) naturally fills 100% of the row. Once
+   it has chips, it and .givePanel share equal flex-grow -> a 50/50 split,
+   each half the hero's width; the chips inside then divide that half equally
+   among themselves via their own flex:1. */
+.heroRow{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 0;min-width:0}
+.heroRow:empty{display:none}
 .hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:clamp(16px,4.5vh,48px) 36px;margin-top:auto;margin-bottom:clamp(10px,1.5vh,16px);text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
 .hero .total{font-size:clamp(42px,9vh,92px);font-weight:800;line-height:1.1;white-space:nowrap}
 .hero .label{font-size:15px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:600}
@@ -89,8 +93,6 @@ h1{font-size:20px;font-weight:700}
 .currencyChip{
   background:var(--grn);color:#fff;border-radius:12px;padding:clamp(6px,1.8vh,14px) 18px;
   box-shadow:0 6px 16px rgba(15,54,34,.2);display:flex;flex-direction:column;justify-content:center;gap:2px;
-  /* One "unit" of width — givePanel below is flex-grow:3, so it stays ~3x
-     a single chip's width regardless of how many chips are present. */
   flex:1 1 0;min-width:130px;
   transition:flex-grow .4s ease,flex-basis .4s ease
 }
@@ -98,25 +100,23 @@ h1{font-size:20px;font-weight:700}
 .currencyChip .ccAmt{font-weight:800;font-size:clamp(20px,3.4vh,30px);white-space:nowrap}
 .currencyChip .ccCount{font-size:12px;opacity:.85}
 .currencyChip.pulse{animation:heroPulse .7s ease}
-.giveRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:clamp(3px,0.8vh,6px) 0;border-bottom:.5px solid var(--bd)}
+.giveRow{display:flex;align-items:center;gap:10px;padding:clamp(3px,0.8vh,6px) 0;border-bottom:.5px solid var(--bd)}
 .giveRow:last-child{border-bottom:none}
 .giveBadge{
   flex-shrink:0;width:74px;text-align:center;font-size:10px;font-weight:800;color:#fff;
   padding:5px 5px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
 }
-.giveText{text-align:right;overflow-wrap:break-word;min-width:0}
+.giveText{text-align:left;overflow-wrap:break-word;min-width:0}
 .giveRow .giveName{font-size:12px;font-weight:700}
 .giveRow .giveDetail{font-size:12px;color:var(--t2)}
 .giveRow .giveDetail b{color:var(--t);font-weight:700}
 .panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:clamp(8px,1.8vh,14px) 18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
 .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:clamp(4px,1vh,8px)}
-/* ~3 units wide — with no currency chips present this is the only flex item
-   in .midBand, so it naturally spans the full row (spacious, full-width
-   beneath the hero). Each chip added shares the ratio at ~1:3. (Grow value
-   is 3.3, not 3 — real content/padding on these boxes makes the flex
-   algorithm's min-content floor skew a plain 1:3 down to ~1:2.7 in practice;
-   this is a measured correction to land close to the intended 3x visually.) */
-.givePanel{flex:3.3 1 0;min-width:280px;transition:flex-grow .4s ease,flex-basis .4s ease}
+/* With no currency chips present, .heroRow is removed from layout (:empty
+   rule above) so this is the only flex item in .midBand and naturally spans
+   the full row. Once a chip appears, equal flex-grow with .heroRow gives a
+   50/50 split -> each half the hero's width. */
+.givePanel{flex:1 1 0;min-width:280px;transition:flex-grow .4s ease,flex-basis .4s ease}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
