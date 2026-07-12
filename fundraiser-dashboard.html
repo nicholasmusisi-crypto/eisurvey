@@ -72,39 +72,40 @@ h1{font-size:20px;font-weight:700}
 }
 .giftPing.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .midBand{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-bottom:auto}
-.heroRow{display:flex;flex-direction:column;gap:6px;flex:0 0 200px}
+.heroRow{display:flex;flex-direction:column;gap:clamp(4px,1vh,8px);flex:0 0 260px}
 .heroRow:empty{display:none}
-.hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:clamp(18px,3.5vh,40px) 32px;margin-top:auto;margin-bottom:clamp(10px,1.5vh,16px);text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
-.hero .total{font-size:clamp(38px,8vh,84px);font-weight:800;line-height:1.1;white-space:nowrap}
-.hero .label{font-size:14px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:600}
+.hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:clamp(16px,4.5vh,48px) 36px;margin-top:auto;margin-bottom:clamp(10px,1.5vh,16px);text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
+.hero .total{font-size:clamp(42px,9vh,92px);font-weight:800;line-height:1.1;white-space:nowrap}
+.hero .label{font-size:15px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:600}
 .hero.pulse{animation:heroPulse .7s ease}
 @keyframes heroPulse{0%{transform:scale(1)}35%{transform:scale(1.035)}100%{transform:scale(1)}}
 .barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:14px;margin-top:16px;overflow:hidden}
 .barInner{background:#fff;height:100%;border-radius:999px;transition:width .6s ease;width:0%}
 .goalRow{display:flex;justify-content:space-between;gap:10px;font-size:13px;opacity:.9;margin-top:8px}
 .goalRow .giftsInline{font-weight:700;opacity:1}
-/* Compact currency chip (secondary currencies) — small on purpose since most
-   giving is expected in the primary currency */
+/* Currency chip (secondary currencies) — sized up to fill the width freed by
+   the narrower Ways to Give panel, but still secondary to the hero */
 .currencyChip{
-  background:var(--grn);color:#fff;border-radius:10px;padding:8px 14px;
-  box-shadow:0 6px 16px rgba(15,54,34,.2);display:flex;flex-direction:column;gap:1px
+  background:var(--grn);color:#fff;border-radius:12px;padding:clamp(6px,1.8vh,14px) 18px;
+  box-shadow:0 6px 16px rgba(15,54,34,.2);display:flex;flex-direction:column;justify-content:center;gap:2px;flex:1
 }
-.currencyChip .ccLabel{font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
-.currencyChip .ccAmt{font-weight:800;font-size:clamp(16px,2.6vh,22px);white-space:nowrap}
-.currencyChip .ccCount{font-size:11px;opacity:.85}
+.currencyChip .ccLabel{font-size:12px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.currencyChip .ccAmt{font-weight:800;font-size:clamp(20px,3.4vh,30px);white-space:nowrap}
+.currencyChip .ccCount{font-size:12px;opacity:.85}
 .currencyChip.pulse{animation:heroPulse .7s ease}
-.giveRow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:.5px solid var(--bd)}
+.giveRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:clamp(3px,0.8vh,6px) 0;border-bottom:.5px solid var(--bd)}
 .giveRow:last-child{border-bottom:none}
 .giveBadge{
   flex-shrink:0;width:74px;text-align:center;font-size:10px;font-weight:800;color:#fff;
   padding:5px 5px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
 }
+.giveText{text-align:right;overflow-wrap:break-word;min-width:0}
 .giveRow .giveName{font-size:12px;font-weight:700}
-.giveRow .giveDetail{font-size:12px;color:var(--t2);word-break:break-all}
+.giveRow .giveDetail{font-size:12px;color:var(--t2)}
 .giveRow .giveDetail b{color:var(--t);font-weight:700}
-.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:14px 18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
-.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:8px}
-.givePanel{flex:1;min-width:260px}
+.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:clamp(8px,1.8vh,14px) 18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:clamp(4px,1vh,8px)}
+.givePanel{flex:0 1 360px;min-width:260px}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
@@ -219,28 +220,28 @@ h1{font-size:20px;font-weight:700}
       <h2>Ways to Give</h2>
       <div class="giveRow">
         <div class="giveBadge" style="background:#E30613">absa</div>
-        <div>
+        <div class="giveText">
           <div class="giveName">ABSA Bank</div>
           <div class="giveDetail">Streams of Life Church · A/C <b>6003961395</b></div>
         </div>
       </div>
       <div class="giveRow">
         <div class="giveBadge" style="background:#FFCC00;color:#28271F">MTN MoMo</div>
-        <div>
+        <div class="giveText">
           <div class="giveName">MTN Mobile Money</div>
           <div class="giveDetail">Merchant Code <b>*165*3*628906#</b></div>
         </div>
       </div>
       <div class="giveRow">
         <div class="giveBadge" style="background:#FF0000">airtel</div>
-        <div>
+        <div class="giveText">
           <div class="giveName">Airtel Money</div>
           <div class="giveDetail">Merchant Code <b>*185*5*10*1260208#</b></div>
         </div>
       </div>
       <div class="giveRow">
         <div class="giveBadge" style="background:#003087">PayPal</div>
-        <div>
+        <div class="giveText">
           <div class="giveName">PayPal</div>
           <div class="giveDetail"><b>https://streamsoflife.co.ug</b></div>
         </div>
