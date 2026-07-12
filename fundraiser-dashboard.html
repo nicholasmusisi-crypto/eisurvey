@@ -47,9 +47,9 @@ body.revealPulse::before{transform:scale(1.1)}
 }
 body::before{opacity:.3;filter:saturate(.75) brightness(.6) contrast(1.15)}
 }
-.wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
-.top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;flex-wrap:wrap;gap:8px}
-h1{font-size:22px;font-weight:700}
+.wrap{max-width:1100px;margin:0 auto;padding:clamp(10px,2vh,22px) 20px 20px}
+.top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:clamp(8px,1.5vh,16px);flex-wrap:wrap;gap:8px}
+h1{font-size:20px;font-weight:700}
 .sub{color:var(--t2);font-size:13px;display:flex;align-items:center;gap:6px}
 .liveDot{width:8px;height:8px;border-radius:50%;background:#3EA65C;box-shadow:0 0 0 rgba(62,166,92,.5);animation:liveDotPulse 2s infinite}
 @keyframes liveDotPulse{
@@ -64,33 +64,40 @@ h1{font-size:22px;font-weight:700}
   opacity:0;transition:opacity .35s ease,transform .35s ease;pointer-events:none;z-index:98;white-space:nowrap
 }
 .giftPing.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.heroRow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:16px}
-.heroRow:empty{margin-bottom:0}
-.hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:48px 40px;margin-bottom:24px;text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
-.hero.mini{flex:1;min-width:220px;padding:32px 28px;background:var(--grn);box-shadow:0 10px 30px rgba(15,54,34,.25);margin-bottom:0}
-.hero.mini .total{font-size:clamp(30px,5vw,46px);white-space:nowrap}
-.hero .total{font-size:clamp(52px,10vw,96px);font-weight:800;line-height:1.1;white-space:nowrap}
-.hero .label{font-size:16px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-weight:600}
+.midBand{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-bottom:clamp(6px,1vh,16px)}
+.heroRow{display:flex;flex-direction:column;gap:6px;flex:0 0 200px}
+.heroRow:empty{display:none}
+.hero{background:var(--g);color:#fff;border-radius:var(--rad);padding:clamp(18px,3.5vh,40px) 32px;margin-bottom:clamp(10px,1.5vh,16px);text-align:center;box-shadow:0 10px 30px rgba(15,36,64,.25);transition:transform .3s ease}
+.hero .total{font-size:clamp(38px,8vh,84px);font-weight:800;line-height:1.1;white-space:nowrap}
+.hero .label{font-size:14px;opacity:.85;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:600}
 .hero.pulse{animation:heroPulse .7s ease}
 @keyframes heroPulse{0%{transform:scale(1)}35%{transform:scale(1.035)}100%{transform:scale(1)}}
-.barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:18px;margin-top:22px;overflow:hidden}
+.barOuter{background:rgba(255,255,255,.2);border-radius:999px;height:14px;margin-top:16px;overflow:hidden}
 .barInner{background:#fff;height:100%;border-radius:999px;transition:width .6s ease;width:0%}
-.goalRow{display:flex;justify-content:space-between;font-size:14px;opacity:.9;margin-top:8px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:16px}
-.stat{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:22px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
-.stat .n{font-size:34px;font-weight:800;white-space:nowrap}
-.stat .l{font-size:13px;color:var(--t2);margin-top:4px}
-.giveRow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--bd)}
+.goalRow{display:flex;justify-content:space-between;gap:10px;font-size:13px;opacity:.9;margin-top:8px}
+.goalRow .giftsInline{font-weight:700;opacity:1}
+/* Compact currency chip (secondary currencies) — small on purpose since most
+   giving is expected in the primary currency */
+.currencyChip{
+  background:var(--grn);color:#fff;border-radius:10px;padding:8px 14px;
+  box-shadow:0 6px 16px rgba(15,54,34,.2);display:flex;flex-direction:column;gap:1px
+}
+.currencyChip .ccLabel{font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.currencyChip .ccAmt{font-weight:800;font-size:clamp(16px,2.6vh,22px);white-space:nowrap}
+.currencyChip .ccCount{font-size:11px;opacity:.85}
+.currencyChip.pulse{animation:heroPulse .7s ease}
+.giveRow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:.5px solid var(--bd)}
 .giveRow:last-child{border-bottom:none}
 .giveBadge{
-  flex-shrink:0;width:86px;text-align:center;font-size:11px;font-weight:800;color:#fff;
-  padding:7px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
+  flex-shrink:0;width:74px;text-align:center;font-size:10px;font-weight:800;color:#fff;
+  padding:5px 5px;border-radius:999px;text-transform:uppercase;letter-spacing:.02em
 }
-.giveRow .giveName{font-size:13px;font-weight:700}
-.giveRow .giveDetail{font-size:13px;color:var(--t2);word-break:break-all}
+.giveRow .giveName{font-size:12px;font-weight:700}
+.giveRow .giveDetail{font-size:12px;color:var(--t2);word-break:break-all}
 .giveRow .giveDetail b{color:var(--t);font-weight:700}
-.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
-.panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:12px}
+.panel{background:var(--bg);border:.5px solid var(--bd);border-radius:var(--rad);padding:14px 18px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:8px}
+.givePanel{flex:1;min-width:260px}
 .goalBtn{border:.5px solid var(--bd2);background:none;color:var(--t2);font-size:12px;border-radius:999px;padding:5px 12px;cursor:pointer}
 .goalBtn:hover{color:var(--t)}
 .goalBtn.danger{color:var(--r);border-color:var(--r)}
@@ -116,8 +123,9 @@ h1{font-size:22px;font-weight:700}
 .catBarLabel{font-size:11px;color:var(--t2);margin-top:4px}
 .panel + .panel{margin-top:16px}
 @media(max-width:480px){
-  .hero{padding:32px 16px}
-  .hero.mini{padding:22px 16px}
+  .hero{padding:20px 16px}
+  .heroRow{flex-direction:row;flex-wrap:wrap;flex-basis:100%}
+  .currencyChip{flex:1;min-width:140px}
 }
 .celebrateBanner{
   position:fixed;top:24px;left:50%;z-index:100;
@@ -190,14 +198,12 @@ h1{font-size:22px;font-weight:700}
     <div class="label">Total raised</div>
     <div class="total" id="total">UGX 0</div>
     <div class="barOuter"><div class="barInner" id="bar"></div></div>
-    <div class="goalRow"><span id="pct">0%</span><span id="goalLabel">Goal: —</span></div>
+    <div class="goalRow"><span id="pct">0%</span><span class="giftsInline"><span id="count">0</span> gifts</span><span id="goalLabel">Goal: —</span></div>
   </div>
 
-  <div class="heroRow" id="heroRow"></div>
-
-  <div class="stats">
-    <div class="stat"><div class="n" id="count">0</div><div class="l">Gifts</div></div>
-    <div class="panel">
+  <div class="midBand">
+    <div class="heroRow" id="heroRow"></div>
+    <div class="panel givePanel">
       <h2>Ways to Give</h2>
       <div class="giveRow">
         <div class="giveBadge" style="background:#E30613">absa</div>
@@ -357,8 +363,28 @@ function pulse(el){
 }
 
 function refitAllNumbers(){
-  const els = [document.getElementById('total'), document.getElementById('count'), ...document.querySelectorAll('.hero.mini .total')];
+  const els = [document.getElementById('total'), ...document.querySelectorAll('.currencyChip .total')];
   els.forEach(el => { if (el) fitText(el, el.textContent, MIN_NUMBER_SIZE); });
+}
+
+// Small stats (like the gift count) live in auto-width containers, so the
+// canvas-measured shrink-to-fit logic isn't meaningful for them — just
+// count up the number directly.
+function animateSimple(el, to, formatFn, duration = 800){
+  if (!el) return;
+  const from = numberState.get(el) ?? 0;
+  numberState.set(el, to);
+  const finalText = formatFn(to);
+  if (from === to) { el.textContent = finalText; return; }
+  const start = performance.now();
+  function frame(now){
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatFn(from + (to - from) * eased);
+    if (t < 1) requestAnimationFrame(frame);
+    else el.textContent = finalText;
+  }
+  requestAnimationFrame(frame);
 }
 let resizeTimer;
 window.addEventListener('resize', () => {
@@ -515,9 +541,9 @@ function renderTotals(data){
   const totalEl = document.getElementById('total');
   const prevTotal = numberState.get(totalEl) ?? 0;
   animateNumber(totalEl, total, v => fmt(v));
-  if (total > prevTotal && !isFirstDonationsRender) pulse(document.querySelector('.hero:not(.mini)'));
+  if (total > prevTotal && !isFirstDonationsRender) pulse(document.querySelector('.hero'));
 
-  animateNumber(document.getElementById('count'), allList.length, v => Math.round(v).toLocaleString('en-US'));
+  animateSimple(document.getElementById('count'), allList.length, v => Math.round(v).toLocaleString('en-US'));
 
   const pct = goal > 0 ? Math.min(100, (total / goal) * 100) : 0;
   document.getElementById('bar').style.width = pct + '%';
@@ -627,20 +653,20 @@ function renderExtraCurrencies(data){
     let el = miniHeroEls.get(cur);
     if (!el) {
       el = document.createElement('div');
-      el.className = 'hero mini';
+      el.className = 'currencyChip';
       el.innerHTML = `
-        <div class="label">${escapeHtml(cur)} raised</div>
-        <div class="total"></div>
-        <div class="goalRow"><span class="miniCount"></span><span></span></div>
+        <div class="ccLabel">${escapeHtml(cur)} raised</div>
+        <div class="total ccAmt"></div>
+        <div class="ccCount"></div>
       `;
       heroRow.appendChild(el);
       miniHeroEls.set(cur, el);
     }
     const totalEl = el.querySelector('.total');
     const prevTotal = numberState.get(totalEl) ?? 0;
-    animateNumber(totalEl, total, v => fmt(v, cur));
+    animateNumber(totalEl, total, v => fmt(v, cur), { minSize: 12 });
     if (total > prevTotal && !isFirstDonationsRender) pulse(el);
-    el.querySelector('.miniCount').textContent = `${list.length} gift${list.length === 1 ? '' : 's'}`;
+    el.querySelector('.ccCount').textContent = `${list.length} gift${list.length === 1 ? '' : 's'}`;
   });
 
   for (const [cur, el] of miniHeroEls) {
