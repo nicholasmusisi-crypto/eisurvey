@@ -1,2 +1,3 @@
 .claude/
 *.log
+firebase-backup-*.json
