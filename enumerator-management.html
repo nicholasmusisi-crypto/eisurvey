@@ -52,6 +52,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .back-link{color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;margin-top:14px;display:inline-block}
 .back-link:active{color:#fff}
 
+/* ── Country picker ── */
+.country-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.country-card{background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;padding:18px 10px;text-align:center;cursor:pointer;transition:background .15s}
+.country-card:active{background:rgba(255,255,255,.18)}
+.country-card .flag{font-size:26px;margin-bottom:6px}
+.country-card h3{font-size:14px;font-weight:600;color:#fff}
+.add-country-row{display:flex;gap:8px}
+.add-country-row input{flex:1;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-family:inherit;outline:none}
+.add-country-row input::placeholder{color:rgba(255,255,255,.4)}
+.country-label-row{text-align:center;margin-top:14px;font-size:12px;color:rgba(255,255,255,.55)}
+
 /* ── App shell ── */
 .hdr{background:var(--gd);border-bottom:.5px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50}
 .hdr-title{color:#fff;font-size:16px;font-weight:600}
@@ -160,13 +171,29 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 </head>
 <body>
 
+<!-- ════ COUNTRY SELECT ════ -->
+<div id="scr-country" class="screen on">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <h1>Enumerator Management</h1>
+      <p>Select your country</p>
+    </div>
+    <div class="country-grid" id="country-list"></div>
+    <div class="add-country-row">
+      <input type="text" id="new-country-input" placeholder="Add a country…" onkeydown="if(event.key==='Enter')addCountryUI()">
+      <button class="btn-white" onclick="addCountryUI()">Add</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════ LOGIN ════ -->
-<div id="scr-login" class="screen on">
+<div id="scr-login" class="screen">
   <div class="login-wrap">
     <div class="login-logo">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <h1 id="lg-title">Enumerator Management</h1>
-      <p id="lg-sub">Educate! Tanzania — Survey Ops</p>
+      <p id="lg-sub">Educate! — Survey Ops</p>
     </div>
 
     <div class="role-card" onclick="showRoleLogin('admin')">
@@ -187,6 +214,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
       <div class="pin-err" id="pin-err">Incorrect PIN</div>
     </div>
     <div style="text-align:center"><span class="back-link" id="back-link" style="display:none" onclick="hideRoleLogin()">&larr; Back</span></div>
+    <div class="country-label-row"><span id="lg-country-label"></span> · <span class="back-link" style="margin-top:0" onclick="switchCountry()">Change country</span></div>
   </div>
 </div>
 
@@ -195,7 +223,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
   <div class="hdr">
     <div>
       <div class="hdr-title">Enumerator Management</div>
-      <div class="hdr-sub"><span id="hdr-org">Educate! Tanzania — Survey Ops</span> <span class="role-badge" id="hdr-role">View Only</span></div>
+      <div class="hdr-sub"><span id="hdr-org">Educate! — Survey Ops</span> <span class="role-badge" id="hdr-country-badge" style="background:rgba(255,255,255,.28)"></span> <span class="role-badge" id="hdr-role">View Only</span></div>
     </div>
     <button class="btn-logout" onclick="logout()">Log out</button>
   </div>
@@ -264,7 +292,8 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
     <!-- Settings (admin only) -->
     <div class="pg" id="pg-settings">
       <div class="card">
-        <div class="ct">Google Sheets connection</div>
+        <div class="ct">Google Sheets connection — <span id="settings-country-label"></span></div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px">Each country has its own Sheet and its own URL here — this one only applies to <span id="settings-country-label2"></span>. Switching country in the app switches which connection you're editing.</div>
         <label class="flbl">Apps Script web app URL</label>
         <input type="text" id="gas-url" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveSyncSettings()">
         <label class="flbl">Write PIN <span style="font-weight:400;color:var(--t3)">(optional — matches TOKEN script property)</span></label>
@@ -286,7 +315,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
       <div class="card">
         <div class="ct">About</div>
         <div style="font-size:12px;color:var(--t2);line-height:1.7">
-          Data lives entirely in your own Google Sheet — no paid service, no expiring trial account. The Evaluation Officer PIN and dropdown options (statuses, regions) are set in <code style="font-size:11px;background:var(--bd);padding:1px 4px;border-radius:3px">enumerator-config.js</code>.
+          Data lives entirely in your own Google Sheets — one per country, so nothing overlaps — no paid service, no expiring trial account. The Evaluation Officer PIN, default countries, and region suggestions are set in <code style="font-size:11px;background:var(--bd);padding:1px 4px;border-radius:3px">enumerator-config.js</code>. Countries added via "Add a country" on the picker screen only show up on that device — ask to have them added to the code if everyone should see them.
         </div>
       </div>
     </div>
@@ -307,11 +336,11 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
     <label class="flbl">Gender</label>
     <select id="enum-gender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
     <label class="flbl">Phone</label>
-    <input type="tel" id="enum-phone" placeholder="+255…">
+    <input type="tel" id="enum-phone" placeholder="Phone number">
     <label class="flbl">Email</label>
     <input type="email" id="enum-email" placeholder="name@example.com">
     <label class="flbl">Region</label>
-    <select id="enum-district"></select>
+    <input type="text" id="enum-district" list="region-datalist" placeholder="Region/District">
     <label class="flbl">Status</label>
     <select id="enum-status"></select>
     <label class="flbl">Notes</label>
@@ -329,7 +358,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
     <label class="flbl">Enumerator</label>
     <select id="assign-enum"></select>
     <label class="flbl">Location / Region</label>
-    <select id="assign-location"></select>
+    <input type="text" id="assign-location" list="region-datalist" placeholder="Region/District">
     <label class="flbl">Project / Survey</label>
     <input type="text" id="assign-project" placeholder="e.g. Q3 Household Survey">
     <label class="flbl">Team</label>
@@ -346,19 +375,23 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
   </div>
 </div>
 
+<datalist id="region-datalist"></datalist>
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { ORG_NAME, APP_TITLE, ADMIN_PIN, STATUSES, ASSIGNMENT_STATUSES, ATTENDANCE_STATUSES, DISTRICTS } from './enumerator-config.js';
+import { ORG_NAME, APP_TITLE, ADMIN_PIN, STATUSES, ASSIGNMENT_STATUSES, ATTENDANCE_STATUSES, COUNTRIES, REGIONS_BY_COUNTRY } from './enumerator-config.js';
 
 document.title = APP_TITLE + ' — E!Survey';
 document.getElementById('lg-title').textContent = APP_TITLE;
 document.getElementById('lg-sub').textContent = ORG_NAME;
 document.getElementById('hdr-org').textContent = ORG_NAME;
 
+const COUNTRY_FLAGS = { Uganda:'🇺🇬', Kenya:'🇰🇪', Tanzania:'🇹🇿', Rwanda:'🇷🇼' };
+
 let currentRole = null; // 'admin' | 'viewer'
+let selectedCountry = null;
 let data = { enumerators: [], assignments: [], attendance: [] };
-let syncCfg = JSON.parse(localStorage.getItem('em_sync') || '{"url":"","token":""}');
+let syncCfg = { url:'', token:'' };
 let lastSynced = null;
 let pollTimer = null;
 let rosterStatusFilter = '';
@@ -371,6 +404,55 @@ function todayStr(){ return new Date().toISOString().slice(0,10); }
 function fillSelect(sel, options, placeholder){
   sel.innerHTML = (placeholder!==undefined ? `<option value="">${esc(placeholder)}</option>` : '') + options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
 }
+
+// ── Country ──
+function getCountries(){
+  const extra = JSON.parse(localStorage.getItem('em_countries_extra')||'[]');
+  return [...COUNTRIES, ...extra.filter(c=>!COUNTRIES.includes(c))];
+}
+function regionsFor(country){ return REGIONS_BY_COUNTRY[country] || []; }
+function syncKey(){ return 'em_sync_' + selectedCountry; }
+function cacheKey(){ return 'em_cache_' + selectedCountry; }
+function loadSyncCfg(){
+  syncCfg = JSON.parse(localStorage.getItem(syncKey()) || '{"url":"","token":""}');
+}
+
+function renderCountryScreen(){
+  document.getElementById('country-list').innerHTML = getCountries().map(c=>
+    `<div class="country-card" onclick="selectCountry('${esc(c)}')"><div class="flag">${COUNTRY_FLAGS[c]||'🌍'}</div><h3>${esc(c)}</h3></div>`
+  ).join('');
+}
+window.addCountryUI = function(){
+  const input = document.getElementById('new-country-input');
+  const name = input.value.trim();
+  if(!name) return;
+  if(getCountries().some(c=>c.toLowerCase()===name.toLowerCase())){ toast('Already in the list'); input.value=''; return; }
+  const extra = JSON.parse(localStorage.getItem('em_countries_extra')||'[]');
+  extra.push(name);
+  localStorage.setItem('em_countries_extra', JSON.stringify(extra));
+  input.value='';
+  renderCountryScreen();
+  toast(name + ' added (this device only)');
+};
+window.selectCountry = function(country){
+  selectedCountry = country;
+  localStorage.setItem('em_selected_country', country);
+  loadSyncCfg();
+  document.getElementById('lg-country-label').textContent = country;
+  document.getElementById('scr-country').classList.remove('on');
+  document.getElementById('scr-app').classList.remove('on');
+  document.getElementById('scr-login').classList.add('on');
+  hideRoleLogin();
+};
+window.switchCountry = function(){
+  currentRole = null;
+  sessionStorage.removeItem('em_role');
+  if(pollTimer){ clearInterval(pollTimer); pollTimer=null; }
+  document.getElementById('scr-app').classList.remove('on');
+  document.getElementById('scr-login').classList.remove('on');
+  renderCountryScreen();
+  document.getElementById('scr-country').classList.add('on');
+};
 
 // ── Login ──
 window.showRoleLogin = function(role){
@@ -396,13 +478,17 @@ window.loginViewer = function(){ enterApp('viewer'); };
 function enterApp(role){
   currentRole = role;
   sessionStorage.setItem('em_role', role);
+  document.getElementById('scr-country').classList.remove('on');
   document.getElementById('scr-login').classList.remove('on');
   document.getElementById('scr-app').classList.add('on');
   document.getElementById('hdr-role').textContent = role==='admin' ? 'Evaluation Officer' : 'View Only';
+  document.getElementById('hdr-country-badge').textContent = selectedCountry;
+  document.getElementById('settings-country-label').textContent = selectedCountry;
+  document.getElementById('settings-country-label2').textContent = selectedCountry;
   document.getElementById('tab-settings-btn').style.display = role==='admin' ? '' : 'none';
   document.getElementById('fab-add').style.display = 'none'; // shown per-tab by switchTab()
-  initDropdowns();
   loadCache();
+  initDropdowns();
   renderAll();
   fetchAll();
   if(pollTimer) clearInterval(pollTimer);
@@ -420,11 +506,11 @@ window.logout = function(){
 
 // ── Dropdown init ──
 function initDropdowns(){
-  fillSelect(document.getElementById('roster-district'), DISTRICTS, 'All regions');
-  document.getElementById('roster-district').firstChild && (document.getElementById('roster-district').value='');
-  fillSelect(document.getElementById('enum-district'), DISTRICTS, '—');
+  const regions = regionsFor(selectedCountry);
+  document.getElementById('region-datalist').innerHTML = regions.map(r=>`<option value="${esc(r)}">`).join('');
+  const knownRegions = new Set([...regions, ...data.enumerators.map(e=>e.District).filter(Boolean)]);
+  fillSelect(document.getElementById('roster-district'), [...knownRegions].sort(), 'All regions');
   fillSelect(document.getElementById('enum-status'), STATUSES);
-  fillSelect(document.getElementById('assign-location'), DISTRICTS, '—');
   fillSelect(document.getElementById('assign-status'), ASSIGNMENT_STATUSES);
 
   document.getElementById('roster-status-pills').innerHTML =
@@ -469,7 +555,7 @@ window.fabClick = function(){
 window.saveSyncSettings = function(){
   syncCfg.url = document.getElementById('gas-url').value.trim();
   syncCfg.token = document.getElementById('gas-token').value.trim();
-  localStorage.setItem('em_sync', JSON.stringify(syncCfg));
+  localStorage.setItem(syncKey(), JSON.stringify(syncCfg));
   updateSyncBadge();
 };
 function updateSyncBadge(){
@@ -493,13 +579,15 @@ window.copyScript = function(){
 };
 
 function loadCache(){
+  data = { enumerators: [], assignments: [], attendance: [] };
+  lastSynced = null;
   try{
-    const c = JSON.parse(localStorage.getItem('em_cache')||'null');
+    const c = JSON.parse(localStorage.getItem(cacheKey())||'null');
     if(c){ data.enumerators=c.enumerators||[]; data.assignments=c.assignments||[]; data.attendance=c.attendance||[]; lastSynced=c.syncedAt?new Date(c.syncedAt):null; }
   }catch(_){}
 }
 function saveCache(){
-  localStorage.setItem('em_cache', JSON.stringify({...data, syncedAt: lastSynced ? lastSynced.toISOString() : null}));
+  localStorage.setItem(cacheKey(), JSON.stringify({...data, syncedAt: lastSynced ? lastSynced.toISOString() : null}));
 }
 
 window.fetchAll = async function(silent){
@@ -801,9 +889,22 @@ function updateRow_(ss,sheetName,data){const sh=getOrCreateSheet_(ss,sheetName);
 function upsertAttendance_(ss,data){const sh=getOrCreateSheet_(ss,'Attendance');const headers=SHEETS.Attendance;const last=sh.getLastRow();let rowIdx=-1;if(last>=2){const rows=sh.getRange(2,1,last-1,headers.length).getValues();for(let i=0;i<rows.length;i++){const eid=rows[i][headers.indexOf('EnumeratorID')];const dt=rows[i][headers.indexOf('Date')];const dtStr=dt instanceof Date?Utilities.formatDate(dt,Session.getScriptTimeZone(),'yyyy-MM-dd'):dt;if(String(eid)===String(data.EnumeratorID)&&dtStr===data.Date){rowIdx=i+2;break;}}}const values=headers.map(h=>data[h]!==undefined?data[h]:'');if(rowIdx===-1){sh.appendRow(values);}else{sh.getRange(rowIdx,1,1,headers.length).setValues([values]);}return{status:'ok'};}
 function doPost(e){try{const d=JSON.parse(e.postData.contents);if(!checkToken_(d))return respond_({status:'error',msg:'Invalid token'});const ss=SpreadsheetApp.getActiveSpreadsheet();switch(d.action){case'addEnumerator':return respond_(addRow_(ss,'Enumerators',d.data));case'updateEnumerator':return respond_(updateRow_(ss,'Enumerators',d.data));case'addAssignment':return respond_(addRow_(ss,'Assignments',d.data));case'updateAssignment':return respond_(updateRow_(ss,'Assignments',d.data));case'logAttendance':return respond_(upsertAttendance_(ss,d.data));default:return respond_({status:'error',msg:'Unknown action: '+d.action});}}catch(err){return respond_({status:'error',msg:err.message});}}`;
 
-// ── Boot: restore session ──
+// ── Boot: restore country + session ──
+const storedCountry = localStorage.getItem('em_selected_country');
 const savedRole = sessionStorage.getItem('em_role');
-if(savedRole) enterApp(savedRole);
+if(storedCountry && getCountries().includes(storedCountry)){
+  selectedCountry = storedCountry;
+  loadSyncCfg();
+  document.getElementById('lg-country-label').textContent = storedCountry;
+  if(savedRole){
+    enterApp(savedRole);
+  } else {
+    document.getElementById('scr-country').classList.remove('on');
+    document.getElementById('scr-login').classList.add('on');
+  }
+} else {
+  renderCountryScreen();
+}
 </script>
 </body>
 </html>
