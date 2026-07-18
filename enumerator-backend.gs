@@ -30,7 +30,7 @@
 //    (pencil) > New version, so the live /exec URL picks up the change.
 
 const SHEETS = {
-  Enumerators: ['ID', 'Name', 'Gender', 'Phone', 'Email', 'District', 'Status', 'DateAdded', 'Notes'],
+  Enumerators: ['ID', 'Name', 'Phone1', 'Phone2', 'Phone3', 'Email', 'District', 'Status', 'Rating', 'PendingReview', 'DateAdded', 'Notes'],
   Assignments: ['ID', 'EnumeratorID', 'EnumeratorName', 'Location', 'Project', 'Team', 'StartDate', 'EndDate', 'Status', 'Notes'],
   Attendance: ['ID', 'EnumeratorID', 'EnumeratorName', 'Date', 'Status', 'Submissions', 'Notes', 'LoggedAt']
 };
@@ -102,6 +102,7 @@ function doPost(e) {
     switch (d.action) {
       case 'addEnumerator': return respond_(addRow_(ss, 'Enumerators', d.data));
       case 'updateEnumerator': return respond_(updateRow_(ss, 'Enumerators', d.data));
+      case 'bulkUpsertEnumerators': return respond_(bulkUpsertEnumerators_(ss, d.data));
       case 'addAssignment': return respond_(addRow_(ss, 'Assignments', d.data));
       case 'updateAssignment': return respond_(updateRow_(ss, 'Assignments', d.data));
       case 'logAttendance': return respond_(upsertAttendance_(ss, d.data));
@@ -131,6 +132,25 @@ function updateRow_(ss, sheetName, data) {
   const values = headers.map(h => data[h] !== undefined ? data[h] : sh.getRange(rowIdx, headers.indexOf(h) + 1).getValue());
   sh.getRange(rowIdx, 1, 1, headers.length).setValues([values]);
   return { status: 'ok' };
+}
+
+// Bulk roster upload: each item in `list` is upserted by ID (present ->
+// update that row, absent -> append). The app assigns IDs client-side before
+// sending, since it already needs the current roster loaded to do the
+// phone/email matching that decides new vs. existing.
+function bulkUpsertEnumerators_(ss, list) {
+  const sh = getOrCreateSheet_(ss, 'Enumerators');
+  const headers = SHEETS.Enumerators;
+  (list || []).forEach(data => {
+    const rowIdx = findRowIndexById_(sh, data.ID);
+    const values = headers.map(h => data[h] !== undefined ? data[h] : '');
+    if (rowIdx === -1) {
+      sh.appendRow(values);
+    } else {
+      sh.getRange(rowIdx, 1, 1, headers.length).setValues([values]);
+    }
+  });
+  return { status: 'ok', count: (list || []).length };
 }
 
 // Attendance is one row per enumerator per day — logging again for the same

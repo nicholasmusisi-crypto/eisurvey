@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Enumerator Management — E!Survey</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -169,6 +170,14 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 .attend-pill.on-Late{background:var(--al);color:var(--a);border-color:var(--a)}
 .attend-pill.on-Excused{background:var(--bl);color:var(--b);border-color:var(--b)}
 .subs-input{width:52px !important;padding:5px 6px !important;font-size:12px !important;text-align:center;flex-shrink:0}
+
+.star-row{display:flex;gap:4px;font-size:28px;line-height:1;user-select:none}
+.star-row .star{color:var(--bd2);cursor:pointer}
+.star-row .star.on{color:var(--a)}
+.star-row.readonly .star{cursor:default}
+.mini-stars{color:var(--a);font-size:11px;letter-spacing:1px}
+.pending-note{font-size:12px;color:var(--a);background:var(--al);border-radius:var(--rs);padding:9px 11px;margin-top:10px;line-height:1.5}
+.upload-row{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -268,8 +277,17 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 
     <!-- Roster -->
     <div class="pg" id="pg-roster">
+      <div class="card" id="roster-upload-card" style="display:none">
+        <div class="ct">Add enumerators</div>
+        <div class="upload-row">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('roster-upload-input').click()">Upload sheet (.xlsx/.csv)</button>
+          <button class="btn btn-primary btn-sm" onclick="openEnumeratorModal(null)">+ Add one</button>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.5">Matched by phone or email — anyone already on the roster gets updated, anyone new gets added with an auto-generated ID. Expected columns: Name, Phone1/Phone2/Phone3 (or just Phone), Email, Region, Status, Rating, Notes — extra or missing columns are fine.</div>
+        <input type="file" id="roster-upload-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleRosterUpload(this)">
+      </div>
       <div class="filter-bar">
-        <input type="text" id="roster-search" placeholder="Search name or phone…" oninput="renderRoster()">
+        <input type="text" id="roster-search" placeholder="Search name, ID or phone…" oninput="renderRoster()">
         <select id="roster-district" onchange="renderRoster()"><option value="">All regions</option></select>
       </div>
       <div class="filter-pills" id="roster-status-pills"></div>
@@ -333,18 +351,24 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
     <button class="modal-close" onclick="closeModal('modal-enum-bg')">&times;</button>
     <h2 id="enum-modal-title">Add enumerator</h2>
     <input type="hidden" id="enum-id">
+    <div id="enum-id-display" style="font-size:11px;color:var(--t3);margin-bottom:10px;display:none">ID: <b id="enum-id-text"></b></div>
     <label class="flbl">Full name</label>
     <input type="text" id="enum-name" placeholder="Full name">
-    <label class="flbl">Gender</label>
-    <select id="enum-gender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
-    <label class="flbl">Phone</label>
-    <input type="tel" id="enum-phone" placeholder="Phone number">
+    <label class="flbl">Phone 1 (primary)</label>
+    <input type="tel" id="enum-phone1" placeholder="Phone number">
+    <label class="flbl">Phone 2 <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+    <input type="tel" id="enum-phone2" placeholder="Phone number">
+    <label class="flbl">Phone 3 <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+    <input type="tel" id="enum-phone3" placeholder="Phone number">
     <label class="flbl">Email</label>
     <input type="email" id="enum-email" placeholder="name@example.com">
     <label class="flbl">Region</label>
     <input type="text" id="enum-district" list="region-datalist" placeholder="Region/District">
     <label class="flbl">Status</label>
     <select id="enum-status"></select>
+    <label class="flbl">Performance rating</label>
+    <div class="star-row" id="enum-rating-stars"></div>
+    <div class="pending-note" id="enum-pending-note" style="display:none">Performance review pending for the last completed assignment — updating the rating reactivates this enumerator to Active.</div>
     <label class="flbl">Notes</label>
     <textarea id="enum-notes" placeholder="Optional notes"></textarea>
     <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="saveEnumerator()">Save</button>
@@ -381,7 +405,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { ORG_NAME, APP_TITLE, ADMIN_PIN, STATUSES, ASSIGNMENT_STATUSES, ATTENDANCE_STATUSES, COUNTRIES, REGIONS_BY_COUNTRY } from './enumerator-config.js';
+import { ORG_NAME, APP_TITLE, ADMIN_PIN, STATUSES, ASSIGNMENT_STATUSES, ATTENDANCE_STATUSES, COUNTRIES, REGIONS_BY_COUNTRY, COUNTRY_CODES } from './enumerator-config.js';
 
 document.title = APP_TITLE + ' — E!Survey';
 document.getElementById('lg-title').textContent = APP_TITLE;
@@ -409,6 +433,7 @@ let lastSynced = null;
 let pollTimer = null;
 let rosterStatusFilter = '';
 let assignStatusFilter = '';
+let currentRatingSelection = 0;
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(()=>el.classList.remove('show'),2400); }
@@ -417,6 +442,41 @@ function todayStr(){ return new Date().toISOString().slice(0,10); }
 function fillSelect(sel, options, placeholder){
   sel.innerHTML = (placeholder!==undefined ? `<option value="">${esc(placeholder)}</option>` : '') + options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
 }
+function fillEnumSelect(sel, selectedId){
+  sel.innerHTML = '<option value="">—</option>' + data.enumerators.map(e=>`<option value="${esc(e.ID)}">${esc(e.ID)} · ${esc(e.Name)}</option>`).join('');
+  sel.value = selectedId || '';
+}
+
+// ── Enumerator IDs: {country code}0001, sequence continues per country ──
+function countryCode(country){
+  if(COUNTRY_CODES[country]) return COUNTRY_CODES[country];
+  const words = (country||'').trim().split(/\s+/);
+  if(words.length>1) return (words[0][0]+words[1][0]).toUpperCase();
+  return (country||'XX').slice(0,2).toUpperCase();
+}
+function genEnumeratorId(list){
+  const prefix = countryCode(selectedCountry);
+  let max = 0;
+  (list || data.enumerators).forEach(e=>{
+    if(e.ID && e.ID.indexOf(prefix)===0){
+      const n = parseInt(e.ID.slice(prefix.length), 10);
+      if(!isNaN(n) && n>max) max = n;
+    }
+  });
+  return prefix + String(max+1).padStart(4,'0');
+}
+
+// ── Star rating widget ──
+function renderStars(container, value, editable){
+  container.className = 'star-row' + (editable ? '' : ' readonly');
+  container.innerHTML = [1,2,3,4,5].map(n=>
+    `<span class="star ${n<=value?'on':''}" ${editable?`onclick="setStarRating(${n})"`:''}>${n<=value?'★':'☆'}</span>`
+  ).join('');
+}
+window.setStarRating = function(n){
+  currentRatingSelection = n;
+  renderStars(document.getElementById('enum-rating-stars'), currentRatingSelection, true);
+};
 
 // ── Country ──
 function getCountries(){
@@ -499,6 +559,7 @@ function enterApp(role){
   document.getElementById('settings-country-label').textContent = selectedCountry;
   document.getElementById('settings-country-label2').textContent = selectedCountry;
   document.getElementById('tab-settings-btn').style.display = role==='admin' ? '' : 'none';
+  document.getElementById('roster-upload-card').style.display = role==='admin' ? 'block' : 'none';
   document.getElementById('fab-add').style.display = 'none'; // shown per-tab by switchTab()
   loadCache();
   initDropdowns();
@@ -652,11 +713,8 @@ function renderAll(){
 // ── Dashboard ──
 function renderDashboard(){
   const e = data.enumerators;
-  const activeEnums = e.filter(x=>x.Status==='Active');
-  const activeIds = new Set(activeEnums.map(x=>x.ID));
-  const deployedIds = new Set(data.assignments.filter(a=>a.Status==='Active' && activeIds.has(a.EnumeratorID)).map(a=>a.EnumeratorID));
-  document.getElementById('st-active').textContent = activeEnums.length;
-  document.getElementById('st-deployed').textContent = deployedIds.size;
+  document.getElementById('st-active').textContent = e.filter(x=>x.Status==='Active').length;
+  document.getElementById('st-deployed').textContent = e.filter(x=>x.Status==='Deployed').length;
   document.getElementById('st-suspended').textContent = e.filter(x=>x.Status==='Suspended').length;
   document.getElementById('st-terminated').textContent = e.filter(x=>x.Status==='Terminated').length;
 
@@ -684,6 +742,7 @@ function renderDashboard(){
 // ── Roster ──
 function statusBadgeClass(s){
   if(s==='Active') return 'ok';
+  if(s==='Deployed') return 'info';
   if(s==='Suspended') return 'warn';
   if(s==='Terminated') return 'red';
   return 'grey';
@@ -694,22 +753,28 @@ function renderRoster(){
   let list = data.enumerators.filter(e=>{
     if(rosterStatusFilter && e.Status!==rosterStatusFilter) return false;
     if(district && e.District!==district) return false;
-    if(q && !((e.Name||'').toLowerCase().includes(q) || (e.Phone||'').toLowerCase().includes(q))) return false;
+    if(q && !((e.Name||'').toLowerCase().includes(q) || (e.ID||'').toLowerCase().includes(q) ||
+        (e.Phone1||'').toLowerCase().includes(q) || (e.Phone2||'').toLowerCase().includes(q) || (e.Phone3||'').toLowerCase().includes(q))) return false;
     return true;
   });
   const el = document.getElementById('roster-list');
   if(!list.length){ el.innerHTML = emptyState('No enumerators found'); return; }
-  el.innerHTML = list.map(e=>`
+  el.innerHTML = list.map(e=>{
+    const rating = Number(e.Rating)||0;
+    return `
     <div class="row-item" onclick="openEnumeratorModal('${esc(e.ID)}')">
       <div class="ri-main">
-        <div class="ri-title">${esc(e.Name||'Unnamed')}</div>
+        <div class="ri-title">${esc(e.ID||'')} · ${esc(e.Name||'Unnamed')}</div>
         <div class="ri-meta">
           <span class="badge ${statusBadgeClass(e.Status)}">${esc(e.Status||'—')}</span>
+          ${e.PendingReview==='Yes' ? '<span class="badge warn">Review due</span>' : ''}
           ${e.District ? `<span>${esc(e.District)}</span>` : ''}
-          ${e.Phone ? `<span>${esc(e.Phone)}</span>` : ''}
+          ${e.Phone1 ? `<span>${esc(e.Phone1)}</span>` : ''}
+          ${rating>0 ? `<span class="mini-stars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>` : ''}
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 window.openEnumeratorModal = function(id){
@@ -717,15 +782,21 @@ window.openEnumeratorModal = function(id){
   const e = id ? data.enumerators.find(x=>x.ID===id) : null;
   document.getElementById('enum-modal-title').textContent = e ? 'Edit enumerator' : 'Add enumerator';
   document.getElementById('enum-id').value = e ? e.ID : '';
+  document.getElementById('enum-id-display').style.display = e ? 'block' : 'none';
+  document.getElementById('enum-id-text').textContent = e ? e.ID : '';
   document.getElementById('enum-name').value = e ? e.Name||'' : '';
-  document.getElementById('enum-gender').value = e ? e.Gender||'' : '';
-  document.getElementById('enum-phone').value = e ? e.Phone||'' : '';
+  document.getElementById('enum-phone1').value = e ? e.Phone1||'' : '';
+  document.getElementById('enum-phone2').value = e ? e.Phone2||'' : '';
+  document.getElementById('enum-phone3').value = e ? e.Phone3||'' : '';
   document.getElementById('enum-email').value = e ? e.Email||'' : '';
   document.getElementById('enum-district').value = e ? e.District||'' : '';
   document.getElementById('enum-status').value = e ? e.Status||STATUSES[0] : STATUSES[0];
   document.getElementById('enum-notes').value = e ? e.Notes||'' : '';
   const readOnly = currentRole!=='admin';
-  ['enum-name','enum-gender','enum-phone','enum-email','enum-district','enum-status','enum-notes'].forEach(id2=>{
+  currentRatingSelection = e && e.Rating ? Number(e.Rating) : 0;
+  renderStars(document.getElementById('enum-rating-stars'), currentRatingSelection, !readOnly);
+  document.getElementById('enum-pending-note').style.display = (e && e.PendingReview==='Yes') ? 'block' : 'none';
+  ['enum-name','enum-phone1','enum-phone2','enum-phone3','enum-email','enum-district','enum-status','enum-notes'].forEach(id2=>{
     document.getElementById(id2).disabled = readOnly;
   });
   document.querySelector('#modal-enum-bg .btn-primary').style.display = readOnly ? 'none' : '';
@@ -735,17 +806,31 @@ window.openEnumeratorModal = function(id){
 window.saveEnumerator = async function(){
   const name = document.getElementById('enum-name').value.trim();
   if(!name){ toast('Enter a name'); return; }
-  const id = document.getElementById('enum-id').value || genId('E');
-  const isNew = !document.getElementById('enum-id').value;
+  const idVal = document.getElementById('enum-id').value;
+  const isNew = !idVal;
+  const existing = isNew ? null : data.enumerators.find(x=>x.ID===idVal);
+  const id = idVal || genEnumeratorId();
+  const newRating = String(currentRatingSelection || '');
+  let status = document.getElementById('enum-status').value;
+  let pendingReview = existing ? existing.PendingReview||'' : '';
+  // Reactivate: a Deployed-with-pending-review enumerator flips back to Active
+  // the moment their rating actually changes (see STATUSES comment in config).
+  if(existing && existing.PendingReview==='Yes' && existing.Status==='Deployed' && newRating!=='' && newRating!==String(existing.Rating||'')){
+    status = 'Active';
+    pendingReview = '';
+  }
   const obj = {
     ID: id,
     Name: name,
-    Gender: document.getElementById('enum-gender').value,
-    Phone: document.getElementById('enum-phone').value.trim(),
+    Phone1: document.getElementById('enum-phone1').value.trim(),
+    Phone2: document.getElementById('enum-phone2').value.trim(),
+    Phone3: document.getElementById('enum-phone3').value.trim(),
     Email: document.getElementById('enum-email').value.trim(),
     District: document.getElementById('enum-district').value,
-    Status: document.getElementById('enum-status').value,
-    DateAdded: isNew ? todayStr() : (data.enumerators.find(x=>x.ID===id)||{}).DateAdded || todayStr(),
+    Status: status,
+    Rating: newRating,
+    PendingReview: pendingReview,
+    DateAdded: existing ? existing.DateAdded || todayStr() : todayStr(),
     Notes: document.getElementById('enum-notes').value.trim()
   };
   if(isNew) data.enumerators.unshift(obj);
@@ -755,6 +840,105 @@ window.saveEnumerator = async function(){
   closeModal('modal-enum-bg');
   toast(isNew ? 'Enumerator added' : 'Enumerator updated');
   await postWrite({ action: isNew ? 'addEnumerator' : 'updateEnumerator', data: obj });
+};
+
+// ── Bulk roster upload ──
+async function postBulkWrite(list){
+  if(!syncCfg.url){ toast('Configure the Apps Script URL in Settings first'); return false; }
+  try{
+    await fetch(syncCfg.url, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ action:'bulkUpsertEnumerators', data:list, token: syncCfg.token || '' })
+    });
+    setTimeout(()=>fetchAll(true), 2000);
+    return true;
+  }catch(_){ toast('Could not reach Google Sheets — check connection'); return false; }
+}
+
+function normHeader(h){ return String(h).toLowerCase().replace(/[^a-z0-9]/g,''); }
+function pickField(rowNorm, keys){
+  for(const k of keys){ if(rowNorm[k]!==undefined && String(rowNorm[k]).trim()!=='') return String(rowNorm[k]).trim(); }
+  return '';
+}
+// Digits-only comparison — spreadsheet tools routinely turn "+256700111222"
+// into the bare number 256700111222 (losing the +), so an exact-string phone
+// match would silently miss real duplicates and create new entries instead.
+function normPhone(p){ return String(p||'').replace(/[^0-9]/g,''); }
+function findExistingEnumerator(email, phones, list){
+  const phoneSet = phones.filter(Boolean).map(normPhone).filter(Boolean);
+  return list.find(e=>{
+    if(email && e.Email && e.Email.toLowerCase()===email.toLowerCase()) return true;
+    return [e.Phone1,e.Phone2,e.Phone3].map(normPhone).filter(Boolean).some(p=>phoneSet.includes(p));
+  }) || null;
+}
+// Matches each uploaded row to an existing enumerator by email/phone (update)
+// or generates a fresh ID for it (add). workingList grows as new rows are
+// assigned IDs so a batch of brand-new rows gets sequential IDs, not
+// duplicates.
+function mergeRosterRows(rows){
+  const workingList = data.enumerators.map(e=>({...e}));
+  const out = [];
+  rows.forEach(raw=>{
+    const rowNorm = {};
+    Object.keys(raw).forEach(h=>{ rowNorm[normHeader(h)] = raw[h]; });
+    const name = pickField(rowNorm, ['name','fullname','enumeratorname']);
+    if(!name) return;
+    const email = pickField(rowNorm, ['email','emailaddress']);
+    const phone1 = pickField(rowNorm, ['phone1','phonenumber1','phone','primaryphone','mobile','phonenumber']);
+    const phone2 = pickField(rowNorm, ['phone2','phonenumber2','secondaryphone']);
+    const phone3 = pickField(rowNorm, ['phone3','phonenumber3']);
+    const district = pickField(rowNorm, ['district','region']);
+    const notes = pickField(rowNorm, ['notes','comment','comments']);
+    const statusRaw = pickField(rowNorm, ['status']);
+    const ratingRaw = pickField(rowNorm, ['rating','score']);
+
+    const existing = findExistingEnumerator(email, [phone1,phone2,phone3], workingList);
+    let obj;
+    if(existing){
+      obj = existing;
+    } else {
+      obj = { ID: genEnumeratorId(workingList), Status:'Active', Rating:'', PendingReview:'', DateAdded: todayStr(), District:'', Notes:'' };
+      workingList.push(obj);
+    }
+    obj.Name = name;
+    if(email) obj.Email = email;
+    if(phone1) obj.Phone1 = phone1;
+    if(phone2) obj.Phone2 = phone2;
+    if(phone3) obj.Phone3 = phone3;
+    if(district) obj.District = district;
+    if(notes) obj.Notes = notes;
+    if(statusRaw && STATUSES.includes(statusRaw)) obj.Status = statusRaw;
+    if(ratingRaw!=='' && !isNaN(Number(ratingRaw))) obj.Rating = String(Math.max(0,Math.min(5,Math.round(Number(ratingRaw)))));
+    out.push({...obj});
+  });
+  return out;
+}
+
+window.handleRosterUpload = function(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try{
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const sheetName = wb.SheetNames.find(n=>/enumerat|roster/i.test(n)) || wb.SheetNames[0];
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {defval:''});
+      const merged = mergeRosterRows(rows);
+      if(!merged.length){ toast('No usable rows found (need at least a name)'); input.value=''; return; }
+      let added=0, updated=0;
+      merged.forEach(r=>{
+        const idx = data.enumerators.findIndex(x=>x.ID===r.ID);
+        if(idx>-1){ data.enumerators[idx]=r; updated++; } else { data.enumerators.unshift(r); added++; }
+      });
+      saveCache();
+      renderAll();
+      toast(`Uploaded: ${added} added, ${updated} updated`);
+      await postBulkWrite(merged);
+    }catch(err){ toast('Could not read that file'); }
+    input.value = '';
+  };
+  reader.readAsArrayBuffer(file);
 };
 
 // ── Assignments ──
@@ -785,10 +969,9 @@ function renderAssignments(){
 
 window.openAssignmentModal = function(id){
   const a = id ? data.assignments.find(x=>x.ID===id) : null;
-  fillSelect(document.getElementById('assign-enum'), data.enumerators.map(e=>e.Name), '—');
+  fillEnumSelect(document.getElementById('assign-enum'), a ? a.EnumeratorID : '');
   document.getElementById('assign-modal-title').textContent = a ? 'Edit assignment' : 'New assignment';
   document.getElementById('assign-id').value = a ? a.ID : '';
-  document.getElementById('assign-enum').value = a ? a.EnumeratorName||'' : '';
   document.getElementById('assign-location').value = a ? a.Location||'' : '';
   document.getElementById('assign-project').value = a ? a.Project||'' : '';
   document.getElementById('assign-team').value = a ? a.Team||'' : '';
@@ -804,16 +987,41 @@ window.openAssignmentModal = function(id){
   openModal('modal-assign-bg');
 };
 
+// Deployment auto-updates the enumerator's own status: Active assignment ->
+// Deployed; Completed -> stays Deployed with a pending-review flag until a
+// rating is entered (see saveEnumerator); Cancelled -> back to Active right
+// away (no review needed). Returns the updated enumerator object if changed.
+function applyAssignmentEffect(assignment){
+  const idx = data.enumerators.findIndex(x=>x.ID===assignment.EnumeratorID);
+  if(idx===-1) return null;
+  const en = data.enumerators[idx];
+  if(assignment.Status==='Active' && en.Status!=='Deployed'){
+    en.Status = 'Deployed';
+    return en;
+  }
+  if(assignment.Status==='Completed' && en.Status==='Deployed' && en.PendingReview!=='Yes'){
+    en.PendingReview = 'Yes';
+    return en;
+  }
+  if(assignment.Status==='Cancelled' && en.Status==='Deployed'){
+    en.Status = 'Active';
+    en.PendingReview = '';
+    return en;
+  }
+  return null;
+}
+
 window.saveAssignment = async function(){
-  const enumName = document.getElementById('assign-enum').value;
-  if(!enumName){ toast('Select an enumerator'); return; }
-  const enumObj = data.enumerators.find(e=>e.Name===enumName);
+  const enumId = document.getElementById('assign-enum').value;
+  if(!enumId){ toast('Select an enumerator'); return; }
+  const enumObj = data.enumerators.find(e=>e.ID===enumId);
+  if(!enumObj){ toast('Enumerator not found'); return; }
   const id = document.getElementById('assign-id').value || genId('A');
   const isNew = !document.getElementById('assign-id').value;
   const obj = {
     ID: id,
-    EnumeratorID: enumObj ? enumObj.ID : '',
-    EnumeratorName: enumName,
+    EnumeratorID: enumObj.ID,
+    EnumeratorName: enumObj.Name,
     Location: document.getElementById('assign-location').value,
     Project: document.getElementById('assign-project').value.trim(),
     Team: document.getElementById('assign-team').value.trim(),
@@ -824,17 +1032,19 @@ window.saveAssignment = async function(){
   };
   if(isNew) data.assignments.unshift(obj);
   else { const idx=data.assignments.findIndex(x=>x.ID===id); if(idx>-1) data.assignments[idx]=obj; }
+  const affectedEnum = applyAssignmentEffect(obj);
   saveCache();
   renderAll();
   closeModal('modal-assign-bg');
   toast(isNew ? 'Assignment added' : 'Assignment updated');
   await postWrite({ action: isNew ? 'addAssignment' : 'updateAssignment', data: obj });
+  if(affectedEnum) await postWrite({ action:'updateEnumerator', data: affectedEnum });
 };
 
 // ── Attendance ──
 function renderAttendance(){
   const date = document.getElementById('attend-date').value || todayStr();
-  const eligible = data.enumerators.filter(e=>e.Status==='Active');
+  const eligible = data.enumerators.filter(e=>e.Status==='Active' || e.Status==='Deployed');
   const el = document.getElementById('attend-list');
   if(!eligible.length){ el.innerHTML = emptyState('No active enumerators yet'); return; }
   const readOnly = currentRole!=='admin';
@@ -887,7 +1097,7 @@ function emptyState(msg){
 
 const GAS_SCRIPT = `// See enumerator-backend.gs in the repo for the fully commented version + setup steps.
 const SHEETS = {
-  Enumerators: ['ID','Name','Gender','Phone','Email','District','Status','DateAdded','Notes'],
+  Enumerators: ['ID','Name','Phone1','Phone2','Phone3','Email','District','Status','Rating','PendingReview','DateAdded','Notes'],
   Assignments: ['ID','EnumeratorID','EnumeratorName','Location','Project','Team','StartDate','EndDate','Status','Notes'],
   Attendance: ['ID','EnumeratorID','EnumeratorName','Date','Status','Submissions','Notes','LoggedAt']
 };
@@ -899,8 +1109,9 @@ function doGet(e){const action=(e.parameter&&e.parameter.action)||'ping';const s
 function respond_(o){return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);}
 function addRow_(ss,sheetName,data){const sh=getOrCreateSheet_(ss,sheetName);const headers=SHEETS[sheetName];sh.appendRow(headers.map(h=>data[h]!==undefined?data[h]:''));return{status:'ok'};}
 function updateRow_(ss,sheetName,data){const sh=getOrCreateSheet_(ss,sheetName);const headers=SHEETS[sheetName];const rowIdx=findRowIndexById_(sh,data.ID);if(rowIdx===-1)return{status:'error',msg:'ID not found: '+data.ID};const values=headers.map(h=>data[h]!==undefined?data[h]:sh.getRange(rowIdx,headers.indexOf(h)+1).getValue());sh.getRange(rowIdx,1,1,headers.length).setValues([values]);return{status:'ok'};}
+function bulkUpsertEnumerators_(ss,list){const sh=getOrCreateSheet_(ss,'Enumerators');const headers=SHEETS.Enumerators;(list||[]).forEach(data=>{const rowIdx=findRowIndexById_(sh,data.ID);const values=headers.map(h=>data[h]!==undefined?data[h]:'');if(rowIdx===-1){sh.appendRow(values);}else{sh.getRange(rowIdx,1,1,headers.length).setValues([values]);}});return{status:'ok',count:(list||[]).length};}
 function upsertAttendance_(ss,data){const sh=getOrCreateSheet_(ss,'Attendance');const headers=SHEETS.Attendance;const last=sh.getLastRow();let rowIdx=-1;if(last>=2){const rows=sh.getRange(2,1,last-1,headers.length).getValues();for(let i=0;i<rows.length;i++){const eid=rows[i][headers.indexOf('EnumeratorID')];const dt=rows[i][headers.indexOf('Date')];const dtStr=dt instanceof Date?Utilities.formatDate(dt,Session.getScriptTimeZone(),'yyyy-MM-dd'):dt;if(String(eid)===String(data.EnumeratorID)&&dtStr===data.Date){rowIdx=i+2;break;}}}const values=headers.map(h=>data[h]!==undefined?data[h]:'');if(rowIdx===-1){sh.appendRow(values);}else{sh.getRange(rowIdx,1,1,headers.length).setValues([values]);}return{status:'ok'};}
-function doPost(e){try{const d=JSON.parse(e.postData.contents);if(!checkToken_(d))return respond_({status:'error',msg:'Invalid token'});const ss=SpreadsheetApp.getActiveSpreadsheet();switch(d.action){case'addEnumerator':return respond_(addRow_(ss,'Enumerators',d.data));case'updateEnumerator':return respond_(updateRow_(ss,'Enumerators',d.data));case'addAssignment':return respond_(addRow_(ss,'Assignments',d.data));case'updateAssignment':return respond_(updateRow_(ss,'Assignments',d.data));case'logAttendance':return respond_(upsertAttendance_(ss,d.data));default:return respond_({status:'error',msg:'Unknown action: '+d.action});}}catch(err){return respond_({status:'error',msg:err.message});}}`;
+function doPost(e){try{const d=JSON.parse(e.postData.contents);if(!checkToken_(d))return respond_({status:'error',msg:'Invalid token'});const ss=SpreadsheetApp.getActiveSpreadsheet();switch(d.action){case'addEnumerator':return respond_(addRow_(ss,'Enumerators',d.data));case'updateEnumerator':return respond_(updateRow_(ss,'Enumerators',d.data));case'bulkUpsertEnumerators':return respond_(bulkUpsertEnumerators_(ss,d.data));case'addAssignment':return respond_(addRow_(ss,'Assignments',d.data));case'updateAssignment':return respond_(updateRow_(ss,'Assignments',d.data));case'logAttendance':return respond_(upsertAttendance_(ss,d.data));default:return respond_({status:'error',msg:'Unknown action: '+d.action});}}catch(err){return respond_({status:'error',msg:err.message});}}`;
 
 // ── Boot: restore country + session ──
 const storedCountry = localStorage.getItem('em_selected_country');

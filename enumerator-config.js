@@ -28,7 +28,11 @@ export const APP_TITLE = "E!EMS";
 export const ADMIN_PIN = "3040";
 
 // Enumerator status options, in the order they appear in dropdowns/filters.
-export const STATUSES = ["Active", "Suspended", "Terminated"];
+// "Deployed" is set automatically when an enumerator is put on an Active
+// assignment, and reverts to "Active" automatically once that assignment is
+// completed AND a performance rating has been entered for them — it can also
+// still be set by hand here if needed.
+export const STATUSES = ["Active", "Deployed", "Suspended", "Terminated"];
 
 // Assignment (deployment) status options.
 export const ASSIGNMENT_STATUSES = ["Planned", "Active", "Completed", "Cancelled"];
@@ -39,6 +43,11 @@ export const ATTENDANCE_STATUSES = ["Present", "Absent", "Late", "Excused"];
 // Countries offered on the picker screen shown when the app opens. Add more
 // here to make them available on every device by default (see note above).
 export const COUNTRIES = ["Uganda", "Kenya", "Tanzania", "Rwanda"];
+
+// Country codes used to build Enumerator IDs, e.g. Uganda -> "UG0001". A
+// country not listed here (including ones added via "Add a country" on the
+// picker) gets a code derived automatically from its name instead.
+export const COUNTRY_CODES = { Uganda: "UG", Kenya: "KE", Tanzania: "TZ", Rwanda: "RW" };
 
 // Region/district options per country, offered as suggestions on the Region
 // field (typing a name not in the list is still allowed). A country with no
