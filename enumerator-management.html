@@ -891,9 +891,9 @@ function mergeRosterRows(rows){
     if(!name) return;
     const gender = pickField(rowNorm, ['gender','sex']);
     const email = pickField(rowNorm, ['email','emailaddress']);
-    const phone1 = pickField(rowNorm, ['phone1','phonenumber1','phone','primaryphone','mobile','phonenumber']);
-    const phone2 = pickField(rowNorm, ['phone2','phonenumber2','secondaryphone']);
-    const phone3 = pickField(rowNorm, ['phone3','phonenumber3']);
+    const phone1 = pickField(rowNorm, ['phone1','phonenumber1','phone','primaryphone','mobile','phonenumber','contact1','contact','contactnumber','contactnumber1','tel','telephone','cell','cellphone','mobilenumber']);
+    const phone2 = pickField(rowNorm, ['phone2','phonenumber2','secondaryphone','contact2','contactnumber2']);
+    const phone3 = pickField(rowNorm, ['phone3','phonenumber3','contact3','contactnumber3']);
     const district = pickField(rowNorm, ['district','region']);
     const notes = pickField(rowNorm, ['notes','comment','comments']);
     const statusRaw = pickField(rowNorm, ['status']);
