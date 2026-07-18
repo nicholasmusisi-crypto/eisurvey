@@ -16,7 +16,7 @@ export const APP_TITLE = "Enumerator Management";
 export const ADMIN_PIN = "3040";
 
 // Enumerator status options, in the order they appear in dropdowns/filters.
-export const STATUSES = ["Applicant", "In Training", "Active", "On Leave", "Inactive", "Terminated"];
+export const STATUSES = ["Active", "Suspended", "Terminated"];
 
 // Assignment (deployment) status options.
 export const ASSIGNMENT_STATUSES = ["Planned", "Active", "Completed", "Cancelled"];

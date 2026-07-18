@@ -82,6 +82,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sv{font-size:26px;font-weight:500}
 .sl{font-size:11px;color:var(--t3);margin-top:2px}
 
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.panel{border-radius:var(--rad);padding:16px}
+.panel .sv{font-size:30px;font-weight:700}
+.panel .sl{font-size:12px;font-weight:600;margin-top:3px;opacity:.85}
+.panel-active{background:var(--gl);color:var(--gd)}
+.panel-deployed{background:var(--bl);color:var(--b)}
+.panel-suspended{background:var(--al);color:var(--a)}
+.panel-terminated{background:var(--rl);color:var(--r)}
+
 input[type=text],input[type=number],input[type=date],input[type=tel],input[type=email],input[type=password],select,textarea{width:100%;padding:10px 12px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);color:var(--t);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(31,168,150,.15)}
 textarea{resize:vertical;min-height:60px;line-height:1.5}
@@ -207,11 +216,11 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
         <span style="font-size:11px;color:var(--t3)" id="sync-status">Not synced yet</span>
         <button class="btn btn-secondary btn-sm" onclick="fetchAll()">Refresh</button>
       </div>
-      <div class="stat-grid">
-        <div class="sc"><div class="sv" id="st-total">0</div><div class="sl">Total enumerators</div></div>
-        <div class="sc"><div class="sv" id="st-active">0</div><div class="sl">Active</div></div>
-        <div class="sc"><div class="sv" id="st-training">0</div><div class="sl">In training</div></div>
-        <div class="sc"><div class="sv" id="st-assign">0</div><div class="sl">Active assignments</div></div>
+      <div class="panel-grid">
+        <div class="panel panel-active"><div class="sv" id="st-active">0</div><div class="sl">Active enumerators</div></div>
+        <div class="panel panel-deployed"><div class="sv" id="st-deployed">0</div><div class="sl">Deployed (on assignment)</div></div>
+        <div class="panel panel-suspended"><div class="sv" id="st-suspended">0</div><div class="sl">Suspended</div></div>
+        <div class="panel panel-terminated"><div class="sv" id="st-terminated">0</div><div class="sl">Terminated</div></div>
       </div>
       <div class="card">
         <div class="ct">Today's attendance</div>
@@ -542,10 +551,13 @@ function renderAll(){
 // ── Dashboard ──
 function renderDashboard(){
   const e = data.enumerators;
-  document.getElementById('st-total').textContent = e.length;
-  document.getElementById('st-active').textContent = e.filter(x=>x.Status==='Active').length;
-  document.getElementById('st-training').textContent = e.filter(x=>x.Status==='In Training').length;
-  document.getElementById('st-assign').textContent = data.assignments.filter(a=>a.Status==='Active').length;
+  const activeEnums = e.filter(x=>x.Status==='Active');
+  const activeIds = new Set(activeEnums.map(x=>x.ID));
+  const deployedIds = new Set(data.assignments.filter(a=>a.Status==='Active' && activeIds.has(a.EnumeratorID)).map(a=>a.EnumeratorID));
+  document.getElementById('st-active').textContent = activeEnums.length;
+  document.getElementById('st-deployed').textContent = deployedIds.size;
+  document.getElementById('st-suspended').textContent = e.filter(x=>x.Status==='Suspended').length;
+  document.getElementById('st-terminated').textContent = e.filter(x=>x.Status==='Terminated').length;
 
   const today = todayStr();
   const todays = data.attendance.filter(a=>a.Date===today);
@@ -571,8 +583,8 @@ function renderDashboard(){
 // ── Roster ──
 function statusBadgeClass(s){
   if(s==='Active') return 'ok';
-  if(s==='In Training' || s==='Applicant') return 'info';
-  if(s==='On Leave') return 'warn';
+  if(s==='Suspended') return 'warn';
+  if(s==='Terminated') return 'red';
   return 'grey';
 }
 function renderRoster(){
@@ -721,7 +733,7 @@ window.saveAssignment = async function(){
 // ── Attendance ──
 function renderAttendance(){
   const date = document.getElementById('attend-date').value || todayStr();
-  const eligible = data.enumerators.filter(e=>e.Status!=='Inactive' && e.Status!=='Terminated' && e.Status!=='Applicant');
+  const eligible = data.enumerators.filter(e=>e.Status==='Active');
   const el = document.getElementById('attend-list');
   if(!eligible.length){ el.innerHTML = emptyState('No active enumerators yet'); return; }
   const readOnly = currentRole!=='admin';
