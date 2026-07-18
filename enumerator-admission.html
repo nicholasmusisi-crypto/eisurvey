@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Admission — E!EMS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAF9F6;--bg2:#F1EFE9;--bg3:#E4E2DA;
+  --t:#28271F;--t2:#6A6858;--t3:#A09E90;
+  --bd:rgba(40,39,31,.11);--bd2:rgba(40,39,31,.20);
+  --g:#8B1A1A;--gl:#F7DEDD;--gd:#5E0E0E;
+  --r:#D95640;--rl:#FAEAE6;
+  --b:#3E8FD6;--bl:#E0EEFA;
+  --a:#C67C15;--al:#FDF0D8;
+  --rad:14px;--rs:9px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1D1C18;--bg2:#252420;--bg3:#302F2A;
+  --t:#EDE8DF;--t2:#A9A799;--t3:#6E6C5E;
+  --bd:rgba(255,255,255,.09);--bd2:rgba(255,255,255,.17);
+  --gl:#4A1512;--gd:#EFA79E;
+  --rl:#4A1509;--r:#F09070;
+  --bl:#04294F;--b:#7AB5EA;
+  --al:#3F2100;--a:#F0A030;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--t);min-height:100vh}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.on{display:flex}
+
+#scr-gate{background:var(--gd);justify-content:center;align-items:center;padding:28px 20px}
+.login-wrap{width:100%;max-width:420px}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo h1{font-size:24px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.login-logo p{font-size:13px;color:rgba(255,255,255,.65);margin-top:5px}
+.pin-wrap{background:rgba(255,255,255,.1);border-radius:16px;padding:20px}
+.pin-wrap h3{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
+.pin-input-row{display:flex;gap:8px}
+.pin-input-row input{flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:16px;font-family:inherit;outline:none;text-align:center;letter-spacing:4px}
+.pin-input-row input::placeholder{letter-spacing:0;color:rgba(255,255,255,.4)}
+.btn-white{padding:10px 20px;border-radius:8px;border:none;background:#fff;color:var(--gd);font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0}
+.btn-white:active{opacity:.85}
+.pin-err{font-size:12px;color:#FFD9CC;margin-top:8px;display:none}
+.gate-note{background:rgba(255,255,255,.1);border-radius:16px;padding:20px;color:rgba(255,255,255,.85);font-size:13px;line-height:1.7;text-align:center}
+.gate-note a{color:#fff;font-weight:600}
+.back-link{color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;margin-top:14px;display:inline-block;text-align:center;width:100%}
+.back-link:active{color:#fff}
+
+.hdr{background:var(--gd);border-bottom:.5px solid var(--bd);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:50}
+.hdr-title{color:#fff;font-size:16px;font-weight:600}
+.hdr-sub{color:rgba(255,255,255,.65);font-size:11px;margin-top:1px;display:flex;align-items:center;gap:6px}
+.role-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.3px;text-transform:uppercase;background:rgba(255,255,255,.28);color:#fff}
+.hdr-link{padding:6px 12px;border-radius:8px;border:.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:500;cursor:pointer;text-decoration:none}
+.hdr-link:active{opacity:.8}
+
+.content{flex:1;overflow-y:auto;padding:14px;max-width:560px;margin:0 auto;width:100%}
+.card{background:var(--bg);border-radius:var(--rad);border:.5px solid var(--bd);padding:14px;margin-bottom:12px}
+.ct{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px}
+input[type=text],input[type=number],input[type=email],input[type=tel],input[type=password],select,textarea{width:100%;padding:10px 12px;border-radius:var(--rs);border:.5px solid var(--bd2);background:var(--bg2);color:var(--t);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(139,26,26,.15)}
+textarea{resize:vertical;min-height:56px;line-height:1.5}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236b6b66' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.flbl{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;margin-top:12px}
+.flbl:first-child{margin-top:0}
+.btn{padding:10px 18px;border-radius:var(--rs);border:none;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--g);color:#fff}
+.btn-primary:active{opacity:.82}
+.btn-secondary{background:var(--bg2);color:var(--t);border:.5px solid var(--bd2)}
+.btn-secondary:active{background:var(--bg3)}
+.btn-full{width:100%;justify-content:center}
+.btn-sm{padding:7px 13px;font-size:12px}
+.upload-row{display:flex;gap:8px;flex-wrap:wrap}
+.star-row{display:flex;gap:4px;font-size:28px;line-height:1;user-select:none}
+.star-row .star{color:var(--bd2);cursor:pointer}
+.star-row .star.on{color:var(--a)}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px}
+.badge.ok{background:var(--gl);color:var(--gd)}
+.badge.info{background:var(--bl);color:var(--b)}
+.recent-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--bd);font-size:13px}
+.recent-item:last-child{border-bottom:none}
+.recent-meta{font-size:11px;color:var(--t3)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--t);color:var(--bg);padding:9px 18px;border-radius:18px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:999;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
+</style>
+</head>
+<body>
+
+<!-- ════ GATE (no country / PIN) ════ -->
+<div id="scr-gate" class="screen on">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      <h1 id="lg-title">Admission</h1>
+      <p id="lg-sub">Educate! — Survey Ops</p>
+    </div>
+
+    <div id="gate-nocountry" style="display:none">
+      <div class="gate-note">No country is selected on this device yet. Open <a href="enumerator-management.html">E!EMS</a> first, pick your country, then come back here.</div>
+    </div>
+
+    <div id="gate-pin" style="display:none">
+      <div class="pin-wrap">
+        <h3>Evaluation Officer PIN — <span id="gate-country-label"></span></h3>
+        <div class="pin-input-row">
+          <input type="password" id="pin-input" placeholder="PIN" maxlength="10" onkeydown="if(event.key==='Enter')doPinLogin()">
+          <button class="btn-white" onclick="doPinLogin()">Go</button>
+        </div>
+        <div class="pin-err" id="pin-err">Incorrect PIN</div>
+      </div>
+      <span class="back-link" onclick="location.href='enumerator-management.html'">&larr; Back to E!EMS</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADMISSION ════ -->
+<div id="scr-admission" class="screen">
+  <div class="hdr">
+    <div>
+      <div class="hdr-title">Admission</div>
+      <div class="hdr-sub"><span id="hdr-org">Educate! — Survey Ops</span> <span class="role-badge" id="hdr-country-badge"></span></div>
+    </div>
+    <a class="hdr-link" href="enumerator-management.html">Roster →</a>
+  </div>
+
+  <div class="content">
+    <div class="card">
+      <div class="ct">Upload sheet</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px;line-height:1.5" id="sync-status">Loading current roster…</div>
+      <button class="btn btn-secondary btn-full" onclick="document.getElementById('upload-input').click()">Upload .xlsx / .csv</button>
+      <input type="file" id="upload-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleUpload(this)">
+      <div style="font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5">Matched by phone or email — existing enumerators get updated, new ones get an auto-generated ID. District/region names are auto-aligned to the closest known name for the country (e.g. "kampala " → "Kampala"). Expected columns: Name, Gender, Phone1/Phone2/Phone3 (or just Phone/Contact), Email, Region, Status, Rating, Notes — extra or missing columns are fine.</div>
+    </div>
+
+    <div class="card">
+      <div class="ct">Add one directly</div>
+      <label class="flbl">Full name</label>
+      <input type="text" id="f-name" placeholder="Full name">
+      <label class="flbl">Gender</label>
+      <select id="f-gender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
+      <label class="flbl">Phone 1 (primary)</label>
+      <input type="tel" id="f-phone1" placeholder="Phone number">
+      <label class="flbl">Phone 2 <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+      <input type="tel" id="f-phone2" placeholder="Phone number">
+      <label class="flbl">Phone 3 <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
+      <input type="tel" id="f-phone3" placeholder="Phone number">
+      <label class="flbl">Email</label>
+      <input type="email" id="f-email" placeholder="name@example.com">
+      <label class="flbl">Region</label>
+      <input type="text" id="f-district" list="region-datalist" placeholder="Region/District">
+      <label class="flbl">Status</label>
+      <select id="f-status"></select>
+      <label class="flbl">Performance rating</label>
+      <div class="star-row" id="f-rating-stars"></div>
+      <label class="flbl">Notes</label>
+      <textarea id="f-notes" placeholder="Optional notes"></textarea>
+      <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="submitOne()">Add enumerator</button>
+    </div>
+
+    <div class="card" id="recent-card" style="display:none">
+      <div class="ct">Added this session (<span id="recent-count">0</span>)</div>
+      <div id="recent-list"></div>
+    </div>
+  </div>
+</div>
+
+<datalist id="region-datalist"></datalist>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { ORG_NAME, ADMIN_PIN, STATUSES, COUNTRY_CODES, REGIONS_BY_COUNTRY } from './enumerator-config.js';
+
+document.getElementById('lg-sub').textContent = ORG_NAME;
+document.getElementById('hdr-org').textContent = ORG_NAME;
+
+let selectedCountry = localStorage.getItem('em_selected_country');
+let syncCfg = { url:'', token:'' };
+let enumerators = [];
+let recentlyAdded = [];
+let currentRatingSelection = 0;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(()=>el.classList.remove('show'),2600); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function fillSelect(sel, options, placeholder){
+  sel.innerHTML = (placeholder!==undefined ? `<option value="">${esc(placeholder)}</option>` : '') + options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+}
+function regionsFor(country){ return REGIONS_BY_COUNTRY[country] || []; }
+function cacheKey(){ return 'em_cache_' + selectedCountry; }
+function syncKey(){ return 'em_sync_' + selectedCountry; }
+
+function countryCode(country){
+  if(COUNTRY_CODES[country]) return COUNTRY_CODES[country];
+  const words = (country||'').trim().split(/\s+/);
+  if(words.length>1) return (words[0][0]+words[1][0]).toUpperCase();
+  return (country||'XX').slice(0,2).toUpperCase();
+}
+function genEnumeratorId(list){
+  const prefix = countryCode(selectedCountry);
+  let max = 0;
+  list.forEach(e=>{
+    if(e.ID && e.ID.indexOf(prefix)===0){
+      const n = parseInt(e.ID.slice(prefix.length), 10);
+      if(!isNaN(n) && n>max) max = n;
+    }
+  });
+  return prefix + String(max+1).padStart(4,'0');
+}
+
+// ── Star rating widget ──
+function renderStars(container, value){
+  container.innerHTML = [1,2,3,4,5].map(n=>
+    `<span class="star ${n<=value?'on':''}" onclick="setStarRating(${n})">${n<=value?'★':'☆'}</span>`
+  ).join('');
+}
+window.setStarRating = function(n){
+  currentRatingSelection = n;
+  renderStars(document.getElementById('f-rating-stars'), currentRatingSelection);
+};
+
+// ── Gate ──
+window.doPinLogin = function(){
+  const v = document.getElementById('pin-input').value;
+  if(v !== ADMIN_PIN){ document.getElementById('pin-err').style.display='block'; return; }
+  enterAdmission();
+};
+
+function enterAdmission(){
+  document.getElementById('scr-gate').classList.remove('on');
+  document.getElementById('scr-admission').classList.add('on');
+  document.getElementById('hdr-country-badge').textContent = selectedCountry;
+  fillSelect(document.getElementById('f-status'), STATUSES, undefined);
+  document.getElementById('f-status').value = 'Active';
+  document.getElementById('region-datalist').innerHTML = regionsFor(selectedCountry).map(r=>`<option value="${esc(r)}">`).join('');
+  renderStars(document.getElementById('f-rating-stars'), 0);
+  loadCacheAndSync();
+}
+
+function loadCacheAndSync(){
+  syncCfg = JSON.parse(localStorage.getItem(syncKey()) || '{"url":"","token":""}');
+  try{
+    const c = JSON.parse(localStorage.getItem(cacheKey())||'null');
+    if(c) enumerators = c.enumerators||[];
+  }catch(_){}
+  updateSyncStatus('Loaded cached roster (' + enumerators.length + ') — syncing…');
+  fetchAll();
+}
+
+async function fetchAll(){
+  if(!syncCfg.url){ updateSyncStatus('Not connected — set up sync in E!EMS → Settings first'); return; }
+  try{
+    const r = await fetch(syncCfg.url + '?action=getAll');
+    const j = await r.json();
+    if(j.status==='ok'){
+      enumerators = j.enumerators||[];
+      localStorage.setItem(cacheKey(), JSON.stringify({ enumerators, assignments:j.assignments||[], attendance:j.attendance||[], syncedAt:new Date().toISOString() }));
+      updateSyncStatus(enumerators.length + ' enumerators on record — ready to add more');
+    }
+  }catch(_){ updateSyncStatus('Could not reach Google Sheets — check connection in E!EMS → Settings'); }
+}
+function updateSyncStatus(msg){ document.getElementById('sync-status').textContent = msg; }
+
+async function postWrite(payload){
+  if(!syncCfg.url){ toast('Not connected — set up sync in E!EMS → Settings first'); return false; }
+  try{
+    await fetch(syncCfg.url, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({...payload, token: syncCfg.token || ''})
+    });
+    setTimeout(fetchAll, 2000);
+    return true;
+  }catch(_){ toast('Could not reach Google Sheets — check connection'); return false; }
+}
+
+// ── District auto-alignment (fuzzy match against known regions) ──
+// Runs entirely client-side — no API/network call. Corrects things like
+// stray spacing/casing/typos ("kampala ", "KAMPALA", "Kampal") to the
+// closest name already in REGIONS_BY_COUNTRY, without a paid AI dependency.
+function levenshtein(a, b){
+  a = a.toLowerCase().trim(); b = b.toLowerCase().trim();
+  const m = a.length, n = b.length;
+  const dp = [];
+  for(let i=0;i<=m;i++){ dp.push([i]); }
+  for(let j=1;j<=n;j++){ dp[0][j] = j; }
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function closestRegion(value){
+  const list = regionsFor(selectedCountry);
+  const v = (value||'').trim();
+  if(!list.length || !v) return { value:v, corrected:false };
+  let best=null, bestDist=Infinity;
+  list.forEach(r=>{
+    const d = levenshtein(v, r);
+    if(d<bestDist){ bestDist=d; best=r; }
+  });
+  const threshold = Math.max(2, Math.ceil(best.length*0.34));
+  if(bestDist===0) return { value:best, corrected:false };
+  if(bestDist<=threshold) return { value:best, corrected:true };
+  return { value:v, corrected:false };
+}
+
+// ── Bulk upload ──
+function normHeader(h){ return String(h).toLowerCase().replace(/[^a-z0-9]/g,''); }
+function pickField(rowNorm, keys){
+  for(const k of keys){ if(rowNorm[k]!==undefined && String(rowNorm[k]).trim()!=='') return String(rowNorm[k]).trim(); }
+  return '';
+}
+function normPhone(p){ return String(p||'').replace(/[^0-9]/g,''); }
+function findExisting(email, phones, list){
+  const phoneSet = phones.filter(Boolean).map(normPhone).filter(Boolean);
+  return list.find(e=>{
+    if(email && e.Email && e.Email.toLowerCase()===email.toLowerCase()) return true;
+    return [e.Phone1,e.Phone2,e.Phone3].map(normPhone).filter(Boolean).some(p=>phoneSet.includes(p));
+  }) || null;
+}
+function mergeRows(rows){
+  const workingList = enumerators.map(e=>({...e}));
+  const out = [];
+  let districtCorrections = 0;
+  rows.forEach(raw=>{
+    const rowNorm = {};
+    Object.keys(raw).forEach(h=>{ rowNorm[normHeader(h)] = raw[h]; });
+    const name = pickField(rowNorm, ['name','fullname','enumeratorname']);
+    if(!name) return;
+    const gender = pickField(rowNorm, ['gender','sex']);
+    const email = pickField(rowNorm, ['email','emailaddress']);
+    const phone1 = pickField(rowNorm, ['phone1','phonenumber1','phone','primaryphone','mobile','phonenumber','contact1','contact','contactnumber','contactnumber1','tel','telephone','cell','cellphone','mobilenumber']);
+    const phone2 = pickField(rowNorm, ['phone2','phonenumber2','secondaryphone','contact2','contactnumber2']);
+    const phone3 = pickField(rowNorm, ['phone3','phonenumber3','contact3','contactnumber3']);
+    const districtRaw = pickField(rowNorm, ['district','region']);
+    const notes = pickField(rowNorm, ['notes','comment','comments']);
+    const statusRaw = pickField(rowNorm, ['status']);
+    const ratingRaw = pickField(rowNorm, ['rating','score']);
+
+    const existing = findExisting(email, [phone1,phone2,phone3], workingList);
+    let obj;
+    if(existing){ obj = existing; }
+    else {
+      obj = { ID: genEnumeratorId(workingList), Status:'Active', Rating:'', PendingReview:'', DateAdded: todayStr(), District:'', Notes:'', Gender:'' };
+      workingList.push(obj);
+    }
+    obj.Name = name;
+    if(gender) obj.Gender = gender;
+    if(email) obj.Email = email;
+    if(phone1) obj.Phone1 = phone1;
+    if(phone2) obj.Phone2 = phone2;
+    if(phone3) obj.Phone3 = phone3;
+    if(districtRaw){
+      const aligned = closestRegion(districtRaw);
+      if(aligned.corrected) districtCorrections++;
+      obj.District = aligned.value;
+    }
+    if(notes) obj.Notes = notes;
+    if(statusRaw && STATUSES.includes(statusRaw)) obj.Status = statusRaw;
+    if(ratingRaw!=='' && !isNaN(Number(ratingRaw))) obj.Rating = String(Math.max(0,Math.min(5,Math.round(Number(ratingRaw)))));
+    out.push({...obj});
+  });
+  return { rows: out, districtCorrections };
+}
+
+window.handleUpload = function(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try{
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const sheetName = wb.SheetNames.find(n=>/enumerat|roster/i.test(n)) || wb.SheetNames[0];
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {defval:''});
+      const { rows: merged, districtCorrections } = mergeRows(rows);
+      if(!merged.length){ toast('No usable rows found (need at least a name)'); input.value=''; return; }
+      let added=0, updated=0;
+      merged.forEach(r=>{
+        const idx = enumerators.findIndex(x=>x.ID===r.ID);
+        if(idx>-1){ enumerators[idx]=r; updated++; } else { enumerators.unshift(r); added++; }
+      });
+      let msg = `Uploaded: ${added} added, ${updated} updated`;
+      if(districtCorrections) msg += `, ${districtCorrections} district name${districtCorrections===1?'':'s'} aligned`;
+      toast(msg);
+      await postBulkWrite(merged);
+    }catch(err){ toast('Could not read that file'); }
+    input.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+async function postBulkWrite(list){
+  if(!syncCfg.url){ toast('Not connected — set up sync in E!EMS → Settings first'); return false; }
+  try{
+    await fetch(syncCfg.url, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ action:'bulkUpsertEnumerators', data:list, token: syncCfg.token || '' })
+    });
+    setTimeout(fetchAll, 2000);
+    return true;
+  }catch(_){ toast('Could not reach Google Sheets — check connection'); return false; }
+}
+
+// ── Direct entry ──
+window.submitOne = async function(){
+  const name = document.getElementById('f-name').value.trim();
+  if(!name){ toast('Enter a name'); return; }
+  const obj = {
+    ID: genEnumeratorId(enumerators),
+    Name: name,
+    Gender: document.getElementById('f-gender').value,
+    Phone1: document.getElementById('f-phone1').value.trim(),
+    Phone2: document.getElementById('f-phone2').value.trim(),
+    Phone3: document.getElementById('f-phone3').value.trim(),
+    Email: document.getElementById('f-email').value.trim(),
+    District: document.getElementById('f-district').value.trim(),
+    Status: document.getElementById('f-status').value || 'Active',
+    Rating: String(currentRatingSelection || ''),
+    PendingReview: '',
+    DateAdded: todayStr(),
+    Notes: document.getElementById('f-notes').value.trim()
+  };
+  enumerators.unshift(obj);
+  recentlyAdded.unshift(obj);
+  renderRecent();
+  toast(obj.ID + ' added');
+  // Clear the form for the next entry.
+  ['f-name','f-phone1','f-phone2','f-phone3','f-email','f-district','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-gender').value='';
+  document.getElementById('f-status').value='Active';
+  currentRatingSelection = 0;
+  renderStars(document.getElementById('f-rating-stars'), 0);
+  document.getElementById('f-name').focus();
+  await postWrite({ action:'addEnumerator', data: obj });
+};
+
+function renderRecent(){
+  document.getElementById('recent-card').style.display = recentlyAdded.length ? 'block' : 'none';
+  document.getElementById('recent-count').textContent = recentlyAdded.length;
+  document.getElementById('recent-list').innerHTML = recentlyAdded.map(e=>
+    `<div class="recent-item"><div><b>${esc(e.ID)}</b> · ${esc(e.Name)}</div><div class="recent-meta">${esc(e.District||'')}</div></div>`
+  ).join('');
+}
+
+// ── Boot ──
+if(!selectedCountry){
+  document.getElementById('gate-nocountry').style.display = 'block';
+} else {
+  document.getElementById('gate-country-label').textContent = selectedCountry;
+  document.getElementById('gate-pin').style.display = 'block';
+  document.getElementById('pin-input').focus();
+}
+</script>
+</body>
+</html>

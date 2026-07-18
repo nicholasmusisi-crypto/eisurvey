@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Enumerator Management — E!Survey</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -179,12 +178,16 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 .pending-note{font-size:12px;color:var(--a);background:var(--al);border-radius:var(--rs);padding:9px 11px;margin-top:10px;line-height:1.5}
 .upload-row{display:flex;gap:8px;flex-wrap:wrap}
 
-.roster-table-wrap{overflow-x:auto;margin:-14px}
-table.roster-table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
-table.roster-table th{text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;border:none}
-table.roster-table td{padding:9px 12px;border:none;cursor:pointer}
+.roster-table-wrap{margin:-14px}
+table.roster-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:11.5px}
+table.roster-table th,table.roster-table td{padding:8px 6px;border:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.roster-table th{text-align:left;font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;cursor:pointer;user-select:none}
+table.roster-table th .sort-ind{opacity:.5;font-size:8px;margin-left:2px}
+table.roster-table th.sorted .sort-ind{opacity:1;color:var(--g)}
+table.roster-table td{cursor:pointer}
 table.roster-table tbody tr:nth-child(even){background:var(--bg2)}
 table.roster-table tbody tr:active{background:var(--gl)}
+table.roster-table .badge{padding:2px 5px;font-size:8.5px}
 .roster-note{padding:9px 12px;font-size:11px;color:var(--t3)}
 </style>
 </head>
@@ -285,17 +288,16 @@ table.roster-table tbody tr:active{background:var(--gl)}
 
     <!-- Roster -->
     <div class="pg" id="pg-roster">
-      <div class="card" id="roster-upload-card" style="display:none">
+      <div class="card" id="roster-admission-card" style="display:none">
         <div class="ct">Add enumerators</div>
-        <div class="upload-row">
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('roster-upload-input').click()">Upload sheet (.xlsx/.csv)</button>
-          <button class="btn btn-primary btn-sm" onclick="openEnumeratorModal(null)">+ Add one</button>
-        </div>
-        <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.5">Matched by phone or email — anyone already on the roster gets updated, anyone new gets added with an auto-generated ID. Expected columns: Name, Gender, Phone1/Phone2/Phone3 (or just Phone), Email, Region, Status, Rating, Notes — extra or missing columns are fine.</div>
-        <input type="file" id="roster-upload-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleRosterUpload(this)">
+        <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px">New enumerators (bulk upload or one at a time) are added from the separate Admission window. This Roster is for browsing, sorting and editing.</div>
+        <a class="btn btn-primary btn-sm" href="enumerator-admission.html" target="_blank" rel="noopener">Open Admission →</a>
       </div>
       <div class="filter-bar">
         <input type="text" id="roster-search" placeholder="Search name, ID or phone…" oninput="onRosterSearchInput()">
+      </div>
+      <div class="filter-bar">
+        <select id="roster-gender" onchange="renderRoster()"><option value="">All genders</option><option>Female</option><option>Male</option><option>Other</option></select>
         <select id="roster-district" onchange="renderRoster()"><option value="">All regions</option></select>
       </div>
       <div class="filter-pills" id="roster-status-pills"></div>
@@ -569,7 +571,7 @@ function enterApp(role){
   document.getElementById('settings-country-label').textContent = selectedCountry;
   document.getElementById('settings-country-label2').textContent = selectedCountry;
   document.getElementById('tab-settings-btn').style.display = role==='admin' ? '' : 'none';
-  document.getElementById('roster-upload-card').style.display = role==='admin' ? 'block' : 'none';
+  document.getElementById('roster-admission-card').style.display = role==='admin' ? 'block' : 'none';
   document.getElementById('fab-add').style.display = 'none'; // shown per-tab by switchTab()
   loadCache();
   initDropdowns();
@@ -626,13 +628,12 @@ window.switchTab = function(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===id));
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
-  document.getElementById('fab-add').style.display = (currentRole==='admin' && (id==='roster'||id==='assign')) ? 'flex' : 'none';
+  document.getElementById('fab-add').style.display = (currentRole==='admin' && id==='assign') ? 'flex' : 'none';
   renderAll();
 };
 window.fabClick = function(){
   const active = document.querySelector('.tab.on').dataset.tab;
-  if(active==='roster') openEnumeratorModal(null);
-  else if(active==='assign') openAssignmentModal(null);
+  if(active==='assign') openAssignmentModal(null);
 };
 
 // ── Sync ──
@@ -764,20 +765,50 @@ window.onRosterSearchInput = function(){
 };
 
 const ROSTER_RENDER_CAP = 200;
+const ROSTER_COLS = [
+  { key:'ID', label:'ID', width:13 },
+  { key:'Name', label:'Name', width:22 },
+  { key:'Gender', label:'Gender', width:11 },
+  { key:'Phone1', label:'Phone', width:16 },
+  { key:'District', label:'Region', width:15 },
+  { key:'Status', label:'Status', width:15 },
+  { key:'Rating', label:'Rating', width:8 }
+];
+let rosterSortCol = 'ID';
+let rosterSortDir = 'asc';
+window.sortRosterBy = function(col){
+  if(rosterSortCol===col){ rosterSortDir = rosterSortDir==='asc' ? 'desc' : 'asc'; }
+  else { rosterSortCol = col; rosterSortDir = 'asc'; }
+  renderRoster();
+};
 function renderRoster(){
   const q = (document.getElementById('roster-search').value||'').toLowerCase();
+  const gender = document.getElementById('roster-gender').value;
   const district = document.getElementById('roster-district').value;
   let list = data.enumerators.filter(e=>{
     if(rosterStatusFilter && e.Status!==rosterStatusFilter) return false;
+    if(gender && e.Gender!==gender) return false;
     if(district && e.District!==district) return false;
     if(q && !((e.Name||'').toLowerCase().includes(q) || (e.ID||'').toLowerCase().includes(q) ||
         (e.Phone1||'').toLowerCase().includes(q) || (e.Phone2||'').toLowerCase().includes(q) || (e.Phone3||'').toLowerCase().includes(q))) return false;
     return true;
   });
+  list = list.slice().sort((a,b)=>{
+    let av, bv;
+    if(rosterSortCol==='Rating'){ av=Number(a.Rating)||0; bv=Number(b.Rating)||0; }
+    else { av=(a[rosterSortCol]||'').toString().toLowerCase(); bv=(b[rosterSortCol]||'').toString().toLowerCase(); }
+    const cmp = av<bv ? -1 : av>bv ? 1 : 0;
+    return rosterSortDir==='asc' ? cmp : -cmp;
+  });
   const el = document.getElementById('roster-list');
   if(!list.length){ el.innerHTML = emptyState('No enumerators found'); return; }
   const total = list.length;
   const shown = list.slice(0, ROSTER_RENDER_CAP);
+  const headerCells = ROSTER_COLS.map(c=>{
+    const active = rosterSortCol===c.key;
+    const ind = active ? (rosterSortDir==='asc'?'▲':'▼') : '↕';
+    return `<th style="width:${c.width}%" class="${active?'sorted':''}" onclick="sortRosterBy('${c.key}')">${esc(c.label)}<span class="sort-ind">${ind}</span></th>`;
+  }).join('');
   const rows = shown.map(e=>{
     const rating = Number(e.Rating)||0;
     return `<tr onclick="openEnumeratorModal('${esc(e.ID)}')">
@@ -786,15 +817,20 @@ function renderRoster(){
       <td>${esc(e.Gender||'—')}</td>
       <td>${esc(e.Phone1||'—')}</td>
       <td>${esc(e.District||'—')}</td>
-      <td><span class="badge ${statusBadgeClass(e.Status)}">${esc(e.Status||'—')}</span>${e.PendingReview==='Yes' ? ' <span class="badge warn">Review due</span>' : ''}</td>
-      <td>${rating>0 ? `<span class="mini-stars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>` : '—'}</td>
+      <td><span class="badge ${statusBadgeClass(e.Status)}">${esc(e.Status||'—')}</span>${e.PendingReview==='Yes' ? ' <span class="badge warn" title="Review due">!</span>' : ''}</td>
+      <td>${rating>0 ? `<span class="mini-stars">${'★'.repeat(rating)}</span>` : '—'}</td>
     </tr>`;
   }).join('');
   el.innerHTML = `<div class="roster-table-wrap"><table class="roster-table">
-    <thead><tr><th>ID</th><th>Name</th><th>Gender</th><th>Phone</th><th>Region</th><th>Status</th><th>Rating</th></tr></thead>
+    <thead><tr>${headerCells}</tr></thead>
     <tbody>${rows}</tbody>
   </table></div>${total>shown.length ? `<div class="roster-note">Showing ${shown.length} of ${total} — keep typing to narrow the search</div>` : ''}`;
 }
+// Referenced directly from inline onchange="renderRoster()"/"renderAttendance()"
+// attributes (District/Gender filters, Attendance date picker) — those
+// handlers resolve against the global scope, not this module's scope, so
+// the functions need an explicit window alias or they silently no-op.
+window.renderRoster = renderRoster;
 
 window.openEnumeratorModal = function(id){
   if(currentRole!=='admin' && id===null) return;
@@ -861,107 +897,6 @@ window.saveEnumerator = async function(){
   closeModal('modal-enum-bg');
   toast(isNew ? 'Enumerator added' : 'Enumerator updated');
   await postWrite({ action: isNew ? 'addEnumerator' : 'updateEnumerator', data: obj });
-};
-
-// ── Bulk roster upload ──
-async function postBulkWrite(list){
-  if(!syncCfg.url){ toast('Configure the Apps Script URL in Settings first'); return false; }
-  try{
-    await fetch(syncCfg.url, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({ action:'bulkUpsertEnumerators', data:list, token: syncCfg.token || '' })
-    });
-    setTimeout(()=>fetchAll(true), 2000);
-    return true;
-  }catch(_){ toast('Could not reach Google Sheets — check connection'); return false; }
-}
-
-function normHeader(h){ return String(h).toLowerCase().replace(/[^a-z0-9]/g,''); }
-function pickField(rowNorm, keys){
-  for(const k of keys){ if(rowNorm[k]!==undefined && String(rowNorm[k]).trim()!=='') return String(rowNorm[k]).trim(); }
-  return '';
-}
-// Digits-only comparison — spreadsheet tools routinely turn "+256700111222"
-// into the bare number 256700111222 (losing the +), so an exact-string phone
-// match would silently miss real duplicates and create new entries instead.
-function normPhone(p){ return String(p||'').replace(/[^0-9]/g,''); }
-function findExistingEnumerator(email, phones, list){
-  const phoneSet = phones.filter(Boolean).map(normPhone).filter(Boolean);
-  return list.find(e=>{
-    if(email && e.Email && e.Email.toLowerCase()===email.toLowerCase()) return true;
-    return [e.Phone1,e.Phone2,e.Phone3].map(normPhone).filter(Boolean).some(p=>phoneSet.includes(p));
-  }) || null;
-}
-// Matches each uploaded row to an existing enumerator by email/phone (update)
-// or generates a fresh ID for it (add). workingList grows as new rows are
-// assigned IDs so a batch of brand-new rows gets sequential IDs, not
-// duplicates.
-function mergeRosterRows(rows){
-  const workingList = data.enumerators.map(e=>({...e}));
-  const out = [];
-  rows.forEach(raw=>{
-    const rowNorm = {};
-    Object.keys(raw).forEach(h=>{ rowNorm[normHeader(h)] = raw[h]; });
-    const name = pickField(rowNorm, ['name','fullname','enumeratorname']);
-    if(!name) return;
-    const gender = pickField(rowNorm, ['gender','sex']);
-    const email = pickField(rowNorm, ['email','emailaddress']);
-    const phone1 = pickField(rowNorm, ['phone1','phonenumber1','phone','primaryphone','mobile','phonenumber','contact1','contact','contactnumber','contactnumber1','tel','telephone','cell','cellphone','mobilenumber']);
-    const phone2 = pickField(rowNorm, ['phone2','phonenumber2','secondaryphone','contact2','contactnumber2']);
-    const phone3 = pickField(rowNorm, ['phone3','phonenumber3','contact3','contactnumber3']);
-    const district = pickField(rowNorm, ['district','region']);
-    const notes = pickField(rowNorm, ['notes','comment','comments']);
-    const statusRaw = pickField(rowNorm, ['status']);
-    const ratingRaw = pickField(rowNorm, ['rating','score']);
-
-    const existing = findExistingEnumerator(email, [phone1,phone2,phone3], workingList);
-    let obj;
-    if(existing){
-      obj = existing;
-    } else {
-      obj = { ID: genEnumeratorId(workingList), Status:'Active', Rating:'', PendingReview:'', DateAdded: todayStr(), District:'', Notes:'', Gender:'' };
-      workingList.push(obj);
-    }
-    obj.Name = name;
-    if(gender) obj.Gender = gender;
-    if(email) obj.Email = email;
-    if(phone1) obj.Phone1 = phone1;
-    if(phone2) obj.Phone2 = phone2;
-    if(phone3) obj.Phone3 = phone3;
-    if(district) obj.District = district;
-    if(notes) obj.Notes = notes;
-    if(statusRaw && STATUSES.includes(statusRaw)) obj.Status = statusRaw;
-    if(ratingRaw!=='' && !isNaN(Number(ratingRaw))) obj.Rating = String(Math.max(0,Math.min(5,Math.round(Number(ratingRaw)))));
-    out.push({...obj});
-  });
-  return out;
-}
-
-window.handleRosterUpload = function(input){
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try{
-      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-      const sheetName = wb.SheetNames.find(n=>/enumerat|roster/i.test(n)) || wb.SheetNames[0];
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {defval:''});
-      const merged = mergeRosterRows(rows);
-      if(!merged.length){ toast('No usable rows found (need at least a name)'); input.value=''; return; }
-      let added=0, updated=0;
-      merged.forEach(r=>{
-        const idx = data.enumerators.findIndex(x=>x.ID===r.ID);
-        if(idx>-1){ data.enumerators[idx]=r; updated++; } else { data.enumerators.unshift(r); added++; }
-      });
-      saveCache();
-      renderAll();
-      toast(`Uploaded: ${added} added, ${updated} updated`);
-      await postBulkWrite(merged);
-    }catch(err){ toast('Could not read that file'); }
-    input.value = '';
-  };
-  reader.readAsArrayBuffer(file);
 };
 
 // ── Assignments ──
@@ -1089,6 +1024,7 @@ function renderAttendance(){
     </div>`;
   }).join('');
 }
+window.renderAttendance = renderAttendance;
 window.getCurrentStatus = function(eid, date){ const r=data.attendance.find(a=>a.EnumeratorID===eid && a.Date===date); return r?r.Status:''; };
 window.getCurrentSubs = function(eid, date){ const r=data.attendance.find(a=>a.EnumeratorID===eid && a.Date===date); return r?r.Submissions||'':''; };
 
