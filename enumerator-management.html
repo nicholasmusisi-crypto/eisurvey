@@ -178,6 +178,14 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 .mini-stars{color:var(--a);font-size:11px;letter-spacing:1px}
 .pending-note{font-size:12px;color:var(--a);background:var(--al);border-radius:var(--rs);padding:9px 11px;margin-top:10px;line-height:1.5}
 .upload-row{display:flex;gap:8px;flex-wrap:wrap}
+
+.roster-table-wrap{overflow-x:auto;margin:-14px}
+table.roster-table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+table.roster-table th{text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;border:none}
+table.roster-table td{padding:9px 12px;border:none;cursor:pointer}
+table.roster-table tbody tr:nth-child(even){background:var(--bg2)}
+table.roster-table tbody tr:active{background:var(--gl)}
+.roster-note{padding:9px 12px;font-size:11px;color:var(--t3)}
 </style>
 </head>
 <body>
@@ -287,7 +295,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
         <input type="file" id="roster-upload-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleRosterUpload(this)">
       </div>
       <div class="filter-bar">
-        <input type="text" id="roster-search" placeholder="Search name, ID or phone…" oninput="renderRoster()">
+        <input type="text" id="roster-search" placeholder="Search name, ID or phone…" oninput="onRosterSearchInput()">
         <select id="roster-district" onchange="renderRoster()"><option value="">All regions</option></select>
       </div>
       <div class="filter-pills" id="roster-status-pills"></div>
@@ -749,6 +757,13 @@ function statusBadgeClass(s){
   if(s==='Terminated') return 'red';
   return 'grey';
 }
+let rosterSearchTimer = null;
+window.onRosterSearchInput = function(){
+  clearTimeout(rosterSearchTimer);
+  rosterSearchTimer = setTimeout(renderRoster, 150);
+};
+
+const ROSTER_RENDER_CAP = 200;
 function renderRoster(){
   const q = (document.getElementById('roster-search').value||'').toLowerCase();
   const district = document.getElementById('roster-district').value;
@@ -761,23 +776,24 @@ function renderRoster(){
   });
   const el = document.getElementById('roster-list');
   if(!list.length){ el.innerHTML = emptyState('No enumerators found'); return; }
-  el.innerHTML = list.map(e=>{
+  const total = list.length;
+  const shown = list.slice(0, ROSTER_RENDER_CAP);
+  const rows = shown.map(e=>{
     const rating = Number(e.Rating)||0;
-    return `
-    <div class="row-item" onclick="openEnumeratorModal('${esc(e.ID)}')">
-      <div class="ri-main">
-        <div class="ri-title">${esc(e.ID||'')} · ${esc(e.Name||'Unnamed')}</div>
-        <div class="ri-meta">
-          <span class="badge ${statusBadgeClass(e.Status)}">${esc(e.Status||'—')}</span>
-          ${e.PendingReview==='Yes' ? '<span class="badge warn">Review due</span>' : ''}
-          ${e.Gender ? `<span>${esc(e.Gender)}</span>` : ''}
-          ${e.District ? `<span>${esc(e.District)}</span>` : ''}
-          ${e.Phone1 ? `<span>${esc(e.Phone1)}</span>` : ''}
-          ${rating>0 ? `<span class="mini-stars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>` : ''}
-        </div>
-      </div>
-    </div>`;
+    return `<tr onclick="openEnumeratorModal('${esc(e.ID)}')">
+      <td>${esc(e.ID||'')}</td>
+      <td>${esc(e.Name||'Unnamed')}</td>
+      <td>${esc(e.Gender||'—')}</td>
+      <td>${esc(e.Phone1||'—')}</td>
+      <td>${esc(e.District||'—')}</td>
+      <td><span class="badge ${statusBadgeClass(e.Status)}">${esc(e.Status||'—')}</span>${e.PendingReview==='Yes' ? ' <span class="badge warn">Review due</span>' : ''}</td>
+      <td>${rating>0 ? `<span class="mini-stars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>` : '—'}</td>
+    </tr>`;
   }).join('');
+  el.innerHTML = `<div class="roster-table-wrap"><table class="roster-table">
+    <thead><tr><th>ID</th><th>Name</th><th>Gender</th><th>Phone</th><th>Region</th><th>Status</th><th>Rating</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>${total>shown.length ? `<div class="roster-note">Showing ${shown.length} of ${total} — keep typing to narrow the search</div>` : ''}`;
 }
 
 window.openEnumeratorModal = function(id){
