@@ -30,7 +30,7 @@
 //    (pencil) > New version, so the live /exec URL picks up the change.
 
 const SHEETS = {
-  Enumerators: ['ID', 'Name', 'Phone1', 'Phone2', 'Phone3', 'Email', 'District', 'Status', 'Rating', 'PendingReview', 'DateAdded', 'Notes'],
+  Enumerators: ['ID', 'Name', 'Gender', 'Phone1', 'Phone2', 'Phone3', 'Email', 'District', 'Status', 'Rating', 'PendingReview', 'DateAdded', 'Notes'],
   Assignments: ['ID', 'EnumeratorID', 'EnumeratorName', 'Location', 'Project', 'Team', 'StartDate', 'EndDate', 'Status', 'Notes'],
   Attendance: ['ID', 'EnumeratorID', 'EnumeratorName', 'Date', 'Status', 'Submissions', 'Notes', 'LoggedAt']
 };

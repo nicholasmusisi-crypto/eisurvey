@@ -283,7 +283,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
           <button class="btn btn-secondary btn-sm" onclick="document.getElementById('roster-upload-input').click()">Upload sheet (.xlsx/.csv)</button>
           <button class="btn btn-primary btn-sm" onclick="openEnumeratorModal(null)">+ Add one</button>
         </div>
-        <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.5">Matched by phone or email — anyone already on the roster gets updated, anyone new gets added with an auto-generated ID. Expected columns: Name, Phone1/Phone2/Phone3 (or just Phone), Email, Region, Status, Rating, Notes — extra or missing columns are fine.</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:8px;line-height:1.5">Matched by phone or email — anyone already on the roster gets updated, anyone new gets added with an auto-generated ID. Expected columns: Name, Gender, Phone1/Phone2/Phone3 (or just Phone), Email, Region, Status, Rating, Notes — extra or missing columns are fine.</div>
         <input type="file" id="roster-upload-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleRosterUpload(this)">
       </div>
       <div class="filter-bar">
@@ -354,6 +354,8 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
     <div id="enum-id-display" style="font-size:11px;color:var(--t3);margin-bottom:10px;display:none">ID: <b id="enum-id-text"></b></div>
     <label class="flbl">Full name</label>
     <input type="text" id="enum-name" placeholder="Full name">
+    <label class="flbl">Gender</label>
+    <select id="enum-gender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
     <label class="flbl">Phone 1 (primary)</label>
     <input type="tel" id="enum-phone1" placeholder="Phone number">
     <label class="flbl">Phone 2 <span style="font-weight:400;color:var(--t3)">(optional)</span></label>
@@ -768,6 +770,7 @@ function renderRoster(){
         <div class="ri-meta">
           <span class="badge ${statusBadgeClass(e.Status)}">${esc(e.Status||'—')}</span>
           ${e.PendingReview==='Yes' ? '<span class="badge warn">Review due</span>' : ''}
+          ${e.Gender ? `<span>${esc(e.Gender)}</span>` : ''}
           ${e.District ? `<span>${esc(e.District)}</span>` : ''}
           ${e.Phone1 ? `<span>${esc(e.Phone1)}</span>` : ''}
           ${rating>0 ? `<span class="mini-stars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span>` : ''}
@@ -785,6 +788,7 @@ window.openEnumeratorModal = function(id){
   document.getElementById('enum-id-display').style.display = e ? 'block' : 'none';
   document.getElementById('enum-id-text').textContent = e ? e.ID : '';
   document.getElementById('enum-name').value = e ? e.Name||'' : '';
+  document.getElementById('enum-gender').value = e ? e.Gender||'' : '';
   document.getElementById('enum-phone1').value = e ? e.Phone1||'' : '';
   document.getElementById('enum-phone2').value = e ? e.Phone2||'' : '';
   document.getElementById('enum-phone3').value = e ? e.Phone3||'' : '';
@@ -796,7 +800,7 @@ window.openEnumeratorModal = function(id){
   currentRatingSelection = e && e.Rating ? Number(e.Rating) : 0;
   renderStars(document.getElementById('enum-rating-stars'), currentRatingSelection, !readOnly);
   document.getElementById('enum-pending-note').style.display = (e && e.PendingReview==='Yes') ? 'block' : 'none';
-  ['enum-name','enum-phone1','enum-phone2','enum-phone3','enum-email','enum-district','enum-status','enum-notes'].forEach(id2=>{
+  ['enum-name','enum-gender','enum-phone1','enum-phone2','enum-phone3','enum-email','enum-district','enum-status','enum-notes'].forEach(id2=>{
     document.getElementById(id2).disabled = readOnly;
   });
   document.querySelector('#modal-enum-bg .btn-primary').style.display = readOnly ? 'none' : '';
@@ -822,6 +826,7 @@ window.saveEnumerator = async function(){
   const obj = {
     ID: id,
     Name: name,
+    Gender: document.getElementById('enum-gender').value,
     Phone1: document.getElementById('enum-phone1').value.trim(),
     Phone2: document.getElementById('enum-phone2').value.trim(),
     Phone3: document.getElementById('enum-phone3').value.trim(),
@@ -884,6 +889,7 @@ function mergeRosterRows(rows){
     Object.keys(raw).forEach(h=>{ rowNorm[normHeader(h)] = raw[h]; });
     const name = pickField(rowNorm, ['name','fullname','enumeratorname']);
     if(!name) return;
+    const gender = pickField(rowNorm, ['gender','sex']);
     const email = pickField(rowNorm, ['email','emailaddress']);
     const phone1 = pickField(rowNorm, ['phone1','phonenumber1','phone','primaryphone','mobile','phonenumber']);
     const phone2 = pickField(rowNorm, ['phone2','phonenumber2','secondaryphone']);
@@ -898,10 +904,11 @@ function mergeRosterRows(rows){
     if(existing){
       obj = existing;
     } else {
-      obj = { ID: genEnumeratorId(workingList), Status:'Active', Rating:'', PendingReview:'', DateAdded: todayStr(), District:'', Notes:'' };
+      obj = { ID: genEnumeratorId(workingList), Status:'Active', Rating:'', PendingReview:'', DateAdded: todayStr(), District:'', Notes:'', Gender:'' };
       workingList.push(obj);
     }
     obj.Name = name;
+    if(gender) obj.Gender = gender;
     if(email) obj.Email = email;
     if(phone1) obj.Phone1 = phone1;
     if(phone2) obj.Phone2 = phone2;
@@ -1097,7 +1104,7 @@ function emptyState(msg){
 
 const GAS_SCRIPT = `// See enumerator-backend.gs in the repo for the fully commented version + setup steps.
 const SHEETS = {
-  Enumerators: ['ID','Name','Phone1','Phone2','Phone3','Email','District','Status','Rating','PendingReview','DateAdded','Notes'],
+  Enumerators: ['ID','Name','Gender','Phone1','Phone2','Phone3','Email','District','Status','Rating','PendingReview','DateAdded','Notes'],
   Assignments: ['ID','EnumeratorID','EnumeratorName','Location','Project','Team','StartDate','EndDate','Status','Notes'],
   Attendance: ['ID','EnumeratorID','EnumeratorName','Date','Status','Submissions','Notes','LoggedAt']
 };
