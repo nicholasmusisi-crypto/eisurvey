@@ -294,7 +294,7 @@ table.roster-table .badge{padding:2px 5px;font-size:8.5px}
         <a class="btn btn-primary btn-sm" href="enumerator-admission.html" target="_blank" rel="noopener">Open Admission →</a>
       </div>
       <div class="filter-bar">
-        <input type="text" id="roster-search" placeholder="Search name, ID or phone…" oninput="onRosterSearchInput()">
+        <input type="text" id="roster-search" placeholder="Search by name…" oninput="onRosterSearchInput()">
       </div>
       <div class="filter-bar">
         <select id="roster-gender" onchange="renderRoster()"><option value="">All genders</option><option>Female</option><option>Male</option><option>Other</option></select>
@@ -789,8 +789,7 @@ function renderRoster(){
     if(rosterStatusFilter && e.Status!==rosterStatusFilter) return false;
     if(gender && e.Gender!==gender) return false;
     if(district && e.District!==district) return false;
-    if(q && !((e.Name||'').toLowerCase().includes(q) || (e.ID||'').toLowerCase().includes(q) ||
-        (e.Phone1||'').toLowerCase().includes(q) || (e.Phone2||'').toLowerCase().includes(q) || (e.Phone3||'').toLowerCase().includes(q))) return false;
+    if(q && !(e.Name||'').toLowerCase().includes(q)) return false;
     return true;
   });
   list = list.slice().sort((a,b)=>{
