@@ -14,7 +14,10 @@
 // add them here too if you want them to show up for everyone by default.
 
 export const ORG_NAME = "Educate! — Survey Ops";
-export const APP_TITLE = "Enumerator Management";
+// E!EMS = Educate! Enumerator Management System. Shown as the big heading on
+// the country picker, login screen, and app header (title bar text pairs it
+// with " — E!Survey").
+export const APP_TITLE = "E!EMS";
 
 // Access PIN — soft deterrent, not real security, same approach as the other
 // tools in this suite (see field-recorder.html, youth-id-config.js). Change

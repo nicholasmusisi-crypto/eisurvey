@@ -178,7 +178,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
   <div class="login-wrap">
     <div class="login-logo">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <h1>Enumerator Management</h1>
+      <h1 id="cs-title">Enumerator Management</h1>
       <p>Select your country</p>
     </div>
     <div class="country-grid" id="country-list"></div>
@@ -224,7 +224,7 @@ hr.div{border:none;border-top:.5px solid var(--bd);margin:12px 0}
 <div id="scr-app" class="screen">
   <div class="hdr">
     <div>
-      <div class="hdr-title">Enumerator Management</div>
+      <div class="hdr-title" id="hdr-app-title">Enumerator Management</div>
       <div class="hdr-sub"><span id="hdr-org">Educate! — Survey Ops</span> <span class="role-badge" id="hdr-country-badge" style="background:rgba(255,255,255,.28)"></span> <span class="role-badge" id="hdr-role">View Only</span></div>
     </div>
     <button class="btn-logout" onclick="logout()">Log out</button>
@@ -387,6 +387,8 @@ document.title = APP_TITLE + ' — E!Survey';
 document.getElementById('lg-title').textContent = APP_TITLE;
 document.getElementById('lg-sub').textContent = ORG_NAME;
 document.getElementById('hdr-org').textContent = ORG_NAME;
+document.getElementById('hdr-app-title').textContent = APP_TITLE;
+document.getElementById('cs-title').textContent = APP_TITLE;
 
 // Inline SVGs instead of flag emoji — Windows Chrome renders regional-indicator
 // emoji as plain letter pairs (no flag glyphs in Segoe UI Emoji), so emoji
