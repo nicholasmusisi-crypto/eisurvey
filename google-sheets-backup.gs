@@ -39,58 +39,11 @@ const CURRENCY = 'UGX';
 // Category groups from the "ORDER OF THE GIVING" sheet, kept in event order.
 // Must be kept in sync with firebase-config.js on the website.
 const CATEGORY_GROUPS = [
-  { name: 'Leadership', items: ['Bishop and Pastor Diana', 'Mengo Pastors', 'Pastors of the Church Plants', "Children's Church"] },
-  { name: 'Mengo Church', items: ["Pr Jacque's Missional Family", "Pr Erinah's Missional Family", "Pr William's Missional Family", 'Pr Dennis/Martin/David Missional Family', "Pr Ivy's Missional Family", "Pr Bonny's Missional Family", 'Generations'] },
-  { name: 'Location Churches', items: ['Nations Church Makerere', 'Nations Church Kyambogo', 'Streams of Life Matugga', 'Streams of Life Nakawuka', 'Streams of Life Bulenga', 'Streams of Life Nakaseke', 'Streams of Life Masindi, Isagara', 'Streams of Life Kitagobwa', 'Streams of Life Matendo', 'Streams of Life Kyengera', 'Streams of Life Church Makindye', 'Streams of Life Church Mukono', 'Streams of Life Church Kabembe'] },
-  { name: 'Guests – Partners', items: ['Older Sons of the Ministry', 'Younger Sons of the Ministry', 'Friends to Bishop & the Ministry', 'Praying Wives', 'Soul Seed', 'CAPRO', 'Diaspora', 'Business Community'] },
-  { name: 'Arms of the Ministry', items: ['Mengo Treasury', 'Makerere Treasury', 'Kyambogo Treasury', 'Light House Treasury', 'Church Planting Treasury', 'Soul Winning Treasury'] },
-  { name: 'Nyongeza for Yesu', items: ['Daughters of Valor', 'Men Connect', 'Great Woman', 'Worship Team', 'Harpazol / Soul Winners', 'Others Who Are Interested to Sow'] }
+  { name: 'Categories', items: ['Pastors', 'Worship', 'Prayer', 'Youth', 'Women', 'Finance', 'Ushers', 'Elders/Pastors', 'Media', 'Children'] }
 ];
 
-// Per-sub-category targets (UGX). Keep in sync with firebase-config.js.
-const CATEGORY_TARGETS = {
-  'Bishop and Pastor Diana': 15000000,
-  'Mengo Pastors': 24000000,
-  'Pastors of the Church Plants': 20000000,
-  "Children's Church": 2500000,
-  "Pr Jacque's Missional Family": 2000000,
-  "Pr Erinah's Missional Family": 8000000,
-  "Pr William's Missional Family": 6000000,
-  'Pr Dennis/Martin/David Missional Family': 6000000,
-  "Pr Ivy's Missional Family": 10000000,
-  "Pr Bonny's Missional Family": 20000000,
-  'Generations': 2000000,
-  'Nations Church Makerere': 10000000,
-  'Nations Church Kyambogo': 1000000,
-  'Streams of Life Matugga': 3000000,
-  'Streams of Life Nakawuka': 500000,
-  'Streams of Life Bulenga': 1000000,
-  'Streams of Life Nakaseke': 1000000,
-  'Streams of Life Masindi, Isagara': 500000,
-  'Streams of Life Kitagobwa': 300000,
-  'Streams of Life Matendo': 1000000,
-  'Streams of Life Kyengera': 1000000,
-  'Older Sons of the Ministry': 10000000,
-  'Younger Sons of the Ministry': 5000000,
-  'Friends to Bishop & the Ministry': 20000000,
-  'Praying Wives': 15000000,
-  'Soul Seed': 1000000,
-  'CAPRO': 500000,
-  'Diaspora': 2000000,
-  'Business Community': 5000000,
-  'Mengo Treasury': 5000000,
-  'Makerere Treasury': 1000000,
-  'Kyambogo Treasury': 500000,
-  'Light House Treasury': 2000000,
-  'Church Planting Treasury': 2000000,
-  'Soul Winning Treasury': 2000000,
-  'Daughters of Valor': 500000,
-  'Men Connect': 1000000,
-  'Great Woman': 1000000,
-  'Worship Team': 500000,
-  'Harpazol / Soul Winners': 500000
-  // "Others Who Are Interested to Sow" intentionally has no target.
-};
+// No per-category targets for today's event. Keep in sync with firebase-config.js.
+const CATEGORY_TARGETS = {};
 
 function groupOfItem_(item){
   const g = CATEGORY_GROUPS.find(g => g.items.indexOf(item) !== -1);
