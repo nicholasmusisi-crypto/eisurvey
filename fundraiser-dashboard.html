@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cheerful Giving — Live Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -159,25 +158,6 @@ h1{font-size:20px;font-weight:700}
   /* Too narrow for the 3:1 ratio to read well — stack everything full-width */
   .currencyChip,.givePanel{flex:1 1 100%}
 }
-.celebrateBanner{
-  position:fixed;top:24px;left:50%;z-index:100;
-  transform:translateX(-50%) translateY(-30px) scale(.9);
-  background:linear-gradient(135deg,#F0A030,#D95640 60%,#5E50C2);
-  color:#fff;padding:18px 32px;border-radius:999px;
-  font-size:clamp(18px,3vw,28px);font-weight:800;text-align:center;
-  box-shadow:0 12px 32px rgba(0,0,0,.28);opacity:0;pointer-events:none;
-  transition:opacity .4s ease,transform .4s ease;white-space:nowrap
-}
-.celebrateBanner.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
-.balloon{
-  position:fixed;bottom:-80px;font-size:42px;z-index:99;pointer-events:none;
-  animation:balloonRise linear forwards;filter:drop-shadow(0 4px 6px rgba(0,0,0,.2))
-}
-@keyframes balloonRise{
-  0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:1}
-  85%{opacity:1}
-  100%{transform:translateY(-110vh) translateX(var(--drift,20px)) rotate(var(--spin,8deg));opacity:0}
-}
 .launcher{
   position:fixed;inset:0;z-index:300;
   display:flex;align-items:center;justify-content:center;
@@ -209,7 +189,6 @@ h1{font-size:20px;font-weight:700}
     <div class="countdown" id="countdown" style="display:none"></div>
   </div>
 </div>
-<div class="celebrateBanner" id="celebrateBanner"></div>
 <div class="giftPing" id="giftPing"></div>
 <div class="wrap">
   <div class="top">
@@ -277,7 +256,7 @@ h1{font-size:20px;font-weight:700}
 </div>
 
 <script type="module">
-import { firebaseConfig, CURRENCY, ADMIN_PIN, MANAGE_PIN, CATEGORY_GROUPS, CATEGORY_TARGETS, PREVIOUS_YEAR_TOTAL } from './firebase-config.js?v=3';
+import { firebaseConfig, CURRENCY, ADMIN_PIN, MANAGE_PIN, CATEGORY_GROUPS, CATEGORY_TARGETS } from './firebase-config.js?v=3';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
@@ -476,9 +455,6 @@ if (sessionStorage.getItem('cg_launched') === '1') {
           document.body.classList.remove('revealPulse');
           document.body.classList.remove('launching');
         }, 300);
-        if (typeof confetti === 'function') {
-          confetti({ particleCount: 120, spread: 100, origin: { y: 0.5 } });
-        }
         return;
       }
       countdownEl.textContent = n;
@@ -492,7 +468,7 @@ if (sessionStorage.getItem('cg_launched') === '1') {
 onValue(goalRef, snap => {
   goal = Number(snap.val()) || 0;
   document.getElementById('goalLabel').textContent = goal ? `Goal: ${fmt(goal)}` : 'Goal: not set';
-  checkMilestones(renderTotals(lastData));
+  renderTotals(lastData);
 });
 
 // --- Admin / Manage unlock ---
@@ -560,7 +536,6 @@ onValue(donationsRef, snap => {
   renderExtraCurrencies(lastData);
   renderCategories(lastData);
   renderExtraCategoryPanels(lastData);
-  checkMilestones(total);
   if (!isFirstDonationsRender && allCount > lastPingCount) showGiftPing();
   lastPingCount = allCount;
   isFirstDonationsRender = false;
@@ -584,91 +559,7 @@ function renderTotals(data){
   return total;
 }
 
-// --- Celebrations ---
 let isFirstDonationsRender = true;
-let milestoneCelebrated = false;
-let celebratedGoalAmount = null;
-
-function checkMilestones(total){
-  if (isFirstDonationsRender) return;
-  if (!milestoneCelebrated && PREVIOUS_YEAR_TOTAL > 0 && total >= PREVIOUS_YEAR_TOTAL) {
-    milestoneCelebrated = true;
-    celebrate(`🎉 We've beaten last year's total of ${fmt(PREVIOUS_YEAR_TOTAL)}! 🎉`, 'milestone');
-  }
-  if (goal > 0 && total >= goal && celebratedGoalAmount !== goal) {
-    celebratedGoalAmount = goal;
-    celebrate('🎊 GOAL REACHED! 🎊', 'goal');
-  }
-}
-
-const CELEBRATION_DURATION_MS = 2 * 60 * 1000; // keep the vibe going for ~2 minutes
-const CELEBRATION_INTERVAL_MS = 20 * 1000;     // re-burst every 20s, cycling colors
-const COLOR_PALETTES = [
-  ['#F0A030', '#D95640', '#5E50C2'],
-  ['#1E7145', '#3E8FD6', '#F0A030'],
-  ['#D95640', '#5E50C2', '#1E3A5F'],
-  ['#3E8FD6', '#F0A030', '#1E7145'],
-  ['#5E50C2', '#D95640', '#3E8FD6'],
-];
-
-function showBanner(text, colors){
-  const el = document.getElementById('celebrateBanner');
-  el.textContent = text;
-  el.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]} 60%, ${colors[2]})`;
-  el.classList.add('show');
-  clearTimeout(showBanner._t);
-  showBanner._t = setTimeout(() => el.classList.remove('show'), 12000);
-}
-
-function floatBalloons(count){
-  const emojis = ['🎈', '🎈', '🎈', '🎉', '🎊'];
-  for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = 'balloon';
-      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      el.style.left = Math.random() * 100 + 'vw';
-      el.style.setProperty('--drift', (Math.random() * 120 - 60) + 'px');
-      el.style.setProperty('--spin', (Math.random() * 40 - 20) + 'deg');
-      el.style.animationDuration = (5 + Math.random() * 3) + 's';
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 9000);
-    }, i * 150);
-  }
-}
-
-function burstOnce(message, kind, colors){
-  showBanner(message, colors);
-  if (typeof confetti !== 'function') return;
-  if (kind === 'goal') {
-    floatBalloons(18);
-    const end = Date.now() + 4000;
-    (function frame(){
-      confetti({ particleCount: 4, angle: 60, spread: 60, origin: { x: 0 }, colors });
-      confetti({ particleCount: 4, angle: 120, spread: 60, origin: { x: 1 }, colors });
-      if (Date.now() < end) requestAnimationFrame(frame);
-    })();
-    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors });
-  } else {
-    floatBalloons(10);
-    confetti({ particleCount: 100, spread: 90, origin: { y: 0.6 }, colors });
-    setTimeout(() => confetti({ particleCount: 80, spread: 120, origin: { y: 0.5 }, colors }), 300);
-  }
-}
-
-function celebrate(message, kind){
-  const start = Date.now();
-  let paletteIndex = 0;
-  const fire = () => {
-    burstOnce(message, kind, COLOR_PALETTES[paletteIndex % COLOR_PALETTES.length]);
-    paletteIndex++;
-  };
-  fire();
-  const timer = setInterval(() => {
-    if (Date.now() - start >= CELEBRATION_DURATION_MS) { clearInterval(timer); return; }
-    fire();
-  }, CELEBRATION_INTERVAL_MS);
-}
 
 const miniHeroEls = new Map(); // currency -> element, reused across renders so animations/pulses work
 
